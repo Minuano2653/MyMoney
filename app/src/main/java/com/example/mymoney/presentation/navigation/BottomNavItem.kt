@@ -1,7 +1,6 @@
-package com.example.mymoney.presentation.screens
+package com.example.mymoney.presentation.navigation
 
 import com.example.mymoney.R
-import com.example.mymoney.presentation.navigation.Screen
 
 sealed class BottomNavItem(
     val screen: Screen,

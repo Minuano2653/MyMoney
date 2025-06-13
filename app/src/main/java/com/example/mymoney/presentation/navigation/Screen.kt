@@ -36,12 +36,11 @@ sealed class Screen(
     )
     object Settings: Screen(
         route = SETTINGS_ROUTE,
-        title = OPTIONS_TITLE,
+        title = SETTINGS_TITLE,
         hasFloatingActionButton = false
     )
 
     companion object {
-
         const val EXPENSES_ROUTE = "Expenses"
         const val INCOMES_ROUTE = "Incomes"
         const val ACCOUNT_ROUTE = "Account"
@@ -52,7 +51,6 @@ sealed class Screen(
         const val INCOMES_TITLE = "Доходы сегодня"
         const val ACCOUNT_TITLE = "Мой счет"
         const val CATEGORIES_TITLE = "Мои статьи"
-        const val OPTIONS_TITLE = "Настройки"
+        const val SETTINGS_TITLE = "Настройки"
     }
-
 }

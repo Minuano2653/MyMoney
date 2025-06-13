@@ -9,10 +9,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.mymoney.ListItemComponent
+import com.example.mymoney.presentation.screens.ListItemComponent
 import androidx.compose.ui.unit.dp
-import com.example.mymoney.EmojiIcon
-import com.example.mymoney.TrailingIcon
+import com.example.mymoney.presentation.screens.EmojiIcon
+import com.example.mymoney.presentation.screens.TrailingIcon
 import com.example.mymoney.domain.entity.Category
 import com.example.mymoney.domain.entity.Income
 import com.example.mymoney.ui.theme.MyMoneyTheme
@@ -35,7 +35,7 @@ fun IncomesScreen(modifier: Modifier = Modifier) {
             backgroundColor = MaterialTheme.colorScheme.secondary,
             itemHeight = 56.dp,
             title = "Всего",
-            trailText = uiState.total.toCurrency()
+            trailingText = uiState.total.toCurrency()
         )
         HorizontalDivider(
             thickness = 1.dp,
@@ -48,7 +48,7 @@ fun IncomesScreen(modifier: Modifier = Modifier) {
                 ListItemComponent(
                     title = incomes.category.name,
                     subtitle = incomes.comment,
-                    trailText = incomes.amount.toCurrency(),
+                    trailingText = incomes.amount.toCurrency(),
                     leadingIcon = {
                         EmojiIcon(emoji = incomes.category.emoji)
                     },

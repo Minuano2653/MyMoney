@@ -23,10 +23,10 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.mymoney.EmojiIcon
-import com.example.mymoney.ListItemComponent
+import com.example.mymoney.presentation.screens.EmojiIcon
+import com.example.mymoney.presentation.screens.ListItemComponent
 import com.example.mymoney.R
-import com.example.mymoney.TrailingIcon
+import com.example.mymoney.presentation.screens.TrailingIcon
 import com.example.mymoney.domain.entity.Category
 import com.example.mymoney.ui.theme.MyMoneyTheme
 
@@ -133,30 +133,24 @@ private fun getMockCategories(): CategoriesUiState = CategoriesUiState(
         ),
         Category(
             id = 4,
-            name = "На собачку",
-            isIncome = false,
-            emoji = "\uD83D\uDC36",
-        ),
-        Category(
-            id = 5,
             name = "Ремонт квартиры",
             isIncome = false,
             emoji = "РК",
         ),
         Category(
-            id = 6,
+            id = 5,
             name = "Продукты",
             isIncome = false,
             emoji = "\uD83C\uDF6D",
         ),
         Category(
-            id = 7,
+            id = 6,
             name = "Спортзал",
             isIncome = false,
             emoji = "\uD83C\uDFCB\uFE0F",
         ),
         Category(
-            id = 8,
+            id = 7,
             name = "Медицина",
             isIncome = false,
             emoji = "\uD83D\uDC8A",

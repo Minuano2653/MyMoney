@@ -7,10 +7,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.mymoney.EmojiIcon
+import com.example.mymoney.presentation.screens.EmojiIcon
 import androidx.compose.ui.unit.dp
-import com.example.mymoney.ListItemComponent
-import com.example.mymoney.TrailingIcon
+import com.example.mymoney.presentation.screens.ListItemComponent
+import com.example.mymoney.presentation.screens.TrailingIcon
 import com.example.mymoney.domain.entity.Account
 import com.example.mymoney.ui.theme.MyMoneyTheme
 import com.example.mymoney.utils.toCurrency
@@ -31,7 +31,7 @@ fun AccountScreen(modifier: Modifier = Modifier) {
     Column(modifier = modifier.fillMaxSize()) {
         ListItemComponent(
             title = uiState.account.name,
-            trailText = uiState.account.balance.toCurrency(),
+            trailingText = uiState.account.balance.toCurrency(),
             leadingIcon = {
                 EmojiIcon(
                     "\uD83D\uDCB0",
@@ -52,7 +52,7 @@ fun AccountScreen(modifier: Modifier = Modifier) {
 
         ListItemComponent(
             title = "Валюта",
-            trailText = uiState.account.currency.toSymbol(),
+            trailingText = uiState.account.currency.toSymbol(),
 
             trailingIcon = {
                 TrailingIcon()
