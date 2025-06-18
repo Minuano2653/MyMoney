@@ -7,14 +7,20 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.mymoney.presentation.screens.EmojiIcon
-import com.example.mymoney.presentation.screens.ListItemComponent
-import com.example.mymoney.presentation.screens.TrailingIcon
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.mymoney.R
+import com.example.mymoney.presentation.components.EmojiIcon
+import com.example.mymoney.presentation.components.ListItemComponent
+import com.example.mymoney.presentation.components.TrailingIcon
 import com.example.mymoney.domain.entity.Category
 import com.example.mymoney.domain.entity.Expense
+import com.example.mymoney.presentation.navigation.FabState
+import com.example.mymoney.presentation.navigation.TopAppBarState
 import com.example.mymoney.ui.theme.MyMoneyTheme
 import com.example.mymoney.utils.toCurrency
 
@@ -23,13 +29,37 @@ import com.example.mymoney.utils.toCurrency
 @Composable
 fun ExpensesScreenPreview() {
     MyMoneyTheme {
-        ExpensesScreen()
+        ExpensesScreen(
+            onUpdateTopAppBar = {},
+            onUpdateFabState = {}
+        )
     }
 }
 
 @Composable
-fun ExpensesScreen(modifier: Modifier = Modifier) {
+fun ExpensesScreen(
+    modifier: Modifier = Modifier,
+    onUpdateTopAppBar: (TopAppBarState) -> Unit,
+    onUpdateFabState: (FabState) -> Unit
+) {
+    LaunchedEffect(Unit) {
+        onUpdateTopAppBar(
+            TopAppBarState(
+                title = "Расходы сегодня",
+                trailingIconRes = R.drawable.ic_history,
+                onTrailingClick = {  }
+            )
+        )
+        onUpdateFabState(
+            FabState(
+                isVisible = true,
+                onClick = {}
+            )
+        )
+    }
+
     val uiState = getMockExpensesUiState()
+
     Column(modifier = Modifier.fillMaxSize()) {
         ListItemComponent(
             title = "Всего",

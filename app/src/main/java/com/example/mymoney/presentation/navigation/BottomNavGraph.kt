@@ -14,7 +14,12 @@ import com.example.mymoney.presentation.screens.settings.SettingsScreen
 @Composable
 fun BottomNavGraph(
     navHostController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    expensesScreenContent: @Composable () -> Unit,
+    incomesScreenContent: @Composable () -> Unit,
+    accountScreenContent: @Composable () -> Unit,
+    categoriesScreenContent: @Composable () -> Unit,
+    settingsScreenContent: @Composable () -> Unit,
 ) {
     NavHost(
         navController = navHostController,
@@ -22,19 +27,19 @@ fun BottomNavGraph(
         modifier = modifier
     ) {
         composable(Screen.Expenses.route) {
-            ExpensesScreen()
+            expensesScreenContent()
         }
         composable(Screen.Incomes.route) {
-            IncomesScreen()
+            incomesScreenContent()
         }
         composable(Screen.Account.route) {
-            AccountScreen()
+            accountScreenContent()
         }
         composable(Screen.Categories.route) {
-            CategoriesScreen()
+            categoriesScreenContent()
         }
         composable(Screen.Settings.route) {
-            SettingsScreen()
+            settingsScreenContent()
         }
     }
 }
