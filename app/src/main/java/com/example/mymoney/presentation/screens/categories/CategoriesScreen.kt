@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,23 +24,46 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.mymoney.presentation.screens.EmojiIcon
-import com.example.mymoney.presentation.screens.ListItemComponent
+import com.example.mymoney.presentation.components.EmojiIcon
+import com.example.mymoney.presentation.components.ListItemComponent
 import com.example.mymoney.R
-import com.example.mymoney.presentation.screens.TrailingIcon
+import com.example.mymoney.presentation.components.TrailingIcon
 import com.example.mymoney.domain.entity.Category
+import com.example.mymoney.presentation.navigation.FabState
+import com.example.mymoney.presentation.navigation.TopAppBarState
 import com.example.mymoney.ui.theme.MyMoneyTheme
 
 @Preview
 @Composable
 fun CategoriesScreenPreview() {
     MyMoneyTheme {
-        CategoriesScreen()
+        CategoriesScreen(
+            onUpdateTopAppBar = {},
+            onUpdateFabState = {}
+        )
     }
 }
 
 @Composable
-fun CategoriesScreen(modifier: Modifier = Modifier) {
+fun CategoriesScreen(
+    modifier: Modifier = Modifier,
+    onUpdateTopAppBar: (TopAppBarState) -> Unit,
+    onUpdateFabState: (FabState) -> Unit
+
+) {
+    LaunchedEffect(Unit) {
+        onUpdateTopAppBar(
+            TopAppBarState(
+                title = "Статьи",
+            )
+        )
+        onUpdateFabState(
+            FabState(
+                isVisible = false,
+                onClick = null
+            )
+        )
+    }
     var searchQuery by remember { mutableStateOf("") }
     val uiState = getMockCategories()
 
@@ -62,9 +86,6 @@ fun CategoriesScreen(modifier: Modifier = Modifier) {
                     title = category.name,
                     leadingIcon = {
                         EmojiIcon(emoji = category.emoji)
-                    },
-                    trailingIcon = {
-                        TrailingIcon()
                     }
                 )
                 HorizontalDivider(

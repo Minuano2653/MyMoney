@@ -5,13 +5,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.mymoney.presentation.screens.EmojiIcon
 import androidx.compose.ui.unit.dp
-import com.example.mymoney.presentation.screens.ListItemComponent
-import com.example.mymoney.presentation.screens.TrailingIcon
+import com.example.mymoney.R
 import com.example.mymoney.domain.entity.Account
+import com.example.mymoney.presentation.components.EmojiIcon
+import com.example.mymoney.presentation.components.ListItemComponent
+import com.example.mymoney.presentation.components.TrailingIcon
+import com.example.mymoney.presentation.navigation.FabState
+import com.example.mymoney.presentation.navigation.TopAppBarState
 import com.example.mymoney.ui.theme.MyMoneyTheme
 import com.example.mymoney.utils.toCurrency
 import com.example.mymoney.utils.toSymbol
@@ -20,12 +24,34 @@ import com.example.mymoney.utils.toSymbol
 @Composable
 fun AccountScreenPreview() {
     MyMoneyTheme {
-        AccountScreen()
+        AccountScreen(
+            onUpdateTopAppBar = {},
+            onUpdateFabState = {}
+        )
     }
 }
 
 @Composable
-fun AccountScreen(modifier: Modifier = Modifier) {
+fun AccountScreen(
+    modifier: Modifier = Modifier,
+    onUpdateTopAppBar: (TopAppBarState) -> Unit,
+    onUpdateFabState: (FabState) -> Unit
+) {
+    LaunchedEffect(Unit) {
+        onUpdateTopAppBar(
+            TopAppBarState(
+                title = "Мой счет",
+                trailingIconRes = R.drawable.ic_edit,
+                onTrailingClick = {  }
+            )
+        )
+        onUpdateFabState(
+            FabState(
+                isVisible = true,
+                onClick = {}
+            )
+        )
+    }
     val uiState = getMockAccount()
 
     Column(modifier = modifier.fillMaxSize()) {
