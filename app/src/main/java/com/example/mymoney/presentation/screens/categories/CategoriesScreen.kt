@@ -1,14 +1,17 @@
 package com.example.mymoney.presentation.screens.categories
 
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -18,12 +21,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.mymoney.presentation.components.EmojiIcon
 import com.example.mymoney.presentation.components.ListItemComponent
 import com.example.mymoney.R
@@ -32,6 +41,7 @@ import com.example.mymoney.domain.entity.Category
 import com.example.mymoney.presentation.navigation.FabState
 import com.example.mymoney.presentation.navigation.TopAppBarState
 import com.example.mymoney.ui.theme.MyMoneyTheme
+import kotlinx.coroutines.flow.collectLatest
 
 @Preview
 @Composable
@@ -39,59 +49,95 @@ fun CategoriesScreenPreview() {
     MyMoneyTheme {
         CategoriesScreen(
             onUpdateTopAppBar = {},
-            onUpdateFabState = {}
+            onUpdateFabState = {},
+            navHostController = rememberNavController(),
+            snackbarHostState = SnackbarHostState()
         )
     }
 }
 
 @Composable
 fun CategoriesScreen(
-    modifier: Modifier = Modifier,
     onUpdateTopAppBar: (TopAppBarState) -> Unit,
-    onUpdateFabState: (FabState) -> Unit
-
+    onUpdateFabState: (FabState) -> Unit,
+    snackbarHostState: SnackbarHostState,
+    navHostController: NavHostController,
+    viewModel: CategoriesViewModel = hiltViewModel()
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     LaunchedEffect(Unit) {
         onUpdateTopAppBar(
             TopAppBarState(
-                title = "Статьи",
+                title = "Мои статьи"
             )
         )
         onUpdateFabState(
             FabState(
-                isVisible = false,
-                onClick = null
+                isVisible = false
             )
         )
     }
+
+    LaunchedEffect(Unit) {
+        viewModel.sideEffect.collectLatest { effect ->
+            when (effect) {
+                is CategoriesSideEffect.ShowError -> {
+                    snackbarHostState.showSnackbar(effect.message)
+                }
+                is CategoriesSideEffect.NavigateToCategoryDetails -> {
+                    //TODO: пока не понятно куда навигация :)
+                }
+            }
+        }
+    }
+
+    CategoriesScreenContent(
+        uiState = uiState,
+        onEvent = viewModel::handleEvent
+    )
+}
+
+@Composable
+fun CategoriesScreenContent(
+    modifier: Modifier = Modifier,
+    uiState: CategoriesUiState,
+    onEvent: (CategoriesEvent) -> Unit,
+) {
     var searchQuery by remember { mutableStateOf("") }
-    val uiState = getMockCategories()
 
-    Column(modifier = modifier.fillMaxSize()) {
-        SearchField(
-            query = searchQuery,
-            onQueryChange = { searchQuery = it }
-        )
+    if (uiState.isLoading) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+    } else {
+        Column(modifier = modifier.fillMaxSize()) {
+            SearchField(
+                query = searchQuery,
+                onQueryChange = { searchQuery = it }
+            )
 
-        HorizontalDivider(
-            thickness = 1.dp,
-            color = MaterialTheme.colorScheme.outlineVariant
-        )
+            HorizontalDivider(
+                thickness = 1.dp,
+                color = MaterialTheme.colorScheme.outlineVariant
+            )
 
-        LazyColumn(
-            modifier = modifier.fillMaxSize()
-        ) {
-            itemsIndexed(uiState.categories) { _, category ->
-                ListItemComponent(
-                    title = category.name,
-                    leadingIcon = {
-                        EmojiIcon(emoji = category.emoji)
-                    }
-                )
-                HorizontalDivider(
-                    thickness = 1.dp,
-                    color = MaterialTheme.colorScheme.outlineVariant
-                )
+            LazyColumn(
+                modifier = modifier.fillMaxSize()
+            ) {
+                itemsIndexed(uiState.categories) { _, category ->
+                    ListItemComponent(
+                        title = category.name,
+                        leadingIcon = {
+                            EmojiIcon(emoji = category.emoji)
+                        },
+                        onClick = {onEvent(CategoriesEvent.OnCategoryClicked)}
+                    )
+                    HorizontalDivider(
+                        thickness = 1.dp,
+                        color = MaterialTheme.colorScheme.outlineVariant
+                    )
+                }
             }
         }
     }
@@ -132,7 +178,7 @@ fun SearchField(
     )
 }
 
-private fun getMockCategories(): CategoriesUiState = CategoriesUiState(
+/*private fun getMockCategories(): CategoriesUiState = CategoriesUiState(
     listOf (
         Category(
             id = 1,
@@ -178,6 +224,6 @@ private fun getMockCategories(): CategoriesUiState = CategoriesUiState(
         )
 
     )
-)
+)*/
 
 

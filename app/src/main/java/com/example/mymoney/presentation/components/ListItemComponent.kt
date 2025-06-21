@@ -26,6 +26,7 @@ fun ListItemComponent(
     modifier: Modifier = Modifier,
     subtitle: String? = null,
     trailingText: String? = null,
+    trailingSubText: String? = null,
     leadingIcon: (@Composable () -> Unit)? = null,
     trailingIcon: (@Composable () -> Unit)? = null,
     itemHeight: Dp = 68.dp,
@@ -82,13 +83,23 @@ fun ListItemComponent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            trailingText?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = contentColor
-                )
+            Column(horizontalAlignment = Alignment.End) {
+                trailingText?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = contentColor
+                    )
+                }
+                trailingSubText?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = contentColor
+                    )
+                }
             }
+
             trailingIcon?.invoke()
         }
     }
@@ -107,6 +118,7 @@ fun ListItemExamples() {
                 title = "На собачку",
                 subtitle = "Джек",
                 trailingText = "1500₽",
+                trailingSubText = "25 февраля",
                 leadingIcon = { EmojiIcon("\uD83D\uDC36") },
                 trailingIcon = { TrailingIcon() }
             )

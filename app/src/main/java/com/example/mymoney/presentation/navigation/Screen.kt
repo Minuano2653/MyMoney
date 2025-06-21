@@ -5,26 +5,43 @@ sealed class Screen(
     val route: String,
 ) {
     object Expenses: Screen(
-        route = EXPENSES_ROUTE,
+        route = ROUTE_EXPENSES,
+    )
+    object ExpensesHistory: Screen(
+        route = ROUTE_EXPENSES_HISTORY
+    )
+    object ExpensesToday: Screen(
+        route = ROUTE_EXPENSES_TODAY
     )
     object Incomes: Screen(
-        route = INCOMES_ROUTE,
+        route = ROUTE_INCOMES,
+    )
+    object IncomesHistory: Screen(
+        route = ROUTE_INCOMES_HISTORY
+    )
+    object IncomesToday: Screen(
+        route = ROUTE_INCOMES_TODAY
     )
     object Account: Screen(
-        route = ACCOUNT_ROUTE,
+        route = ROUTE_ACCOUNT,
     )
     object Categories: Screen(
-        route = CATEGORIES_ROUTE,
+        route = ROUTE_CATEGORIES,
     )
     object Settings: Screen(
-        route = SETTINGS_ROUTE,
+        route = ROUTE_SETTINGS,
     )
 
+
     companion object {
-        const val EXPENSES_ROUTE = "Expenses"
-        const val INCOMES_ROUTE = "Incomes"
-        const val ACCOUNT_ROUTE = "Account"
-        const val CATEGORIES_ROUTE = "Categories"
-        const val SETTINGS_ROUTE = "Settings"
+        const val ROUTE_EXPENSES = "Expenses"
+        const val ROUTE_INCOMES = "Incomes"
+        const val ROUTE_ACCOUNT = "Account"
+        const val ROUTE_CATEGORIES = "Categories"
+        const val ROUTE_SETTINGS = "Settings"
+        const val ROUTE_EXPENSES_HISTORY = "ExpensesHistory"
+        const val ROUTE_EXPENSES_TODAY = "ExpensesToday"
+        const val ROUTE_INCOMES_HISTORY = "IncomesHistory"
+        const val ROUTE_INCOMES_TODAY = "IncomesToday"
     }
 }
