@@ -29,6 +29,7 @@ fun CustomTopAppBar(state: TopAppBarState) {
                 IconButton(onClick = state.onLeadingClick) {
                     Icon(
                         painter = painterResource(state.leadingIconRes),
+                        tint = MaterialTheme.colorScheme.onSurface,
                         contentDescription = null
                     )
                 }
@@ -39,7 +40,8 @@ fun CustomTopAppBar(state: TopAppBarState) {
                 IconButton(onClick = state.onTrailingClick) {
                     Icon(
                         painter = painterResource(state.trailingIconRes),
-                        contentDescription = null
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }

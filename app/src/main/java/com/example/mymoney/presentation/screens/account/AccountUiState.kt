@@ -1,7 +1,13 @@
 package com.example.mymoney.presentation.screens.account
 
-import com.example.mymoney.domain.entity.Account
+import java.math.BigDecimal
+
 
 data class AccountUiState(
-    val account: Account
+    val isLoading: Boolean = false,
+    val name: String = "",
+    val balance: BigDecimal = BigDecimal(0),
+    val currency: String = "",
+    val isNetworkAvailable: Boolean = true,
+    val error: String? = null
 )

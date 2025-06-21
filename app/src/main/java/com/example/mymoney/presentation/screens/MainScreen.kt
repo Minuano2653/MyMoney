@@ -9,6 +9,8 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -19,9 +21,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.mymoney.presentation.components.CustomTopAppBar
-import com.example.mymoney.presentation.navigation.BottomNavGraph
+import com.example.mymoney.presentation.navigation.AppNavGraph
 import com.example.mymoney.presentation.navigation.BottomNavItem
 import com.example.mymoney.presentation.navigation.FabState
 import com.example.mymoney.presentation.navigation.TopAppBarState
@@ -29,8 +32,10 @@ import com.example.mymoney.presentation.navigation.rememberNavigationState
 import com.example.mymoney.presentation.screens.account.AccountScreen
 import com.example.mymoney.presentation.screens.categories.CategoriesScreen
 import com.example.mymoney.presentation.screens.expenses.ExpensesScreen
+import com.example.mymoney.presentation.screens.transactions_history.ExpensesHistoryScreen
 import com.example.mymoney.presentation.screens.incomes.IncomesScreen
 import com.example.mymoney.presentation.screens.settings.SettingsScreen
+import com.example.mymoney.presentation.screens.transactions_history.IncomesHistoryScreen
 import com.example.mymoney.ui.theme.MyMoneyTheme
 
 @Preview
@@ -51,6 +56,7 @@ fun MainScreen() {
     var fabState by remember {
         mutableStateOf(FabState())
     }
+    val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -60,7 +66,6 @@ fun MainScreen() {
 
         bottomBar = {
             val navBackStackEntry by navigationState.navHostController.currentBackStackEntryAsState()
-            val currentRoute = navBackStackEntry?.destination?.route
 
             val navigationList = listOf(
                 BottomNavItem.Expenses,
@@ -72,8 +77,11 @@ fun MainScreen() {
 
             NavigationBar(containerColor = MaterialTheme.colorScheme.surfaceContainer) {
                 navigationList.forEach { item ->
+                    val selected = navBackStackEntry?.destination?.hierarchy?.any {
+                        it.route == item.screen.route
+                    } == true
                     NavigationBarItem(
-                        selected = currentRoute == item.screen.route,
+                        selected = selected,
                         onClick = {
                             navigationState.navigateTo(item.screen.route)
                         },
@@ -87,7 +95,7 @@ fun MainScreen() {
                             Text(
                                 text = item.label,
                                 style = MaterialTheme.typography.labelMedium.copy(
-                                    fontWeight = if (currentRoute == item.screen.route) FontWeight.W600 else FontWeight.Medium
+                                    fontWeight = if (selected) FontWeight.W600 else FontWeight.Medium
                                 )
                             )
                         },
@@ -117,39 +125,65 @@ fun MainScreen() {
                     )
                 }
             }
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
-        BottomNavGraph(
+        AppNavGraph(
             navHostController = navigationState.navHostController,
             modifier = Modifier.padding(paddingValues),
-            expensesScreenContent = {
+            expensesTodayScreenContent = {
                 ExpensesScreen(
                     onUpdateTopAppBar = { newState -> topAppBarState = newState },
-                    onUpdateFabState = {newState -> fabState = newState}
+                    onUpdateFabState = { newState -> fabState = newState },
+                    navHostController = navigationState.navHostController,
+                    snackbarHostState = snackbarHostState
                 )
             },
-            incomesScreenContent = {
+            incomesTodayScreenContent = {
                 IncomesScreen(
                     onUpdateTopAppBar = { newState -> topAppBarState = newState },
-                    onUpdateFabState = {newState -> fabState = newState}
+                    onUpdateFabState = { newState -> fabState = newState },
+                    navHostController = navigationState.navHostController,
+                    snackbarHostState = snackbarHostState
                 )
             },
             accountScreenContent = {
                 AccountScreen(
                     onUpdateTopAppBar = { newState -> topAppBarState = newState },
-                    onUpdateFabState = {newState -> fabState = newState}
+                    onUpdateFabState = { newState -> fabState = newState },
+                    navHostController = navigationState.navHostController,
+                    snackbarHostState = snackbarHostState
                 )
             },
             categoriesScreenContent = {
                 CategoriesScreen(
                     onUpdateTopAppBar = { newState -> topAppBarState = newState },
-                    onUpdateFabState = {newState -> fabState = newState}
+                    onUpdateFabState = { newState -> fabState = newState },
+                    navHostController = navigationState.navHostController,
+                    snackbarHostState = snackbarHostState
                 )
             },
             settingsScreenContent = {
                 SettingsScreen(
                     onUpdateTopAppBar = { newState -> topAppBarState = newState },
-                    onUpdateFabState = {newState -> fabState = newState}
+                    onUpdateFabState = { newState -> fabState = newState }
+                )
+            },
+            expensesHistoryScreenContent = {
+                ExpensesHistoryScreen(
+                    onUpdateTopAppBar = { newState -> topAppBarState = newState },
+                    onUpdateFabState = { newState -> fabState = newState },
+                    navHostController = navigationState.navHostController,
+                    snackbarHostState = snackbarHostState
+
+                )
+            },
+            incomesHistoryScreenContent = {
+                IncomesHistoryScreen(
+                    onUpdateTopAppBar = { newState -> topAppBarState = newState },
+                    onUpdateFabState = { newState -> fabState = newState },
+                    navHostController = navigationState.navHostController,
+                    snackbarHostState = snackbarHostState
                 )
             }
         )
