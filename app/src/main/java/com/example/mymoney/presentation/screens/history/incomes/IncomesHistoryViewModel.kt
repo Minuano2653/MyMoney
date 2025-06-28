@@ -1,40 +1,48 @@
-package com.example.mymoney.presentation.screens.transactions_history
+package com.example.mymoney.presentation.screens.history.incomes
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mymoney.domain.usecase.GetIncomesUseCase
+import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
+import com.example.mymoney.presentation.screens.history.HistoryEvent
+import com.example.mymoney.presentation.screens.history.HistorySideEffect
+import com.example.mymoney.presentation.screens.history.HistoryUiState
 import com.example.mymoney.utils.DateUtils
 import com.example.mymoney.utils.NetworkMonitor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel для экрана истории доходов.
+ *
+ * Загружает список доходов за выбранный период, управляет состоянием UI,
+ * обрабатывает события пользователя и реагирует на изменения подключения к сети.
+ * Использует [GetIncomesUseCase] для получения данных и [NetworkMonitor] для отслеживания сети.
+ *
+ * Основные функции:
+ * - Загрузка транзакций за выбранный период.
+ * - Отображение и обработка выбора дат начала и конца периода.
+ * - Обработка навигации и ошибок.
+ * - Повторная загрузка данных при восстановлении сети.
+ *
+ * Наследуется от [BaseViewModel] с типами состояния UI, событий и побочных эффектов.
+ */
 @HiltViewModel
 class IncomesHistoryViewModel @Inject constructor(
     private val getIncomesUseCase: GetIncomesUseCase,
-    private val networkMonitor: NetworkMonitor
-) : ViewModel() {
-
-    private val _uiState = MutableStateFlow(HistoryUiState())
-    val uiState: StateFlow<HistoryUiState> = _uiState.asStateFlow()
-
-    private val _sideEffect = MutableSharedFlow<HistorySideEffect>()
-    val sideEffect = _sideEffect.asSharedFlow()
-
+    networkMonitor: NetworkMonitor
+): BaseViewModel<HistoryUiState, HistoryEvent, HistorySideEffect>(
+    networkMonitor,
+    HistoryUiState()
+) {
     private var loadTransactionsJob: Job? = null
 
     init {
-        observeNetworkConnectivity()
         handleEvent(HistoryEvent.LoadTransactions)
     }
 
@@ -43,7 +51,7 @@ class IncomesHistoryViewModel @Inject constructor(
         loadTransactionsJob?.cancel()
     }
 
-    fun handleEvent(event: HistoryEvent) {
+    override fun handleEvent(event: HistoryEvent) {
         when (event) {
             is HistoryEvent.LoadTransactions -> {
                 loadTransactions()
@@ -68,7 +76,6 @@ class IncomesHistoryViewModel @Inject constructor(
             is HistoryEvent.OnAnalysisClicked -> {
                 emitEffect(HistorySideEffect.NavigateToAnalysis)
             }
-
         }
     }
 
@@ -92,6 +99,7 @@ class IncomesHistoryViewModel @Inject constructor(
                         _uiState.update {
                             it.copy(
                                 transactions = sortedTransactions,
+                                total = sortedTransactions.sumOf {trs -> trs.amount},
                                 isLoading = false,
                                 error = null
                             )
@@ -107,25 +115,19 @@ class IncomesHistoryViewModel @Inject constructor(
         }
     }
 
-    private fun observeNetworkConnectivity() {
-        viewModelScope.launch {
-            networkMonitor.isConnected.collect { isConnected ->
-                _uiState.update { it.copy(isNetworkAvailable = isConnected) }
-                if (!isConnected) {
-                    emitEffect(HistorySideEffect.ShowError("Нет подключения к интернету"))
-                }
-            }
+    override fun onNetworkStateChanged(isConnected: Boolean) {
+        val wasDisconnected = !_uiState.value.isNetworkAvailable
+        _uiState.update { it.copy(isNetworkAvailable = isConnected) }
+
+        if (!isConnected) {
+            emitEffect(HistorySideEffect.ShowError("Нет подключения к интернету"))
+        } else if (wasDisconnected && (_uiState.value.transactions.isEmpty() || _uiState.value.error != null)) {
+            handleEvent(HistoryEvent.LoadTransactions)
         }
     }
 
     private fun cancelLoadingAndNavigateBack() {
         loadTransactionsJob?.cancel()
         emitEffect(HistorySideEffect.NavigateBack)
-    }
-
-    private fun emitEffect(effect: HistorySideEffect) {
-        viewModelScope.launch {
-            _sideEffect.emit(effect)
-        }
     }
 }

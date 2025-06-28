@@ -1,4 +1,5 @@
 import org.gradle.api.JavaVersion.VERSION_11
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -6,6 +7,12 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.dagger.hilt)
     kotlin("kapt")
+}
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
 }
 
 android {
@@ -23,6 +30,9 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        val authToken = localProperties.getProperty("auth.token") ?: ""
+        buildConfigField("String", "AUTH_TOKEN", "\"$authToken\"")
     }
 
     buildTypes {
@@ -43,6 +53,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"

@@ -13,6 +13,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
+/**
+ * Компонент отображения эмодзи с круглым фоном и заданным размером.
+ *
+ * @param emoji Строка с эмодзи для отображения.
+ * @param backgroundColor Цвет фона (по умолчанию [MaterialTheme.colorScheme.secondary]).
+ * @param size Размер компонента (ширина и высота) (по умолчанию 24.dp).
+ */
 @Composable
 fun EmojiIcon(
     emoji: String,

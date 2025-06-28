@@ -2,27 +2,25 @@ package com.example.mymoney.presentation.screens.account
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.mymoney.R
+import com.example.mymoney.presentation.components.Divider
 import com.example.mymoney.presentation.components.EmojiIcon
 import com.example.mymoney.presentation.components.ListItemComponent
 import com.example.mymoney.presentation.components.TrailingIcon
-import com.example.mymoney.presentation.navigation.FabState
-import com.example.mymoney.presentation.navigation.TopAppBarState
-import com.example.mymoney.ui.theme.MyMoneyTheme
-import com.example.mymoney.utils.toCurrency
+import com.example.mymoney.presentation.components.model.FabState
+import com.example.mymoney.presentation.components.model.TopAppBarState
+import com.example.mymoney.presentation.theme.MyMoneyTheme
+import com.example.mymoney.utils.formatAmount
 import com.example.mymoney.utils.toSymbol
 import kotlinx.coroutines.flow.collectLatest
 
@@ -33,18 +31,24 @@ fun AccountScreenPreview() {
         AccountScreen(
             onUpdateTopAppBar = {},
             onUpdateFabState = {},
-            navHostController = rememberNavController(),
-            snackbarHostState = SnackbarHostState()
+            onShowSnackbar = {}
         )
     }
 }
 
+/**
+ * Контейнер для экрана аккаунта, обрабатывающий состояние, события и сайд-эффекты.
+ *
+ * @param onUpdateTopAppBar Функция для обновления состояния верхней панели.
+ * @param onUpdateFabState Функция для обновления состояния FAB.
+ * @param onShowSnackbar Функция отображения Snackbar с сообщением.
+ * @param viewModel ViewModel экрана аккаунта (по умолчанию внедряется через Hilt).
+ */
 @Composable
 fun AccountScreen(
     onUpdateTopAppBar: (TopAppBarState) -> Unit,
     onUpdateFabState: (FabState) -> Unit,
-    snackbarHostState: SnackbarHostState,
-    navHostController: NavHostController,
+    onShowSnackbar: suspend (String) -> Unit,
     viewModel: AccountViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -52,7 +56,7 @@ fun AccountScreen(
     LaunchedEffect(Unit) {
         onUpdateTopAppBar(
             TopAppBarState(
-                title = "Мой счет",
+                titleRes = R.string.top_bar_title_account,
                 trailingIconRes = R.drawable.ic_edit,
                 onTrailingClick = {
                     viewModel.handleEvent(AccountEvent.OnEditClicked)
@@ -66,7 +70,7 @@ fun AccountScreen(
         viewModel.sideEffect.collectLatest { effect ->
             when (effect) {
                 is AccountSideEffect.ShowError -> {
-                    snackbarHostState.showSnackbar(effect.message)
+                    onShowSnackbar(effect.message)
                 }
                 is AccountSideEffect.NavigateToEdit -> {
                     //TODO: навигация на редактирование счёта
@@ -84,6 +88,13 @@ fun AccountScreen(
     )
 }
 
+/**
+ * UI-содержимое экрана аккаунта, отображающее имя пользователя, баланс и валюту.
+ *
+ * @param modifier Модификатор для настройки внешнего вида.
+ * @param uiState Текущее состояние UI, предоставляемое ViewModel.
+ * @param onEvent Обработчик пользовательских событий.
+ */
 @Composable
 fun AccountScreenContent(
     modifier: Modifier = Modifier,
@@ -93,7 +104,7 @@ fun AccountScreenContent(
     Column(modifier = modifier.fillMaxSize()) {
         ListItemComponent(
             title = uiState.name,
-            trailingText = uiState.balance.toCurrency(),
+            trailingText = uiState.balance.formatAmount(),
             leadingIcon = {
                 EmojiIcon(
                     "\uD83D\uDCB0",
@@ -106,14 +117,9 @@ fun AccountScreenContent(
             itemHeight = 56.dp,
             backgroundColor = MaterialTheme.colorScheme.secondary,
         )
-
-        HorizontalDivider(
-            thickness = 1.dp,
-            color = MaterialTheme.colorScheme.outlineVariant
-        )
-
+        Divider()
         ListItemComponent(
-            title = "Валюта",
+            title = stringResource(R.string.list_item_text_currency),
             trailingText = uiState.currency.toSymbol(),
             trailingIcon = {
                 TrailingIcon()
@@ -124,8 +130,3 @@ fun AccountScreenContent(
         )
     }
 }
-
-/*
-private fun getMockAccount(): AccountUiState = AccountUiState(
-    Account(1, "Баланс", (-670000.00).toBigDecimal(), "RUB")
-)*/

@@ -1,38 +1,37 @@
 package com.example.mymoney.presentation.screens.categories
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mymoney.domain.usecase.GetCategoriesUseCase
+import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
 import com.example.mymoney.utils.NetworkMonitor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel для экрана статей.
+ *
+ * Загружает список статей, обрабатывает события UI и управляет сайд-эффектами.
+ *
+ * @property getCategoriesUseCase UseCase для получения списка категорий.
+ * @property networkMonitor Мониторинг состояния сети.
+ */
 @HiltViewModel
 class CategoriesViewModel @Inject constructor(
     private val getCategoriesUseCase: GetCategoriesUseCase,
-    private val networkMonitor: NetworkMonitor
-) : ViewModel() {
-
-    private val _uiState = MutableStateFlow(CategoriesUiState())
-    val uiState: StateFlow<CategoriesUiState> = _uiState.asStateFlow()
-
-    private val _sideEffect = MutableSharedFlow<CategoriesSideEffect>()
-    val sideEffect = _sideEffect.asSharedFlow()
+    networkMonitor: NetworkMonitor
+): BaseViewModel<CategoriesUiState, CategoriesEvent, CategoriesSideEffect>(
+    networkMonitor,
+    CategoriesUiState()
+) {
 
     init {
-        observeNetworkConnectivity()
         handleEvent(CategoriesEvent.LoadCategories)
     }
 
-    fun handleEvent(event: CategoriesEvent) {
+    override fun handleEvent(event: CategoriesEvent) {
         when (event) {
             is CategoriesEvent.LoadCategories -> {
                 loadCategories()
@@ -69,16 +68,14 @@ class CategoriesViewModel @Inject constructor(
         }
     }
 
-    private fun observeNetworkConnectivity() {
-        viewModelScope.launch {
-            networkMonitor.isConnected.collect { isConnected ->
-                _uiState.update { it.copy(isNetworkAvailable = isConnected) }
-                if (!isConnected) {
-                    _sideEffect.emit(
-                        CategoriesSideEffect.ShowError("Нет подключения к интернету")
-                    )
-                }
-            }
+    override fun onNetworkStateChanged(isConnected: Boolean) {
+        val wasDisconnected = !_uiState.value.isNetworkAvailable
+        _uiState.update { it.copy(isNetworkAvailable = isConnected) }
+
+        if (!isConnected) {
+            emitEffect(CategoriesSideEffect.ShowError("Нет подключения к интернету"))
+        } else if (wasDisconnected && (_uiState.value.categories.isEmpty() || _uiState.value.error != null)) {
+            handleEvent(CategoriesEvent.LoadCategories)
         }
     }
 }

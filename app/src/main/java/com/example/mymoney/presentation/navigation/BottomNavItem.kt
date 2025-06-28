@@ -2,6 +2,13 @@ package com.example.mymoney.presentation.navigation
 
 import com.example.mymoney.R
 
+/**
+ * Элементы нижней навигационной панели.
+ *
+ * @property screen Связанный экран [Screen], на который осуществляется переход.
+ * @property label Отображаемое название вкладки.
+ * @property iconRes Ресурс иконки для вкладки.
+ */
 sealed class BottomNavItem(
     val screen: Screen,
     val label: String,

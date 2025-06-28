@@ -1,4 +1,4 @@
-package com.example.mymoney.presentation.screens
+package com.example.mymoney.presentation.screens.splash
 
 import com.example.mymoney.R
 import androidx.compose.foundation.background

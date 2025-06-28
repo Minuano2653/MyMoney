@@ -6,9 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -18,19 +16,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.mymoney.R
 import com.example.mymoney.presentation.components.EmojiIcon
 import com.example.mymoney.presentation.components.TrailingIcon
-import com.example.mymoney.domain.entity.Category
-import com.example.mymoney.domain.entity.Transaction
+import com.example.mymoney.presentation.components.Divider
 import com.example.mymoney.presentation.components.ListItemComponent
-import com.example.mymoney.presentation.navigation.FabState
+import com.example.mymoney.presentation.components.model.FabState
 import com.example.mymoney.presentation.navigation.Screen
-import com.example.mymoney.presentation.navigation.TopAppBarState
-import com.example.mymoney.ui.theme.MyMoneyTheme
-import com.example.mymoney.utils.toCurrency
+import com.example.mymoney.presentation.components.model.TopAppBarState
+import com.example.mymoney.presentation.theme.MyMoneyTheme
+import com.example.mymoney.utils.formatAmount
 import kotlinx.coroutines.flow.collectLatest
 
 @Preview
@@ -40,18 +35,27 @@ fun IncomesScreenPreview() {
         IncomesScreen(
             onUpdateTopAppBar = {},
             onUpdateFabState = {},
-            navHostController = rememberNavController(),
-            snackbarHostState = SnackbarHostState()
+            onNavigateToHistory = {},
+            onShowSnackbar = {}
         )
     }
 }
 
+/**
+ * Экран отображения доходов.
+ *
+ * @param onUpdateTopAppBar функция для обновления состояния верхней панели приложения (TopAppBar).
+ * @param onUpdateFabState функция для обновления состояния плавающей кнопки действия (FAB).
+ * @param onNavigateToHistory функция для навигации на экран истории доходов.
+ * @param onShowSnackbar suspend функция для отображения сообщений (snackbar).
+ * @param viewModel ViewModel для управления состоянием экрана, предоставляемый Hilt.
+ */
 @Composable
 fun IncomesScreen(
     onUpdateTopAppBar: (TopAppBarState) -> Unit,
     onUpdateFabState: (FabState) -> Unit,
-    snackbarHostState: SnackbarHostState,
-    navHostController: NavHostController,
+    onNavigateToHistory: (String) -> Unit,
+    onShowSnackbar: suspend (String) -> Unit,
     viewModel: IncomesViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -59,7 +63,7 @@ fun IncomesScreen(
     LaunchedEffect(Unit) {
         onUpdateTopAppBar(
             TopAppBarState(
-                title = "Доходы сегодня",
+                titleRes = R.string.top_bar_title_incomes,
                 trailingIconRes = R.drawable.ic_history,
                 onTrailingClick = {
                     viewModel.handleEvent(IncomesEvent.OnHistoryClicked)
@@ -78,10 +82,10 @@ fun IncomesScreen(
         viewModel.sideEffect.collectLatest { effect ->
             when (effect) {
                 is IncomesSideEffect.ShowError -> {
-                    snackbarHostState.showSnackbar(effect.message)
+                    onShowSnackbar(effect.message)
                 }
                 IncomesSideEffect.NavigateToHistory -> {
-                    navHostController.navigate(Screen.ROUTE_INCOMES_HISTORY)
+                    onNavigateToHistory(Screen.ROUTE_INCOMES_HISTORY)
                 }
                 is IncomesSideEffect.NavigateToAddExpense -> {
                     //TODO: навигация на экран добавления расхода
@@ -96,6 +100,15 @@ fun IncomesScreen(
     )
 }
 
+/**
+ * Контент экрана доходов.
+ *
+ * Отвечает за отображение общего итога и списка доходов.
+ *
+ * @param modifier модификатор для настройки компоновки.
+ * @param uiState текущее состояние UI, содержащее данные и загрузку.
+ * @param onEvent callback для обработки событий UI.
+ */
 @Composable
 fun IncomesScreenContent(
     modifier: Modifier = Modifier,
@@ -112,12 +125,9 @@ fun IncomesScreenContent(
                 backgroundColor = MaterialTheme.colorScheme.secondary,
                 itemHeight = 56.dp,
                 title = "Всего",
-                trailingText = uiState.total.toCurrency()
+                trailingText = uiState.total.formatAmount()
             )
-            HorizontalDivider(
-                thickness = 1.dp,
-                color = MaterialTheme.colorScheme.outlineVariant
-            )
+            Divider()
             LazyColumn(
                 modifier = modifier.fillMaxSize()
             ) {
@@ -125,7 +135,7 @@ fun IncomesScreenContent(
                     ListItemComponent(
                         title = incomes.category.name,
                         subtitle = incomes.comment,
-                        trailingText = incomes.amount.toCurrency(),
+                        trailingText = incomes.amount.formatAmount(),
                         leadingIcon = {
                             EmojiIcon(emoji = incomes.category.emoji)
                         },
@@ -133,32 +143,9 @@ fun IncomesScreenContent(
                             TrailingIcon()
                         }
                     )
-                    HorizontalDivider(
-                        thickness = 1.dp,
-                        color = MaterialTheme.colorScheme.outlineVariant
-                    )
+                    Divider()
                 }
             }
         }
     }
 }
-
-/*
-private fun getMockIncomesUiState() = IncomesUiState(
-    incomes = listOf(
-        Transaction(
-            id = 1,
-            category = Category(1, "Зарплата", "\uD83D\uDCB0", isIncome = true),
-            amount = 500000.00.toBigDecimal(),
-            createdAt = "2025-01-01",
-            updatedAt = "2025-01-01"
-        ),
-        Transaction(
-            id = 2,
-            category = Category(2, "Подработка", "\uD83D\uDCB0", isIncome = false),
-            amount = 100000.00.toBigDecimal(),
-            createdAt = "2025-01-02",
-            updatedAt = "2025-01-02"
-        )
-    )
-)*/

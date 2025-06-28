@@ -1,12 +1,24 @@
 package com.example.mymoney.utils
 
-import android.util.Log
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
+/**
+ * Утилитный объект для работы с датами в формате "yyyy-MM-dd" и ISO-строками.
+ *
+ * Использует часовой пояс UTC и локаль "ru_RU".
+ *
+ * Основные функции:
+ * - Получение сегодняшней даты в формате "yyyy-MM-dd".
+ * - Получение первой даты текущего месяца в формате "yyyy-MM-dd".
+ * - Форматирование даты из миллисекунд в строку "yyyy-MM-dd".
+ * - Парсинг даты из строки в миллисекунды.
+ * - Преобразование ISO-формата даты ("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'") в миллисекунды.
+ * - Форматирование ISO-строки в формат "dd.MM".
+ */
 object DateUtils {
     private val formatter = SimpleDateFormat("yyyy-MM-dd", Locale("ru", "RU")).apply {
         timeZone = TimeZone.getTimeZone("UTC")
@@ -26,8 +38,6 @@ object DateUtils {
         val calendar = Calendar.getInstance()
         calendar.set(Calendar.DAY_OF_MONTH, 1)
         val date = calendar.time
-        Log.d("DateUtils", "calendar.time = $date")
-        Log.d("DateUtils", "formatted = ${formatter.format(date)}")
         return formatter.format(calendar.time)
     }
 
@@ -51,7 +61,6 @@ object DateUtils {
         }
     }
 
-
     fun formatIsoToDayMonth(isoString: String): String? {
         return try {
             val date = inputFormatter.parse(isoString)
@@ -59,9 +68,5 @@ object DateUtils {
         } catch (e: Exception) {
             null
         }
-    }
-
-    fun formatDate(date: Date): String {
-        return formatter.format(date)
     }
 }

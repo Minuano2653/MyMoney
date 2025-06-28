@@ -15,6 +15,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
+/**
+ * Модуль Dagger-Hilt для предоставления реализаций репозиториев.
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 object RepositoryModule {

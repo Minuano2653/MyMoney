@@ -9,18 +9,24 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.mymoney.R
-import com.example.mymoney.presentation.navigation.TopAppBarState
-import com.example.mymoney.ui.theme.MyMoneyTheme
+import com.example.mymoney.presentation.components.model.TopAppBarState
+import com.example.mymoney.presentation.theme.MyMoneyTheme
 
+/**
+ * Компонент верхнего AppBar с центрированным заголовком и опциональными иконками слева и справа.
+ *
+ * @param state Состояние AppBar, содержащее ресурсы заголовка, иконок и обработчики кликов.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomTopAppBar(state: TopAppBarState) {
     CenterAlignedTopAppBar(
         title = {
             Text(
-                text = state.title,
+                text = stringResource(state.titleRes),
                 style = MaterialTheme.typography.titleLarge
             )
         },
@@ -59,7 +65,7 @@ fun MyTopAppBarPreview() {
     MyMoneyTheme {
         CustomTopAppBar(
             TopAppBarState(
-                title = "Расходы сегодня",
+                titleRes = R.string.top_bar_title_expenses,
                 trailingIconRes = R.drawable.ic_history,
                 onTrailingClick = {}
             )

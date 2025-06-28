@@ -2,6 +2,14 @@ package com.example.mymoney.data.remote.dto
 
 import com.example.mymoney.domain.entity.Category
 
+/**
+ * DTO-модель статьи, получаемая с сервера.
+ *
+ * @property id Идентификатор статьи.
+ * @property name Название статьи.
+ * @property emoji Эмодзи, связанный с статьёй.
+ * @property isIncome Флаг, обозначающий, относится ли статься к доходам.
+ */
 data class CategoryDto(
     val id: Int,
     val name: String,

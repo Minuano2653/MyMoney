@@ -10,6 +10,9 @@ import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
+/**
+ * Модуль Dagger-Hilt для предоставления API-интерфейсов.
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 object ApiModule {
