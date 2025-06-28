@@ -1,37 +1,37 @@
 package com.example.mymoney.presentation.screens.incomes
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mymoney.domain.usecase.GetIncomesUseCase
+import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
 import com.example.mymoney.utils.NetworkMonitor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * Состояние UI для экрана доходов.
+ *
+ * @property isLoading Индикатор загрузки данных.
+ * @property incomes Список доходов (транзакций).
+ * @property total Общая сумма доходов.
+ * @property error Сообщение об ошибке, если загрузка не удалась.
+ * @property isNetworkAvailable Статус доступности сети.
+ */
 @HiltViewModel
 class IncomesViewModel @Inject constructor(
     private val getIncomesUseCase: GetIncomesUseCase,
-    private val networkMonitor: NetworkMonitor
-): ViewModel() {
-    private val _uiState = MutableStateFlow(IncomesUiState())
-    val uiState: StateFlow<IncomesUiState> = _uiState.asStateFlow()
-
-    private val _sideEffect = MutableSharedFlow<IncomesSideEffect>()
-    val sideEffect = _sideEffect.asSharedFlow()
-
+    networkMonitor: NetworkMonitor
+): BaseViewModel<IncomesUiState, IncomesEvent, IncomesSideEffect>(
+    networkMonitor,
+    IncomesUiState()
+) {
     init {
-        observeNetworkConnectivity()
         handleEvent(IncomesEvent.LoadIncomes)
     }
 
-    fun handleEvent(event: IncomesEvent) {
+    override fun handleEvent(event: IncomesEvent) {
         when (event) {
             is IncomesEvent.LoadIncomes -> {
                 loadIncomes()
@@ -45,17 +45,6 @@ class IncomesViewModel @Inject constructor(
         }
     }
 
-    private fun observeNetworkConnectivity() {
-        viewModelScope.launch {
-            networkMonitor.isConnected.collect { isConnected ->
-                _uiState.update { it.copy(isNetworkAvailable = isConnected) }
-                if (!isConnected) {
-                    _sideEffect.emit(IncomesSideEffect.ShowError("Нет подключения к интернету"))
-                }
-            }
-        }
-    }
-
     private fun loadIncomes() {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update { it.copy(isLoading = true, error = null) }
@@ -64,7 +53,12 @@ class IncomesViewModel @Inject constructor(
             result
                 .onSuccess { incomes ->
                     _uiState.update {
-                        it.copy(incomes = incomes, isLoading = false, error = null)
+                        it.copy(
+                            incomes = incomes,
+                            total = incomes.sumOf {income -> income.amount},
+                            isLoading = false,
+                            error = null
+                        )
                     }
                 }
                 .onFailure { e ->
@@ -75,9 +69,15 @@ class IncomesViewModel @Inject constructor(
                 }
         }
     }
-    private fun emitEffect(effect: IncomesSideEffect) {
-        viewModelScope.launch {
-            _sideEffect.emit(effect)
+
+    override fun onNetworkStateChanged(isConnected: Boolean) {
+        val wasDisconnected = !_uiState.value.isNetworkAvailable
+        _uiState.update { it.copy(isNetworkAvailable = isConnected) }
+
+        if (!isConnected) {
+            emitEffect(IncomesSideEffect.ShowError("Нет подключения к интернету"))
+        } else if (wasDisconnected && (_uiState.value.incomes.isEmpty() || _uiState.value.error != null)) {
+            handleEvent(IncomesEvent.LoadIncomes)
         }
     }
 }

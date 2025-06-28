@@ -1,50 +1,45 @@
 package com.example.mymoney.presentation.screens.account
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mymoney.domain.usecase.GetAccountUseCase
+import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
 import com.example.mymoney.utils.NetworkMonitor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel для экрана счёта.
+ *
+ * Отвечает за загрузку данных аккаунта, обработку пользовательских событий и управление состоянием UI.
+ *
+ * @property getAccountUseCase UseCase для получения данных счёта.
+ * @property networkMonitor Монитор состояния сети.
+ */
 @HiltViewModel
 class AccountViewModel @Inject constructor(
     private val getAccountUseCase: GetAccountUseCase,
-    private val networkMonitor: NetworkMonitor
-): ViewModel(){
-    private val _uiState = MutableStateFlow(AccountUiState())
-    val uiState: StateFlow<AccountUiState> = _uiState.asStateFlow()
-
-    private val _sideEffect = MutableSharedFlow<AccountSideEffect>()
-    val sideEffect = _sideEffect.asSharedFlow()
-
+    networkMonitor: NetworkMonitor
+): BaseViewModel<AccountUiState, AccountEvent, AccountSideEffect>(
+    networkMonitor,
+    AccountUiState()
+){
     init {
-        observeNetworkConnectivity()
         handleEvent(AccountEvent.LoadAccount)
     }
 
-    fun handleEvent(event: AccountEvent) {
+    override fun handleEvent(event: AccountEvent) {
         when (event) {
             AccountEvent.LoadAccount -> {
                 loadAccount()
             }
             AccountEvent.OnCurrencyClicked -> {
-                viewModelScope.launch {
-                    _sideEffect.emit(AccountSideEffect.NavigateToChangeCurrency)
-                }
+                emitEffect(AccountSideEffect.NavigateToChangeCurrency)
             }
             AccountEvent.OnEditClicked -> {
-                viewModelScope.launch {
-                    _sideEffect.emit(AccountSideEffect.NavigateToChangeCurrency)
-                }
+                emitEffect(AccountSideEffect.NavigateToChangeCurrency)
             }
         }
     }
@@ -75,14 +70,14 @@ class AccountViewModel @Inject constructor(
         }
     }
 
-    private fun observeNetworkConnectivity() {
-        viewModelScope.launch {
-            networkMonitor.isConnected.collect { isConnected ->
-                _uiState.update { it.copy(isNetworkAvailable = isConnected) }
-                if (!isConnected) {
-                    _sideEffect.emit(AccountSideEffect.ShowError("Нет подключения к интернету"))
-                }
-            }
+    override fun onNetworkStateChanged(isConnected: Boolean) {
+        val wasDisconnected = !_uiState.value.isNetworkAvailable
+        _uiState.update { it.copy(isNetworkAvailable = isConnected) }
+
+        if (!isConnected) {
+            emitEffect(AccountSideEffect.ShowError("Нет подключения к интернету"))
+        } else if (wasDisconnected && (_uiState.value.name.isBlank() || _uiState.value.error != null)) {
+            handleEvent(AccountEvent.LoadAccount)
         }
     }
 }
