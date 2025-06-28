@@ -1,4 +1,35 @@
 <resources>
     <string name="app_name">My money</string>
-    <string name="expenses_top_bar_title">Расходы сегодня</string>
+    <string name="top_bar_title_expenses">Расходы сегодня</string>
+    <string name="top_bar_title_incomes">Доходы сегодня</string>
+    <string name="top_bar_title_account">Мой счет</string>
+    <string name="top_bar_title_categories">Мои статьи</string>
+    <string name="top_bar_title_settings">Настройки</string>
+    <string name="top_bar_title_history">Моя история</string>
+
+    <string name="date_picker_clear_button">Очистить</string>
+    <string name="date_picker_dismiss_button">Отмена</string>
+    <string name="date_picker_ok_button">Ок</string>
+
+    <string name="fab_description">Добавить</string>
+
+    <string name="list_item_text_currency">Валюта</string>
+    <string name="list_item_text_total">Всего</string>
+    <string name="list_item_text_start">Начало</string>
+    <string name="list_item_text_end">Конец</string>
+    <string name="list_item_text_sum">Сумма</string>
+
+    <string name="search_field_placeholder">Найти статью</string>
+    <string name="search_field_icon_description">Поиск</string>
+
+    <string name="settings_item_night_theme">Тёмная тема</string>
+    <string name="settings_item_primary_color">Основной цвет</string>
+    <string name="settings_item_sounds">Звуки</string>
+    <string name="settings_item_haptic">Хаптики</string>
+    <string name="settings_item_password">Код пароль</string>
+    <string name="settings_item_sync">Синхронизация</string>
+    <string name="settings_item_lang">Язык</string>
+    <string name="settings_item_about">О программе</string>
+
+
 </resources>
