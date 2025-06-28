@@ -5,6 +5,12 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 
+/**
+ * Добавляет вложенный граф навигации для раздела "Доходы" в основной [NavGraphBuilder].
+ *
+ * @param incomesTodayScreenContent composable контент для экрана "Доходы сегодня".
+ * @param incomesHistoryScreenContent composable контент для экрана "История доходов".
+ */
 fun NavGraphBuilder.incomesNavGraph(
     incomesTodayScreenContent: @Composable () -> Unit,
     incomesHistoryScreenContent: @Composable () -> Unit,

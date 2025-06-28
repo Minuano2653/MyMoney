@@ -6,6 +6,11 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 
+/**
+ * Класс-обёртка над [NavHostController] для управления навигацией с сохранением состояния.
+ *
+ * @param navHostController Контроллер навигации Jetpack Compose.
+ */
 class NavigationState(
     val navHostController: NavHostController
 ) {
@@ -20,6 +25,12 @@ class NavigationState(
     }
 }
 
+/**
+ * Хелпер-функция для запоминания [NavigationState] внутри Composable.
+ *
+ * @param navHostController Контроллер навигации (по умолчанию создаётся новый).
+ * @return remember [NavigationState].
+ */
 @Composable
 fun rememberNavigationState(
     navHostController: NavHostController = rememberNavController()

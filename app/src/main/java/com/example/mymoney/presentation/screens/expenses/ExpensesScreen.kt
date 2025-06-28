@@ -6,9 +6,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -18,19 +17,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.mymoney.R
-import com.example.mymoney.domain.entity.Category
-import com.example.mymoney.domain.entity.Transaction
+import com.example.mymoney.presentation.components.Divider
 import com.example.mymoney.presentation.components.EmojiIcon
 import com.example.mymoney.presentation.components.ListItemComponent
 import com.example.mymoney.presentation.components.TrailingIcon
-import com.example.mymoney.presentation.navigation.FabState
+import com.example.mymoney.presentation.components.model.FabState
 import com.example.mymoney.presentation.navigation.Screen
-import com.example.mymoney.presentation.navigation.TopAppBarState
-import com.example.mymoney.ui.theme.MyMoneyTheme
-import com.example.mymoney.utils.toCurrency
+import com.example.mymoney.presentation.components.model.TopAppBarState
+import com.example.mymoney.presentation.theme.MyMoneyTheme
+import com.example.mymoney.utils.formatAmount
 import kotlinx.coroutines.flow.collectLatest
 
 
@@ -41,18 +37,30 @@ fun ExpensesScreenPreview() {
         ExpensesScreen(
             onUpdateTopAppBar = {},
             onUpdateFabState = {},
-            navHostController = rememberNavController(),
-            snackbarHostState = SnackbarHostState()
+            onNavigateToHistory = {},
+            onShowSnackbar = {}
         )
     }
 }
 
+/**
+ * Обёртка экрана расходов.
+ *
+ * Отображает список расходов, заголовок и кнопку добавления нового расхода.
+ * Обрабатывает навигацию, ошибки и взаимодействия пользователя через ViewModel.
+ *
+ * @param onUpdateTopAppBar Функция для обновления состояния верхней панели приложения.
+ * @param onUpdateFabState Функция для обновления состояния плавающей кнопки действий (FAB).
+ * @param onNavigateToHistory Функция навигации к экрану истории расходов.
+ * @param onShowSnackbar Функция для показа сообщений пользователю (snackbar).
+ * @param viewModel ViewModel экрана расходов (по умолчанию внедряется через Hilt).
+ */
 @Composable
 fun ExpensesScreen(
     onUpdateTopAppBar: (TopAppBarState) -> Unit,
     onUpdateFabState: (FabState) -> Unit,
-    snackbarHostState: SnackbarHostState,
-    navHostController: NavHostController,
+    onNavigateToHistory: (String) -> Unit,
+    onShowSnackbar: suspend (String) -> Unit,
     viewModel: ExpensesViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -60,7 +68,7 @@ fun ExpensesScreen(
     LaunchedEffect(Unit) {
         onUpdateTopAppBar(
             TopAppBarState(
-                title = "Расходы сегодня",
+                titleRes = R.string.top_bar_title_expenses,
                 trailingIconRes = R.drawable.ic_history,
                 onTrailingClick = {
                     viewModel.handleEvent(ExpensesEvent.OnHistoryClicked)
@@ -69,8 +77,8 @@ fun ExpensesScreen(
         )
         onUpdateFabState(
             FabState(
-            isVisible = true,
-            onClick = { viewModel.handleEvent(ExpensesEvent.OnAddClicked) }
+                isVisible = true,
+                onClick = { viewModel.handleEvent(ExpensesEvent.OnAddClicked) }
             )
         )
     }
@@ -79,10 +87,10 @@ fun ExpensesScreen(
         viewModel.sideEffect.collectLatest { effect ->
             when (effect) {
                 is ExpensesSideEffect.ShowError -> {
-                    snackbarHostState.showSnackbar(effect.message)
+                    onShowSnackbar(effect.message)
                 }
                 ExpensesSideEffect.NavigateToHistory -> {
-                    navHostController.navigate(Screen.ROUTE_EXPENSES_HISTORY)
+                    onNavigateToHistory(Screen.ROUTE_EXPENSES_HISTORY)
                 }
                 is ExpensesSideEffect.NavigateToAddExpense -> {
                     //TODO: навигация на экран добавления расхода
@@ -97,6 +105,17 @@ fun ExpensesScreen(
     )
 }
 
+/**
+ * Контентная часть экрана расходов.
+ *
+ * Показывает общее количество расходов и список отдельных записей расходов.
+ * Отображает индикатор загрузки при необходимости.
+ *
+ * @param modifier Модификатор Compose для настройки компоновки.
+ * @param uiState Текущее состояние UI с данными расходов.
+ * @param onEvent Обработчик событий UI, например, кликов.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExpensesScreenContent(
     modifier: Modifier = Modifier,
@@ -111,135 +130,23 @@ fun ExpensesScreenContent(
         Column(modifier = modifier.fillMaxSize()) {
             ListItemComponent(
                 title = "Всего",
-                trailingText = uiState.total.toCurrency(),
+                trailingText = uiState.total.formatAmount(),
                 backgroundColor = MaterialTheme.colorScheme.secondary,
                 itemHeight = 56.dp
             )
-            HorizontalDivider(
-                thickness = 1.dp,
-                color = MaterialTheme.colorScheme.outlineVariant
-            )
+            Divider()
             LazyColumn {
                 itemsIndexed(uiState.expenses) { _, expense ->
                     ListItemComponent(
                         title = expense.category.name,
                         subtitle = expense.comment,
-                        trailingText = expense.amount.toCurrency(),
+                        trailingText = expense.amount.formatAmount(),
                         leadingIcon = { EmojiIcon(emoji = expense.category.emoji) },
                         trailingIcon = { TrailingIcon() }
                     )
-                    HorizontalDivider(
-                        thickness = 1.dp,
-                        color = MaterialTheme.colorScheme.outlineVariant
-                    )
+                    Divider()
                 }
             }
         }
     }
 }
-
-/*@Composable
-fun ExpensesScreenContent(
-    modifier: Modifier = Modifier,
-    uiState: ExpensesUiState,
-    onEvent: (ExpensesEvent) -> Unit
-) {
-
-    Column(modifier = Modifier.fillMaxSize()) {
-        ListItemComponent(
-            title = "Всего",
-            trailingText = uiState.total.toCurrency(),
-            backgroundColor = MaterialTheme.colorScheme.secondary,
-            itemHeight = 56.dp
-        )
-        HorizontalDivider(
-            thickness = 1.dp,
-            color = MaterialTheme.colorScheme.outlineVariant
-        )
-        LazyColumn(
-            modifier = modifier.fillMaxSize()
-        ) {
-            itemsIndexed(uiState.expenses) { _, expense ->
-                ListItemComponent(
-                    title = expense.category.name,
-                    subtitle = expense.comment,
-                    trailingText = expense.amount.toCurrency(),
-                    leadingIcon = {
-                        EmojiIcon(emoji = expense.category.emoji)
-                    },
-                    trailingIcon = {
-                        TrailingIcon()
-                    }
-                )
-                HorizontalDivider(
-                    thickness = 1.dp,
-                    color = MaterialTheme.colorScheme.outlineVariant
-                )
-            }
-        }
-    }
-}*/
-
-/*
-private fun getMockExpensesUiState() = ExpensesUiState(
-    expenses = listOf(
-        Transaction(
-            id = 1,
-            category = Category(1, "Аренда квартиры", "🏡", isIncome = false),
-            amount = 100000.00.toBigDecimal(),
-            createdAt = "2025-01-01",
-            updatedAt = "2025-01-01"
-        ),
-        Transaction(
-            id = 2,
-            category = Category(2, "Одежда", "👗", isIncome = false),
-            amount = 100000.00.toBigDecimal(),
-            createdAt = "2025-01-02",
-            updatedAt = "2025-01-02"
-        ),
-        Transaction(
-            id = 3,
-            category = Category(3, "На собачку", "🐶", isIncome = false),
-            comment = "Джек",
-            amount = 100000.00.toBigDecimal(),
-            createdAt = "2025-01-02",
-            updatedAt = "2025-01-02"
-        ),
-        Transaction(
-            id = 4,
-            category = Category(3, "На собачку", "🐶", isIncome = false),
-            comment = "Энни",
-            amount = 100000.00.toBigDecimal(),
-            createdAt = "2025-01-02",
-            updatedAt = "2025-01-02"
-        ),
-        Transaction(
-            id = 5,
-            category = Category(4, "Ремонт квартиры", "РК", isIncome = false),
-            amount = 100000.00.toBigDecimal(),
-            createdAt = "2025-01-02",
-            updatedAt = "2025-01-02"
-        ),
-        Transaction(
-            id = 6,
-            category = Category(5, "Продукты", "🍭", isIncome = false),
-            amount = 100000.00.toBigDecimal(),
-            createdAt = "2025-01-02",
-            updatedAt = "2025-01-02"
-        ),
-        Transaction(
-            id = 7,
-            category = Category(6, "Спортзал", "🏋️", isIncome = false),
-            amount = 100000.00.toBigDecimal(),
-            createdAt = "2025-01-02",
-            updatedAt = "2025-01-02"
-        ),
-        Transaction(
-            id = 8,
-            category = Category(7, "Медицина", "💊", isIncome = false),
-            amount = 100000.00.toBigDecimal(),
-            createdAt = "2025-01-02",
-            updatedAt = "2025-01-02"
-        )
-    )
-)*/

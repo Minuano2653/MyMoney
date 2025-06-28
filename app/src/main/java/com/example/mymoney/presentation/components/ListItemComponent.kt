@@ -18,8 +18,24 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.mymoney.ui.theme.MyMoneyTheme
+import com.example.mymoney.presentation.theme.MyMoneyTheme
 
+/**
+ * Компонент списка с заголовком, необязательным подзаголовком, иконками и дополнительным текстом.
+ *
+ * @param title Основной заголовок элемента списка.
+ * @param modifier Модификатор для внешнего оформления компонента.
+ * @param subtitle Необязательный подзаголовок.
+ * @param trailingText Текст, отображаемый справа сверху.
+ * @param trailingSubText Текст, отображаемый справа снизу.
+ * @param leadingIcon composable лямбда для иконки слева (необязательный).
+ * @param trailingIcon composable лямбда для иконки справа (необязательный).
+ * @param itemHeight Высота элемента списка (по умолчанию 68.dp).
+ * @param backgroundColor Цвет фона элемента (по умолчанию [MaterialTheme.colorScheme.surface]).
+ * @param contentColor Цвет основного текста (по умолчанию [MaterialTheme.colorScheme.onSurface]).
+ * @param subtitleColor Цвет подзаголовка (по умолчанию [MaterialTheme.colorScheme.onSurfaceVariant]).
+ * @param onClick Обработчик нажатия на элемент (необязательный).
+ */
 @Composable
 fun ListItemComponent(
     title: String,

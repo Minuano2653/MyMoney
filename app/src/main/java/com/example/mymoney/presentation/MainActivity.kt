@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.example.mymoney.presentation.navigation.RootGraph
-import com.example.mymoney.ui.theme.MyMoneyTheme
+import com.example.mymoney.presentation.theme.MyMoneyTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

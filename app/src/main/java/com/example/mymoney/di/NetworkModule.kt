@@ -1,6 +1,6 @@
 package com.example.mymoney.di
 
-import com.example.mymoney.data.remote.AuthInterceptor
+import com.example.mymoney.data.remote.interceptor.AuthInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -11,6 +11,12 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
+/**
+ * Модуль Dagger-Hilt для настройки сетевого слоя.
+ *
+ * Предоставляет OkHttpClient с интерсептором авторизации и логированием,
+ * а также Retrofit с базовым URL и конвертером Gson.
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {

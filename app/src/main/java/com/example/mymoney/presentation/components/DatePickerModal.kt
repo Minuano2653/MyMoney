@@ -16,8 +16,17 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.mymoney.R
 
+/**
+ * Диалоговое окно выбора даты с кнопками подтверждения, отмены и очистки выбора.
+ *
+ * @param initialSelectedDateMillis Начальное выбранное значение даты в миллисекундах (или null).
+ * @param onDateSelected Колбэк, вызываемый при подтверждении выбора даты, передаёт выбранное время в миллисекундах или null.
+ * @param onDismiss Колбэк для закрытия диалогового окна.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerModal(
@@ -42,18 +51,27 @@ fun DatePickerModal(
                 TextButton(onClick = {
                     datePickerState.selectedDateMillis = null
                 }) {
-                    Text("Очистить", color = MaterialTheme.colorScheme.onSurface)
+                    Text(
+                        text = stringResource(R.string.date_picker_clear_button),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
                 }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     TextButton(onClick = onDismiss) {
-                        Text("Отмена", color = MaterialTheme.colorScheme.onSurface)
+                        Text(
+                            text = stringResource(R.string.date_picker_dismiss_button),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                     }
                     TextButton(onClick = {
                         onDateSelected(datePickerState.selectedDateMillis)
                         onDismiss()
                     }) {
-                        Text("Ок", color = MaterialTheme.colorScheme.onSurface)
+                        Text(
+                            text = stringResource(R.string.date_picker_ok_button),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                     }
                 }
             }

@@ -19,24 +19,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.mymoney.R
 import com.example.mymoney.presentation.components.CustomTopAppBar
 import com.example.mymoney.presentation.navigation.AppNavGraph
 import com.example.mymoney.presentation.navigation.BottomNavItem
-import com.example.mymoney.presentation.navigation.FabState
-import com.example.mymoney.presentation.navigation.TopAppBarState
+import com.example.mymoney.presentation.components.model.FabState
+import com.example.mymoney.presentation.components.model.TopAppBarState
 import com.example.mymoney.presentation.navigation.rememberNavigationState
 import com.example.mymoney.presentation.screens.account.AccountScreen
 import com.example.mymoney.presentation.screens.categories.CategoriesScreen
 import com.example.mymoney.presentation.screens.expenses.ExpensesScreen
-import com.example.mymoney.presentation.screens.transactions_history.ExpensesHistoryScreen
+import com.example.mymoney.presentation.screens.history.expenses.ExpensesHistoryScreen
 import com.example.mymoney.presentation.screens.incomes.IncomesScreen
 import com.example.mymoney.presentation.screens.settings.SettingsScreen
-import com.example.mymoney.presentation.screens.transactions_history.IncomesHistoryScreen
-import com.example.mymoney.ui.theme.MyMoneyTheme
+import com.example.mymoney.presentation.screens.history.incomes.IncomesHistoryScreen
+import com.example.mymoney.presentation.theme.MyMoneyTheme
 
 @Preview
 @Composable
@@ -46,6 +48,27 @@ fun MainScreenPreview() {
     }
 }
 
+/**
+ * Главный экран приложения с навигацией и базовым UI-скелетом.
+ *
+ * Содержит Scaffold с верхней панелью (TopAppBar), нижней навигационной панелью (NavigationBar),
+ * плавающей кнопкой действия (FAB) и Snackbar для отображения сообщений.
+ *
+ * Управляет состоянием TopAppBar, FAB и навигацией между основными разделами приложения:
+ * Расходы, Доходы, Счёт, Категории и Настройки.
+ *
+ * Использует [AppNavGraph] для построения навигационного графа с экранами:
+ * - ExpensesScreen
+ * - IncomesScreen
+ * - AccountScreen
+ * - CategoriesScreen
+ * - SettingsScreen
+ * - ExpensesHistoryScreen
+ * - IncomesHistoryScreen
+ *
+ * Взаимодействие с UI-элементами происходит через лямбды для обновления состояний TopAppBar и FAB,
+ * а также для навигации и показа snackbar.
+ */
 @Composable
 fun MainScreen() {
     val navigationState = rememberNavigationState()
@@ -63,7 +86,6 @@ fun MainScreen() {
         topBar = {
             CustomTopAppBar(topAppBarState)
         },
-
         bottomBar = {
             val navBackStackEntry by navigationState.navHostController.currentBackStackEntryAsState()
 
@@ -110,7 +132,6 @@ fun MainScreen() {
                 }
             }
         },
-
         floatingActionButton = {
             if (fabState.isVisible && fabState.onClick != null) {
                 FloatingActionButton(
@@ -121,7 +142,7 @@ fun MainScreen() {
                 ) {
                     Icon(
                         painter = painterResource(fabState.iconRes),
-                        contentDescription = "FAB"
+                        contentDescription = stringResource(R.string.fab_description)
                     )
                 }
             }
@@ -135,32 +156,30 @@ fun MainScreen() {
                 ExpensesScreen(
                     onUpdateTopAppBar = { newState -> topAppBarState = newState },
                     onUpdateFabState = { newState -> fabState = newState },
-                    navHostController = navigationState.navHostController,
-                    snackbarHostState = snackbarHostState
+                    onNavigateToHistory = { route -> navigationState.navigateTo(route) },
+                    onShowSnackbar = { message -> snackbarHostState.showSnackbar(message) },
                 )
             },
             incomesTodayScreenContent = {
                 IncomesScreen(
                     onUpdateTopAppBar = { newState -> topAppBarState = newState },
                     onUpdateFabState = { newState -> fabState = newState },
-                    navHostController = navigationState.navHostController,
-                    snackbarHostState = snackbarHostState
+                    onNavigateToHistory = { route -> navigationState.navigateTo(route) },
+                    onShowSnackbar = { message -> snackbarHostState.showSnackbar(message) },
                 )
             },
             accountScreenContent = {
                 AccountScreen(
                     onUpdateTopAppBar = { newState -> topAppBarState = newState },
                     onUpdateFabState = { newState -> fabState = newState },
-                    navHostController = navigationState.navHostController,
-                    snackbarHostState = snackbarHostState
+                    onShowSnackbar = { message -> snackbarHostState.showSnackbar(message) },
                 )
             },
             categoriesScreenContent = {
                 CategoriesScreen(
                     onUpdateTopAppBar = { newState -> topAppBarState = newState },
                     onUpdateFabState = { newState -> fabState = newState },
-                    navHostController = navigationState.navHostController,
-                    snackbarHostState = snackbarHostState
+                    onShowSnackbar = { message -> snackbarHostState.showSnackbar(message) },
                 )
             },
             settingsScreenContent = {
@@ -173,17 +192,16 @@ fun MainScreen() {
                 ExpensesHistoryScreen(
                     onUpdateTopAppBar = { newState -> topAppBarState = newState },
                     onUpdateFabState = { newState -> fabState = newState },
-                    navHostController = navigationState.navHostController,
-                    snackbarHostState = snackbarHostState
-
+                    onShowSnackbar = { message -> snackbarHostState.showSnackbar(message) },
+                    onNavigateBack = { navigationState.navHostController.popBackStack() },
                 )
             },
             incomesHistoryScreenContent = {
                 IncomesHistoryScreen(
                     onUpdateTopAppBar = { newState -> topAppBarState = newState },
                     onUpdateFabState = { newState -> fabState = newState },
-                    navHostController = navigationState.navHostController,
-                    snackbarHostState = snackbarHostState
+                    onShowSnackbar = { message -> snackbarHostState.showSnackbar(message) },
+                    onNavigateBack = { navigationState.navHostController.popBackStack() },
                 )
             }
         )

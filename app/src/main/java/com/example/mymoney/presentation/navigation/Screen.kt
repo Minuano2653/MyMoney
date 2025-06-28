@@ -1,6 +1,11 @@
 package com.example.mymoney.presentation.navigation
 
 
+/**
+ * Навигационные маршруты приложения, представленные в виде sealed-класса.
+ *
+ * @property route Строковое значение маршрута для использования в NavHost.
+ */
 sealed class Screen(
     val route: String,
 ) {

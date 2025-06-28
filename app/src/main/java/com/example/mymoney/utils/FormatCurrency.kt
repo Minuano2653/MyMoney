@@ -6,5 +6,5 @@ fun String.toSymbol(): String {
         "USD" to "$",
         "EUR" to "€"
     )
-    return currencySymbols[this] ?: this
+    return currencySymbols[this] ?: "₽"
 }

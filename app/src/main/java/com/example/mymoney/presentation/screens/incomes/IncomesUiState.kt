@@ -1,14 +1,22 @@
 package com.example.mymoney.presentation.screens.incomes
 
 import com.example.mymoney.domain.entity.Transaction
+import com.example.mymoney.presentation.base.contract.BaseUiState
 import java.math.BigDecimal
 
+/**
+ * Состояние UI для экрана доходов.
+ *
+ * @property isLoading Индикатор загрузки данных.
+ * @property incomes Список доходов (транзакций).
+ * @property total Общая сумма доходов.
+ * @property error Сообщение об ошибке, если загрузка не удалась.
+ * @property isNetworkAvailable Статус доступности сети.
+ */
 data class IncomesUiState(
     val isLoading: Boolean = false,
     val incomes: List<Transaction> = emptyList(),
+    val total: BigDecimal = BigDecimal(0),
     val error: String? = null,
     val isNetworkAvailable: Boolean = true
-) {
-    val total: BigDecimal
-        get() = incomes.sumOf { it.amount }
-}
+): BaseUiState
