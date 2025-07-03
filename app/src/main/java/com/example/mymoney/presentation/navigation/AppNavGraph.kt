@@ -1,10 +1,13 @@
 package com.example.mymoney.presentation.navigation
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.mymoney.domain.entity.Transaction
 
 /**
  * Навигационный граф приложения, объединяющий навигацию по основным экранам.
@@ -34,6 +37,12 @@ fun AppNavGraph(
     NavHost(
         navController = navHostController,
         startDestination = Screen.Expenses.route,
+        enterTransition = {
+            EnterTransition.None
+        },
+        exitTransition = {
+            ExitTransition.None
+        },
         modifier = modifier
     ) {
         expensesNavGraph(

@@ -28,7 +28,7 @@ abstract class BaseViewModel<T: BaseUiState, E: BaseEvent, S: BaseSideEffect>(
 ): ViewModel() {
 
     protected val _uiState = MutableStateFlow<T>(initialState)
-    val uiState: StateFlow<T> = _uiState.asStateFlow()
+    open val uiState: StateFlow<T> = _uiState.asStateFlow()
 
     protected val _sideEffect = MutableSharedFlow<S>()
     val sideEffect = _sideEffect.asSharedFlow()

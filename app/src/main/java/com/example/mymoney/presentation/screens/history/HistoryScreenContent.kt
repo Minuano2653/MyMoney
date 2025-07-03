@@ -20,19 +20,7 @@ import com.example.mymoney.utils.DateUtils
 import com.example.mymoney.utils.formatAmount
 import com.example.mymoney.R
 
-/**
- * Контент экрана истории транзакций.
- *
- * Отображает:
- * - Период фильтрации с выбором даты начала и конца.
- * - Итоговую сумму за выбранный период.
- * - Список транзакций с информацией о категории, комментарии, сумме и дате.
- * - Индикатор загрузки при загрузке данных.
- *
- * @param modifier модификатор для настройки внешнего вида компонента.
- * @param uiState текущее состояние UI с данными транзакций и параметрами фильтра.
- * @param onEvent лямбда для обработки событий UI, таких как выбор даты.
- */
+
 @Composable
 fun HistoryScreenContent(
     modifier: Modifier = Modifier,
@@ -65,15 +53,13 @@ fun HistoryScreenContent(
 
         if (uiState.isLoading) {
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
             }
         } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
+            LazyColumn {
                 itemsIndexed(uiState.transactions) { _, transaction ->
                     ListItemComponent(
                         title = transaction.category.name,

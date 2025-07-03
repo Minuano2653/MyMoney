@@ -7,7 +7,8 @@ import com.example.mymoney.presentation.base.contract.BaseEvent
  * Используются для обработки действий пользователя во ViewModel.
  */
 sealed class ExpensesEvent: BaseEvent {
-    object LoadExpenses : ExpensesEvent()
-    object OnHistoryClicked : ExpensesEvent()
-    object OnAddClicked : ExpensesEvent()
+    object LoadExpenses: ExpensesEvent()
+    object OnHistoryClicked: ExpensesEvent()
+    object OnAddClicked: ExpensesEvent()
+    object OnTransactionClicked: ExpensesEvent()
 }

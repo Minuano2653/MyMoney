@@ -23,6 +23,16 @@ class NavigationState(
             restoreState = true
         }
     }
+    fun navigateToHistory(route: String, isIncome: Boolean) {
+        when(isIncome) {
+            true -> {
+                navHostController.navigate("$route/true")
+            }
+            false -> {
+                navHostController.navigate("$route/false")
+            }
+        }
+    }
 }
 
 /**

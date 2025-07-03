@@ -37,8 +37,9 @@ sealed class Screen(
         route = ROUTE_SETTINGS,
     )
 
-
     companion object {
+        const val ARGUMENT_HISTORY = "isIncome"
+
         const val ROUTE_EXPENSES = "Expenses"
         const val ROUTE_INCOMES = "Incomes"
         const val ROUTE_ACCOUNT = "Account"

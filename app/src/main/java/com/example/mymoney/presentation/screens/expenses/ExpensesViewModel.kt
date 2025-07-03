@@ -1,19 +1,12 @@
 package com.example.mymoney.presentation.screens.expenses
 
 import android.util.Log
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mymoney.domain.usecase.GetExpensesUseCase
-import com.example.mymoney.presentation.base.contract.BaseEvent
+import com.example.mymoney.domain.usecase.GetTransactionsByPeriodUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
 import com.example.mymoney.utils.NetworkMonitor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,15 +14,15 @@ import javax.inject.Inject
 /**
  * ViewModel для экрана расходов.
  *
- * Отвечает за загрузку списка расходов через [getExpensesUseCase],
+ * Отвечает за загрузку списка расходов через [getTransactionsByPeriodUseCase],
  * обработку событий UI, управление состоянием [ExpensesUiState] и генерацию сайд-эффектов [ExpensesSideEffect].
  *
- * @property getExpensesUseCase Юзкейс для получения списка расходов.
+ * @property getTransactionsByPeriodUseCase Юзкейс для получения списка расходов.
  * @property networkMonitor Монитор состояния сети, обновляет UI при изменении подключения.
  */
 @HiltViewModel
 class ExpensesViewModel @Inject constructor(
-    private val getExpensesUseCase: GetExpensesUseCase,
+    private val getTransactionsByPeriodUseCase: GetTransactionsByPeriodUseCase,
     networkMonitor: NetworkMonitor
 ): BaseViewModel<ExpensesUiState, ExpensesEvent, ExpensesSideEffect>(
     networkMonitor,
@@ -51,6 +44,9 @@ class ExpensesViewModel @Inject constructor(
             is ExpensesEvent.OnAddClicked -> {
                 emitEffect(ExpensesSideEffect.NavigateToAddExpense)
             }
+            is ExpensesEvent.OnTransactionClicked -> {
+                emitEffect(ExpensesSideEffect.NavigateToTransactionDetail)
+            }
         }
     }
 
@@ -59,7 +55,7 @@ class ExpensesViewModel @Inject constructor(
             Log.d("VIEW_MODEL", "load expenses")
             _uiState.update { it.copy(isLoading = true, error = null) }
 
-            val result = getExpensesUseCase()
+            val result = getTransactionsByPeriodUseCase(isIncome = false)
             result
                 .onSuccess { expenses ->
                     _uiState.update {

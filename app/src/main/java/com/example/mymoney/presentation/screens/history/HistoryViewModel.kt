@@ -1,11 +1,11 @@
-package com.example.mymoney.presentation.screens.history.expenses
+package com.example.mymoney.presentation.screens.history
 
+import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.example.mymoney.domain.usecase.GetExpensesUseCase
+import com.example.mymoney.domain.usecase.GetTransactionsByPeriodUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
-import com.example.mymoney.presentation.screens.history.HistoryEvent
-import com.example.mymoney.presentation.screens.history.HistorySideEffect
-import com.example.mymoney.presentation.screens.history.HistoryUiState
+import com.example.mymoney.presentation.navigation.Screen
 import com.example.mymoney.utils.DateUtils
 import com.example.mymoney.utils.NetworkMonitor
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,21 +23,25 @@ import javax.inject.Inject
  * Отвечает за загрузку списка расходов за выбранный период, обработку выбора дат начала и конца периода,
  * а также управление состояниями загрузки, ошибками и навигационными эффектами.
  *
- * @property getExpensesUseCase UseCase для получения списка расходов.
+ * @property getTransactionsByPeriodUseCase UseCase для получения списка расходов.
  * @property networkMonitor Мониторинг состояния сети для реагирования на изменения подключения.
  */
 @HiltViewModel
-class ExpensesHistoryViewModel @Inject constructor(
-    private val getExpensesUseCase: GetExpensesUseCase,
+class HistoryViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    private val getTransactionsByPeriodUseCase: GetTransactionsByPeriodUseCase,
     networkMonitor: NetworkMonitor
 ): BaseViewModel<HistoryUiState, HistoryEvent, HistorySideEffect>(
     networkMonitor,
     HistoryUiState()
 ) {
-
+    private val isIncome: Boolean by lazy {
+        savedStateHandle.get<Boolean>(Screen.Companion.ARGUMENT_HISTORY)!!
+    }
     private var loadTransactionsJob: Job? = null
 
     init {
+        Log.d("EXPENSES_VIEW_MODEL", isIncome.toString())
         handleEvent(HistoryEvent.LoadTransactions)
     }
 
@@ -52,10 +56,10 @@ class ExpensesHistoryViewModel @Inject constructor(
                 loadTransactions()
             }
             is HistoryEvent.OnStartDateClicked -> {
-                emitEffect(HistorySideEffect.ShowStartDatePicker)
+                _uiState.update { it.copy(showStartDatePicker = !it.showStartDatePicker) }
             }
             is HistoryEvent.OnEndDateClicked -> {
-                emitEffect(HistorySideEffect.ShowEndDatePicker)
+                _uiState.update { it.copy(showEndDatePicker = !it.showEndDatePicker) }
             }
             is HistoryEvent.OnStartDateSelected -> {
                 _uiState.update { it.copy(startDate = event.date) }
@@ -80,9 +84,10 @@ class ExpensesHistoryViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true, error = null) }
 
             val currentState = _uiState.value
-            val result = getExpensesUseCase(
+            val result = getTransactionsByPeriodUseCase(
+                isIncome = isIncome,
                 startDate = currentState.startDate,
-                endDate = currentState.endDate
+                endDate = currentState.endDate,
             )
 
             if (isActive) {

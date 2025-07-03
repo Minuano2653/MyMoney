@@ -9,5 +9,6 @@ import com.example.mymoney.presentation.base.contract.BaseSideEffect
 sealed class ExpensesSideEffect: BaseSideEffect {
     data object NavigateToHistory : ExpensesSideEffect()
     data object NavigateToAddExpense : ExpensesSideEffect()
+    data object NavigateToTransactionDetail: ExpensesSideEffect()
     data class ShowError(val message: String) : ExpensesSideEffect()
 }
