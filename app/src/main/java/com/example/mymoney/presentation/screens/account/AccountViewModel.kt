@@ -35,11 +35,8 @@ class AccountViewModel @Inject constructor(
             AccountEvent.LoadAccount -> {
                 loadAccount()
             }
-            AccountEvent.OnCurrencyClicked -> {
-                emitEffect(AccountSideEffect.NavigateToChangeCurrency)
-            }
             AccountEvent.OnEditClicked -> {
-                emitEffect(AccountSideEffect.NavigateToChangeCurrency)
+                emitEffect(AccountSideEffect.NavigateToEditAccount)
             }
         }
     }

@@ -17,7 +17,7 @@ import com.example.mymoney.presentation.components.EmojiIcon
 import com.example.mymoney.presentation.components.ListItemComponent
 import com.example.mymoney.presentation.components.TrailingIcon
 import com.example.mymoney.utils.DateUtils
-import com.example.mymoney.utils.formatAmount
+import com.example.mymoney.utils.formatAmountWithCurrency
 import com.example.mymoney.R
 
 
@@ -46,7 +46,7 @@ fun HistoryScreenContent(
         Divider()
         ListItemComponent(
             title = stringResource(R.string.list_item_text_sum),
-            trailingText = uiState.total.formatAmount(),
+            trailingText = uiState.total.formatAmountWithCurrency(),
             itemHeight = 56.dp,
             backgroundColor = MaterialTheme.colorScheme.secondary,
         )
@@ -64,7 +64,7 @@ fun HistoryScreenContent(
                     ListItemComponent(
                         title = transaction.category.name,
                         subtitle = transaction.comment,
-                        trailingText = transaction.amount.formatAmount(),
+                        trailingText = transaction.amount.formatAmountWithCurrency(),
                         trailingSubText = DateUtils.formatIsoToDayMonth(transaction.transactionDate),
                         leadingIcon = {
                             EmojiIcon(emoji = transaction.category.emoji)

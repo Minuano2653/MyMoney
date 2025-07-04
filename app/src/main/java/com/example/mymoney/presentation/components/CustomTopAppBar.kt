@@ -14,7 +14,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.mymoney.R
-import com.example.mymoney.presentation.components.model.TopAppBarState
 import com.example.mymoney.presentation.theme.MyMoneyTheme
 
 

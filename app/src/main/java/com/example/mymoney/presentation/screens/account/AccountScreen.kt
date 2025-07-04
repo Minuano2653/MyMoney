@@ -25,13 +25,13 @@ import com.example.mymoney.presentation.components.EmojiIcon
 import com.example.mymoney.presentation.components.ListItemComponent
 import com.example.mymoney.presentation.components.TrailingIcon
 import com.example.mymoney.presentation.theme.MyMoneyTheme
-import com.example.mymoney.utils.formatAmount
+import com.example.mymoney.utils.formatAmountWithCurrency
 import com.example.mymoney.utils.toSymbol
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun AccountScreen(
-    onNavigateToEditAccount: () -> Unit,
+    onNavigateToEditAccount: (Int) -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     viewModel: AccountViewModel = hiltViewModel()
@@ -65,16 +65,12 @@ fun AccountScreen(
                     snackbarHostState.showSnackbar(effect.message)
                 }
                 is AccountSideEffect.NavigateToEditAccount -> {
-                    onNavigateToEditAccount()
-                }
-                is AccountSideEffect.NavigateToChangeCurrency-> {
-                    //TODO: навигация на смену валюты
+                    onNavigateToEditAccount(38) //TODO: пока захардкожено
                 }
             }
         }
     }
 }
-
 
 @Composable
 fun AccountScreenContent(
@@ -85,7 +81,7 @@ fun AccountScreenContent(
     Column(modifier = modifier.fillMaxSize()) {
         ListItemComponent(
             title = uiState.name,
-            trailingText = uiState.balance.formatAmount(),
+            trailingText = uiState.balance.formatAmountWithCurrency(),
             leadingIcon = {
                 EmojiIcon(
                     "\uD83D\uDCB0",
@@ -105,7 +101,6 @@ fun AccountScreenContent(
             trailingIcon = {
                 TrailingIcon()
             },
-            onClick = {onEvent(AccountEvent.OnCurrencyClicked)},
             itemHeight = 56.dp,
             backgroundColor = MaterialTheme.colorScheme.secondary,
         )

@@ -16,7 +16,7 @@ import javax.inject.Inject
  * ViewModel для экрана доходов.
  *
  * Отвечает за загрузку списка доходов через [getTransactionsByPeriodUseCase],
- * обработку событий UI, управление состоянием [ExpensesUiState] и генерацию сайд-эффектов [ExpensesSideEffect].
+ * обработку событий UI, управление состоянием [IncomesUiState] и генерацию сайд-эффектов [ExpensesSideEffect].
  *
  * @property getTransactionsByPeriodUseCase Юзкейс для получения списка доходов.
  * @property networkMonitor Монитор состояния сети, обновляет UI при изменении подключения.

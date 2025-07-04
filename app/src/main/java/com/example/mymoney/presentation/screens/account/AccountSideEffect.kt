@@ -8,6 +8,5 @@ import com.example.mymoney.presentation.base.contract.BaseSideEffect
  */
 sealed class AccountSideEffect: BaseSideEffect {
     data object NavigateToEditAccount : AccountSideEffect()
-    data object NavigateToChangeCurrency : AccountSideEffect()
     data class ShowError(val message: String) : AccountSideEffect()
 }

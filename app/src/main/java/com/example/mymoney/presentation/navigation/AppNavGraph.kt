@@ -7,7 +7,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.mymoney.domain.entity.Transaction
 
 /**
  * Навигационный граф приложения, объединяющий навигацию по основным экранам.
@@ -18,7 +17,7 @@ import com.example.mymoney.domain.entity.Transaction
  * @param expensesHistoryScreenContent composable контент для экрана "История расходов".
  * @param incomesTodayScreenContent composable контент для экрана "Доходы сегодня".
  * @param incomesHistoryScreenContent composable контент для экрана "История доходов".
- * @param accountScreenContent composable контент для экрана "Аккаунт".
+ * @param accountInfoScreenContent composable контент для экрана "Аккаунт".
  * @param categoriesScreenContent composable контент для экрана "Категории".
  * @param settingsScreenContent composable контент для экрана "Настройки".
  */
@@ -30,7 +29,8 @@ fun AppNavGraph(
     expensesHistoryScreenContent: @Composable () -> Unit,
     incomesTodayScreenContent: @Composable () -> Unit,
     incomesHistoryScreenContent: @Composable () -> Unit,
-    accountScreenContent: @Composable () -> Unit,
+    accountInfoScreenContent: @Composable () -> Unit,
+    editAccountScreenContent: @Composable () -> Unit,
     categoriesScreenContent: @Composable () -> Unit,
     settingsScreenContent: @Composable () -> Unit,
 ) {
@@ -53,9 +53,10 @@ fun AppNavGraph(
             incomesTodayScreenContent = incomesTodayScreenContent,
             incomesHistoryScreenContent = incomesHistoryScreenContent
         )
-        composable(Screen.Account.route) {
-            accountScreenContent()
-        }
+        accountNavGraph(
+            accountInfoScreenContent = accountInfoScreenContent,
+            editAccountScreenContent = editAccountScreenContent
+        )
         composable(Screen.Categories.route) {
             categoriesScreenContent()
         }

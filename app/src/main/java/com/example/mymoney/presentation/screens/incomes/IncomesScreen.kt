@@ -29,9 +29,8 @@ import com.example.mymoney.presentation.components.TrailingIcon
 import com.example.mymoney.presentation.components.Divider
 import com.example.mymoney.presentation.components.ListItemComponent
 import com.example.mymoney.presentation.components.CustomFloatingActionButton
-import com.example.mymoney.presentation.navigation.Screen
 import com.example.mymoney.presentation.theme.MyMoneyTheme
-import com.example.mymoney.utils.formatAmount
+import com.example.mymoney.utils.formatAmountWithCurrency
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -110,7 +109,7 @@ fun IncomesScreenContent(
                 backgroundColor = MaterialTheme.colorScheme.secondary,
                 itemHeight = 56.dp,
                 title = "Всего",
-                trailingText = uiState.total.formatAmount()
+                trailingText = uiState.total.formatAmountWithCurrency()
             )
             Divider()
             LazyColumn {
@@ -118,7 +117,7 @@ fun IncomesScreenContent(
                     ListItemComponent(
                         title = incomes.category.name,
                         subtitle = incomes.comment,
-                        trailingText = incomes.amount.formatAmount(),
+                        trailingText = incomes.amount.formatAmountWithCurrency(),
                         leadingIcon = {
                             EmojiIcon(emoji = incomes.category.emoji)
                         },

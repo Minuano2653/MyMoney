@@ -33,6 +33,9 @@ class NavigationState(
             }
         }
     }
+    fun navigateToEditAccount(route: String, accountId: Int) {
+        navHostController.navigate("$route/$accountId")
+    }
 }
 
 /**

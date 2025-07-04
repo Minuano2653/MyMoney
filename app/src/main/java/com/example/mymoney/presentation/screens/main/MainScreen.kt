@@ -27,6 +27,7 @@ import com.example.mymoney.presentation.navigation.Screen
 import com.example.mymoney.presentation.navigation.rememberNavigationState
 import com.example.mymoney.presentation.screens.account.AccountScreen
 import com.example.mymoney.presentation.screens.categories.CategoriesScreen
+import com.example.mymoney.presentation.screens.edit_account.EditAccountScreen
 import com.example.mymoney.presentation.screens.expenses.ExpensesScreen
 import com.example.mymoney.presentation.screens.history.HistoryScreen
 import com.example.mymoney.presentation.screens.incomes.IncomesScreen
@@ -128,9 +129,14 @@ fun MainScreen(
                     modifier = modifier
                 )
             },
-            accountScreenContent = {
+            accountInfoScreenContent = {
                 AccountScreen(
-                    onNavigateToEditAccount = { /*navigationState.navigateTo("Навигация на экран редактирования")*/ },
+                    onNavigateToEditAccount = { accountId ->
+                        navigationState.navigateToEditAccount(
+                            route = Screen.ROUTE_EDIT_ACCOUNT,
+                            accountId = accountId
+                        )
+                    },
                     modifier = modifier
                 )
             },
@@ -156,7 +162,13 @@ fun MainScreen(
                     onNavigateBack = { navigationState.navHostController.popBackStack() },
                     modifier = modifier
                 )
-            }
+            },
+            editAccountScreenContent = {
+                EditAccountScreen(
+                    onNavigateBack = { navigationState.navHostController.popBackStack() },
+                    modifier = modifier,
+                )
+            },
         )
     }
 }
