@@ -31,7 +31,6 @@ fun SplashScreen(
     LaunchedEffect(Unit) {
         viewModel.handleEvent(SplashEvent.LoadAccount)
     }
-    //val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.splash_animation))
     val progress by animateLottieCompositionAsState(

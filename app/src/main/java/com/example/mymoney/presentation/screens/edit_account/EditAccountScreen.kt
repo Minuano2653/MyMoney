@@ -107,10 +107,6 @@ fun EditAccountScreen(
                 is EditAccountSideEffect.ShowError -> {
                     snackbarHostState.showSnackbar(effect.message)
                 }
-
-                is EditAccountSideEffect.ShowSuccess -> {
-                    snackbarHostState.showSnackbar(effect.message)
-                }
             }
         }
     }

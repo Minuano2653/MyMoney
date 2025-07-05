@@ -5,5 +5,4 @@ import com.example.mymoney.presentation.base.contract.BaseSideEffect
 sealed class EditAccountSideEffect: BaseSideEffect {
     object NavigateBack : EditAccountSideEffect()
     data class ShowError(val message: String) : EditAccountSideEffect()
-    data class ShowSuccess(val message: String) : EditAccountSideEffect()
 }

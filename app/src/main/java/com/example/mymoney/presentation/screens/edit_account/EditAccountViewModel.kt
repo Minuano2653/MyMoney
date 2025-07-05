@@ -1,6 +1,5 @@
 package com.example.mymoney.presentation.screens.edit_account
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.mymoney.domain.usecase.GetAccountUseCase
@@ -8,10 +7,9 @@ import com.example.mymoney.domain.usecase.UpdateAccountUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
 import com.example.mymoney.presentation.navigation.Screen
 import com.example.mymoney.utils.NetworkMonitor
-import com.example.mymoney.utils.formatAmount
-import com.example.mymoney.utils.formatAmountWithCurrency
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -26,6 +24,9 @@ class EditAccountViewModel @Inject constructor(
         networkMonitor,
         EditAccountUiState()
 ) {
+    private var loadAccountJob: Job? = null
+    private var saveChangesJob: Job? = null
+
     private val accountId: Int by lazy {
         savedStateHandle.get<Int>(Screen.Companion.ARGUMENT_ACCOUNT_ID)!!
     }
@@ -83,7 +84,8 @@ class EditAccountViewModel @Inject constructor(
     }
 
     private fun loadAccount() {
-        viewModelScope.launch(Dispatchers.IO) {
+        loadAccountJob?.cancel()
+        loadAccountJob = viewModelScope.launch(Dispatchers.IO) {
             _uiState.update { it.copy(isLoading = true, error = null) }
 
             val result = getAccountUseCase()
@@ -109,7 +111,8 @@ class EditAccountViewModel @Inject constructor(
     }
 
     private fun saveChanges() {
-        Log.d("EDIT_ACCOUNT_VIEW_MODEL", "save changes")
+        saveChangesJob?.cancel()
+
         val currentState = _uiState.value
 
         if (currentState.name.isBlank()) {
@@ -122,7 +125,7 @@ class EditAccountViewModel @Inject constructor(
             return
         }
 
-        viewModelScope.launch(Dispatchers.IO) {
+        saveChangesJob = viewModelScope.launch(Dispatchers.IO) {
             _uiState.update { it.copy(isSaving = true, error = null) }
 
             val result = updateAccountUseCase(
@@ -141,7 +144,6 @@ class EditAccountViewModel @Inject constructor(
                             error = null
                         )
                     }
-                    _sideEffect.emit(EditAccountSideEffect.ShowSuccess("Счёт успешно обновлён"))
                     _sideEffect.emit(EditAccountSideEffect.NavigateBack)
                 }
                 .onFailure { e ->
@@ -159,4 +161,9 @@ class EditAccountViewModel @Inject constructor(
                 currency != originalCurrency
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        loadAccountJob?.cancel()
+        saveChangesJob?.cancel()
+    }
 }
