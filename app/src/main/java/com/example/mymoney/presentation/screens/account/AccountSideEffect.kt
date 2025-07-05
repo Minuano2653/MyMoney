@@ -7,6 +7,6 @@ import com.example.mymoney.presentation.base.contract.BaseSideEffect
  * Используются для навигации и отображения одноразовых событий, таких как ошибки.
  */
 sealed class AccountSideEffect: BaseSideEffect {
-    data object NavigateToEditAccount : AccountSideEffect()
-    data class ShowError(val message: String) : AccountSideEffect()
+    data class NavigateToEditAccount(val accountId: Int): AccountSideEffect()
+    data class ShowError(val message: String): AccountSideEffect()
 }

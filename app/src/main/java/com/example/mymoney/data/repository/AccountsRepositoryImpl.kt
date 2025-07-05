@@ -1,5 +1,6 @@
 package com.example.mymoney.data.repository
 
+import com.example.mymoney.data.remote.datasource.AccountDataStore
 import com.example.mymoney.data.remote.datasource.AccountsRemoteDataSource
 import com.example.mymoney.data.remote.dto.UpdateAccountRequest
 import com.example.mymoney.domain.entity.Account
@@ -14,7 +15,8 @@ import javax.inject.Inject
  */
 class AccountsRepositoryImpl @Inject constructor(
     private val remoteDataSource: AccountsRemoteDataSource,
-): BaseRepository(), AccountsRepository {
+    private val dataStore: AccountDataStore
+) : BaseRepository(), AccountsRepository {
     override suspend fun getAccountById(accountId: Int): Result<Account> {
         return callWithRetry {
             remoteDataSource
@@ -36,9 +38,36 @@ class AccountsRepositoryImpl @Inject constructor(
                 balance = balance,
                 currency = currency
             )
-            remoteDataSource
+            val account = remoteDataSource
                 .updateAccount(accountId, request)
                 .toDomain()
+
+            dataStore.saveAccount(account)
+            account
+        }
+    }
+
+    override suspend fun getInitAccountInfo(): Result<Account> {
+        return callWithRetry {
+            val account = remoteDataSource.getAccounts()[0].toDomain()
+
+            dataStore.saveAccount(account)
+            account
+        }
+    }
+
+    override suspend fun getAccountId(): Result<Int> {
+        return try {
+            val localAccountId = dataStore.getAccountId()
+
+            if (localAccountId != null) {
+                Result.success(localAccountId)
+            } else {
+                getInitAccountInfo()
+                    .map { account -> account.id }
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.example.mymoney.presentation.screens.incomes
 
 import androidx.lifecycle.viewModelScope
+import com.example.mymoney.domain.usecase.GetCurrentAccountUseCase
 import com.example.mymoney.domain.usecase.GetTransactionsByPeriodUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
 import com.example.mymoney.presentation.screens.expenses.ExpensesSideEffect
@@ -8,6 +9,7 @@ import com.example.mymoney.presentation.screens.expenses.ExpensesUiState
 import com.example.mymoney.utils.NetworkMonitor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -24,6 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class IncomesViewModel @Inject constructor(
     private val getTransactionsByPeriodUseCase: GetTransactionsByPeriodUseCase,
+    private val getCurrentAccountUseCase: GetCurrentAccountUseCase,
     networkMonitor: NetworkMonitor
 ): BaseViewModel<IncomesUiState, IncomesEvent, IncomesSideEffect>(
     networkMonitor,
@@ -31,6 +34,7 @@ class IncomesViewModel @Inject constructor(
 ) {
     init {
         handleEvent(IncomesEvent.LoadIncomes)
+        observeAccountChanges()
     }
 
     override fun handleEvent(event: IncomesEvent) {
@@ -72,6 +76,18 @@ class IncomesViewModel @Inject constructor(
                     }
                     _sideEffect.emit(IncomesSideEffect.ShowError(e.message ?: "Неизвестная ошибка"))
                 }
+        }
+    }
+
+    private fun observeAccountChanges() {
+        viewModelScope.launch {
+            getCurrentAccountUseCase().collectLatest { account ->
+                account?.let {
+                    _uiState.update { currentState ->
+                        currentState.copy(currency = it.currency)
+                    }
+                }
+            }
         }
     }
 

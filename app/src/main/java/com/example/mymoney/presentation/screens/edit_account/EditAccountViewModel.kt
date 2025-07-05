@@ -86,13 +86,13 @@ class EditAccountViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update { it.copy(isLoading = true, error = null) }
 
-            val result = getAccountUseCase(accountId)
+            val result = getAccountUseCase()
             result
                 .onSuccess { account ->
                     _uiState.update {
                         it.copy(
                             name = account.name,
-                            balance = account.balance.formatAmount(),
+                            balance = account.balance.toString(),
                             currency = account.currency,
                             isLoading = false,
                             error = null

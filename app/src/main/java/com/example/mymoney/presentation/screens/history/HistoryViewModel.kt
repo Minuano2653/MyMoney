@@ -3,6 +3,7 @@ package com.example.mymoney.presentation.screens.history
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.example.mymoney.domain.usecase.GetCurrentAccountUseCase
 import com.example.mymoney.domain.usecase.GetTransactionsByPeriodUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
 import com.example.mymoney.presentation.navigation.Screen
@@ -11,6 +12,7 @@ import com.example.mymoney.utils.NetworkMonitor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.job
@@ -30,6 +32,7 @@ import javax.inject.Inject
 class HistoryViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getTransactionsByPeriodUseCase: GetTransactionsByPeriodUseCase,
+    private val getCurrentAccountUseCase: GetCurrentAccountUseCase,
     networkMonitor: NetworkMonitor
 ): BaseViewModel<HistoryUiState, HistoryEvent, HistorySideEffect>(
     networkMonitor,
@@ -41,8 +44,8 @@ class HistoryViewModel @Inject constructor(
     private var loadTransactionsJob: Job? = null
 
     init {
-        Log.d("EXPENSES_VIEW_MODEL", isIncome.toString())
         handleEvent(HistoryEvent.LoadTransactions)
+        observeAccountChanges()
     }
 
     override fun onCleared() {
@@ -111,6 +114,18 @@ class HistoryViewModel @Inject constructor(
                         }
                         emitEffect(HistorySideEffect.ShowError(e.message ?: "Неизвестная ошибка"))
                     }
+            }
+        }
+    }
+
+    private fun observeAccountChanges() {
+        viewModelScope.launch {
+            getCurrentAccountUseCase().collectLatest { account ->
+                account?.let {
+                    _uiState.update { currentState ->
+                        currentState.copy(currency = it.currency)
+                    }
+                }
             }
         }
     }

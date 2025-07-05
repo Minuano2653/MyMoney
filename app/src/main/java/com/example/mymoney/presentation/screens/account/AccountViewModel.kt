@@ -2,10 +2,12 @@ package com.example.mymoney.presentation.screens.account
 
 import androidx.lifecycle.viewModelScope
 import com.example.mymoney.domain.usecase.GetAccountUseCase
+import com.example.mymoney.domain.usecase.GetCurrentAccountUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
 import com.example.mymoney.utils.NetworkMonitor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,6 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AccountViewModel @Inject constructor(
     private val getAccountUseCase: GetAccountUseCase,
+    private val getCurrentAccountUseCase: GetCurrentAccountUseCase,
     networkMonitor: NetworkMonitor
 ): BaseViewModel<AccountUiState, AccountEvent, AccountSideEffect>(
     networkMonitor,
@@ -28,6 +31,7 @@ class AccountViewModel @Inject constructor(
 ){
     init {
         handleEvent(AccountEvent.LoadAccount)
+        observeAccountChanges()
     }
 
     override fun handleEvent(event: AccountEvent) {
@@ -36,7 +40,7 @@ class AccountViewModel @Inject constructor(
                 loadAccount()
             }
             AccountEvent.OnEditClicked -> {
-                emitEffect(AccountSideEffect.NavigateToEditAccount)
+                emitEffect(AccountSideEffect.NavigateToEditAccount(uiState.value.accountId))
             }
         }
     }
@@ -50,6 +54,7 @@ class AccountViewModel @Inject constructor(
                 .onSuccess { account ->
                     _uiState.update {
                         it.copy(
+                            accountId = account.id,
                             name = account.name,
                             balance = account.balance,
                             currency = account.currency,
@@ -64,6 +69,22 @@ class AccountViewModel @Inject constructor(
                     }
                     _sideEffect.emit(AccountSideEffect.ShowError(e.message ?: "Неизвестная ошибка"))
                 }
+        }
+    }
+
+    private fun observeAccountChanges() {
+        viewModelScope.launch {
+            getCurrentAccountUseCase().collectLatest { account ->
+                account?.let {
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            name = it.name,
+                            balance = it.balance,
+                            currency = it.currency
+                        )
+                    }
+                }
+            }
         }
     }
 

@@ -5,7 +5,7 @@ import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
 
-fun BigDecimal.formatAmountWithCurrency(currency: String = "₽"): String {
+fun BigDecimal.formatAmountWithCurrency(currency: String = ""): String {
     val symbols = DecimalFormatSymbols(Locale("ru")).apply {
         groupingSeparator = ' '
         decimalSeparator = ','

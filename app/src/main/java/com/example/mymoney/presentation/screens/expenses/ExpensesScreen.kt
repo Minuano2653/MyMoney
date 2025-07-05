@@ -32,7 +32,8 @@ import com.example.mymoney.presentation.components.ListItemComponent
 import com.example.mymoney.presentation.components.TrailingIcon
 import com.example.mymoney.presentation.components.CustomFloatingActionButton
 import com.example.mymoney.presentation.theme.MyMoneyTheme
-import com.example.mymoney.utils.formatAmountWithCurrency
+import com.example.mymoney.utils.formatAmount
+import com.example.mymoney.utils.toSymbol
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -111,7 +112,7 @@ fun ExpensesScreenContent(
         Column(modifier = modifier.fillMaxSize()) {
             ListItemComponent(
                 title = stringResource(R.string.list_item_text_total),
-                trailingText = uiState.total.formatAmountWithCurrency(),
+                trailingText = "${uiState.total.formatAmount()} ${uiState.currency.toSymbol()}",
                 backgroundColor = MaterialTheme.colorScheme.secondary,
                 itemHeight = 56.dp
             )
@@ -121,7 +122,7 @@ fun ExpensesScreenContent(
                     ListItemComponent(
                         title = expense.category.name,
                         subtitle = expense.comment,
-                        trailingText = expense.amount.formatAmountWithCurrency(),
+                        trailingText = "${expense.amount.formatAmount()} ${uiState.currency.toSymbol()}",
                         leadingIcon = { EmojiIcon(emoji = expense.category.emoji) },
                         trailingIcon = { TrailingIcon() },
                         onClick = { onEvent(ExpensesEvent.OnTransactionClicked) }

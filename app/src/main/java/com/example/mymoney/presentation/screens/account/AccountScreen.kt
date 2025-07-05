@@ -25,6 +25,7 @@ import com.example.mymoney.presentation.components.EmojiIcon
 import com.example.mymoney.presentation.components.ListItemComponent
 import com.example.mymoney.presentation.components.TrailingIcon
 import com.example.mymoney.presentation.theme.MyMoneyTheme
+import com.example.mymoney.utils.formatAmount
 import com.example.mymoney.utils.formatAmountWithCurrency
 import com.example.mymoney.utils.toSymbol
 import kotlinx.coroutines.flow.collectLatest
@@ -65,7 +66,7 @@ fun AccountScreen(
                     snackbarHostState.showSnackbar(effect.message)
                 }
                 is AccountSideEffect.NavigateToEditAccount -> {
-                    onNavigateToEditAccount(38) //TODO: пока захардкожено
+                    onNavigateToEditAccount(effect.accountId) //TODO: пока захардкожено
                 }
             }
         }
@@ -81,7 +82,7 @@ fun AccountScreenContent(
     Column(modifier = modifier.fillMaxSize()) {
         ListItemComponent(
             title = uiState.name,
-            trailingText = uiState.balance.formatAmountWithCurrency(),
+            trailingText = "${uiState.balance.formatAmount()} ${uiState.currency.toSymbol()}",
             leadingIcon = {
                 EmojiIcon(
                     "\uD83D\uDCB0",

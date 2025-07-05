@@ -2,11 +2,14 @@ package com.example.mymoney.presentation.screens.expenses
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.example.mymoney.data.remote.datasource.AccountDataStore
+import com.example.mymoney.domain.usecase.GetCurrentAccountUseCase
 import com.example.mymoney.domain.usecase.GetTransactionsByPeriodUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
 import com.example.mymoney.utils.NetworkMonitor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,14 +26,15 @@ import javax.inject.Inject
 @HiltViewModel
 class ExpensesViewModel @Inject constructor(
     private val getTransactionsByPeriodUseCase: GetTransactionsByPeriodUseCase,
+    private val getCurrentAccountUseCase: GetCurrentAccountUseCase,
     networkMonitor: NetworkMonitor
 ): BaseViewModel<ExpensesUiState, ExpensesEvent, ExpensesSideEffect>(
     networkMonitor,
     ExpensesUiState()
 ) {
-
     init {
         handleEvent(ExpensesEvent.LoadExpenses)
+        observeAccountChanges()
     }
 
     override fun handleEvent(event: ExpensesEvent) {
@@ -73,6 +77,18 @@ class ExpensesViewModel @Inject constructor(
                     }
                     _sideEffect.emit(ExpensesSideEffect.ShowError(e.message ?: "Неизвестная ошибка"))
                 }
+        }
+    }
+
+    private fun observeAccountChanges() {
+        viewModelScope.launch {
+            getCurrentAccountUseCase().collectLatest { account ->
+                account?.let {
+                    _uiState.update { currentState ->
+                        currentState.copy(currency = it.currency)
+                    }
+                }
+            }
         }
     }
 
