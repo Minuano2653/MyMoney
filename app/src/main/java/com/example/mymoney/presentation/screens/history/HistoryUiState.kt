@@ -24,6 +24,8 @@ data class HistoryUiState(
     val currency: String = "",
     val startDate: String = DateUtils.getFirstDayOfCurrentMonth(),
     val endDate: String = DateUtils.getTodayFormatted(),
+    val showStartDatePicker: Boolean = false,
+    val showEndDatePicker: Boolean = false,
     val error: String? = null,
     val isNetworkAvailable: Boolean = true
 ): BaseUiState

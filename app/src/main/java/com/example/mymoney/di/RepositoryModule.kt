@@ -1,5 +1,6 @@
 package com.example.mymoney.di
 
+import com.example.mymoney.data.remote.datasource.AccountDataStore
 import com.example.mymoney.data.remote.datasource.AccountsRemoteDataSource
 import com.example.mymoney.data.remote.datasource.CategoriesRemoteDataSource
 import com.example.mymoney.data.remote.datasource.TransactionsRemoteDataSource
@@ -31,8 +32,9 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideAccountsRepository(
-        remoteDataSource: AccountsRemoteDataSource
-    ): AccountsRepository = AccountsRepositoryImpl(remoteDataSource)
+        remoteDataSource: AccountsRemoteDataSource,
+        dataStore: AccountDataStore
+    ): AccountsRepository = AccountsRepositoryImpl(remoteDataSource, dataStore)
 
     @Provides
     @Singleton

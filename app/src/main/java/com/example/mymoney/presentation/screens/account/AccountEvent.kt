@@ -9,5 +9,4 @@ import com.example.mymoney.presentation.base.contract.BaseEvent
 sealed class AccountEvent: BaseEvent {
     object LoadAccount : AccountEvent()
     object OnEditClicked : AccountEvent()
-    object OnCurrencyClicked : AccountEvent()
 }

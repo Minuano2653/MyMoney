@@ -15,6 +15,4 @@ sealed class HistorySideEffect: BaseSideEffect {
     data class ShowError(val message: String) : HistorySideEffect()
     object NavigateBack : HistorySideEffect()
     object NavigateToAnalysis : HistorySideEffect()
-    object ShowStartDatePicker : HistorySideEffect()
-    object ShowEndDatePicker : HistorySideEffect()
 }

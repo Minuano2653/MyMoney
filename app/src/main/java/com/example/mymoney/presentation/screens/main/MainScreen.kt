@@ -1,8 +1,7 @@
-package com.example.mymoney.presentation.screens
+package com.example.mymoney.presentation.screens.main
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -14,30 +13,25 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.mymoney.R
-import com.example.mymoney.presentation.components.CustomTopAppBar
 import com.example.mymoney.presentation.navigation.AppNavGraph
 import com.example.mymoney.presentation.navigation.BottomNavItem
-import com.example.mymoney.presentation.components.model.FabState
-import com.example.mymoney.presentation.components.model.TopAppBarState
+import com.example.mymoney.presentation.navigation.Screen
 import com.example.mymoney.presentation.navigation.rememberNavigationState
 import com.example.mymoney.presentation.screens.account.AccountScreen
 import com.example.mymoney.presentation.screens.categories.CategoriesScreen
+import com.example.mymoney.presentation.screens.edit_account.EditAccountScreen
 import com.example.mymoney.presentation.screens.expenses.ExpensesScreen
-import com.example.mymoney.presentation.screens.history.expenses.ExpensesHistoryScreen
+import com.example.mymoney.presentation.screens.history.HistoryScreen
 import com.example.mymoney.presentation.screens.incomes.IncomesScreen
 import com.example.mymoney.presentation.screens.settings.SettingsScreen
-import com.example.mymoney.presentation.screens.history.incomes.IncomesHistoryScreen
 import com.example.mymoney.presentation.theme.MyMoneyTheme
 
 @Preview
@@ -48,44 +42,16 @@ fun MainScreenPreview() {
     }
 }
 
-/**
- * Главный экран приложения с навигацией и базовым UI-скелетом.
- *
- * Содержит Scaffold с верхней панелью (TopAppBar), нижней навигационной панелью (NavigationBar),
- * плавающей кнопкой действия (FAB) и Snackbar для отображения сообщений.
- *
- * Управляет состоянием TopAppBar, FAB и навигацией между основными разделами приложения:
- * Расходы, Доходы, Счёт, Категории и Настройки.
- *
- * Использует [AppNavGraph] для построения навигационного графа с экранами:
- * - ExpensesScreen
- * - IncomesScreen
- * - AccountScreen
- * - CategoriesScreen
- * - SettingsScreen
- * - ExpensesHistoryScreen
- * - IncomesHistoryScreen
- *
- * Взаимодействие с UI-элементами происходит через лямбды для обновления состояний TopAppBar и FAB,
- * а также для навигации и показа snackbar.
- */
 @Composable
-fun MainScreen() {
+fun MainScreen(
+    modifier: Modifier = Modifier,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
+) {
     val navigationState = rememberNavigationState()
 
-    var topAppBarState by remember {
-        mutableStateOf(TopAppBarState())
-    }
-    var fabState by remember {
-        mutableStateOf(FabState())
-    }
-    val snackbarHostState = remember { SnackbarHostState() }
-
     Scaffold(
+        contentWindowInsets = WindowInsets(0.dp),
         containerColor = MaterialTheme.colorScheme.surface,
-        topBar = {
-            CustomTopAppBar(topAppBarState)
-        },
         bottomBar = {
             val navBackStackEntry by navigationState.navHostController.currentBackStackEntryAsState()
 
@@ -132,78 +98,77 @@ fun MainScreen() {
                 }
             }
         },
-        floatingActionButton = {
-            if (fabState.isVisible && fabState.onClick != null) {
-                FloatingActionButton(
-                    onClick = fabState.onClick!!,
-                    shape = CircleShape,
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                ) {
-                    Icon(
-                        painter = painterResource(fabState.iconRes),
-                        contentDescription = stringResource(R.string.fab_description)
-                    )
-                }
-            }
-        },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         AppNavGraph(
+            modifier = modifier.padding(paddingValues),
             navHostController = navigationState.navHostController,
-            modifier = Modifier.padding(paddingValues),
             expensesTodayScreenContent = {
                 ExpensesScreen(
-                    onUpdateTopAppBar = { newState -> topAppBarState = newState },
-                    onUpdateFabState = { newState -> fabState = newState },
-                    onNavigateToHistory = { route -> navigationState.navigateTo(route) },
-                    onShowSnackbar = { message -> snackbarHostState.showSnackbar(message) },
+                    onNavigateToHistory = {
+                        navigationState.navigateToHistory(
+                            route = Screen.ROUTE_EXPENSES_HISTORY,
+                            isIncome = false
+                        )
+                    },
+                    onNavigateToAddExpense = { /*navigationState.navigateTo("навигация на экран добавления")*/ },
+                    onNavigateToTransactionDetail = { /*navigationState.navigateTo("навигация на детальную инфу")*/ },
+                    modifier = modifier
                 )
             },
             incomesTodayScreenContent = {
                 IncomesScreen(
-                    onUpdateTopAppBar = { newState -> topAppBarState = newState },
-                    onUpdateFabState = { newState -> fabState = newState },
-                    onNavigateToHistory = { route -> navigationState.navigateTo(route) },
-                    onShowSnackbar = { message -> snackbarHostState.showSnackbar(message) },
+                    onNavigateToHistory = {
+                        navigationState.navigateToHistory(
+                            route = Screen.ROUTE_INCOMES_HISTORY,
+                            isIncome = true
+                        )
+                    },
+                    onNavigateToAddIncome = { /*navigationState.navigateTo("навигация на экран добавления")*/ },
+                    onNavigateToTransactionDetail = { /*navigationState.navigateTo("навигация на экран добавления")*/ },
+                    modifier = modifier
                 )
             },
-            accountScreenContent = {
+            accountInfoScreenContent = {
                 AccountScreen(
-                    onUpdateTopAppBar = { newState -> topAppBarState = newState },
-                    onUpdateFabState = { newState -> fabState = newState },
-                    onShowSnackbar = { message -> snackbarHostState.showSnackbar(message) },
+                    onNavigateToEditAccount = { accountId ->
+                        navigationState.navigateToEditAccount(
+                            route = Screen.ROUTE_EDIT_ACCOUNT,
+                            accountId = accountId
+                        )
+                    },
+                    modifier = modifier
                 )
             },
             categoriesScreenContent = {
                 CategoriesScreen(
-                    onUpdateTopAppBar = { newState -> topAppBarState = newState },
-                    onUpdateFabState = { newState -> fabState = newState },
-                    onShowSnackbar = { message -> snackbarHostState.showSnackbar(message) },
+                    onNavigateToCategoriesDetail = { /*navigationState.navigateTo("Навигация на категорию")*/ },
+                    modifier = modifier
                 )
             },
             settingsScreenContent = {
                 SettingsScreen(
-                    onUpdateTopAppBar = { newState -> topAppBarState = newState },
-                    onUpdateFabState = { newState -> fabState = newState }
+                    modifier = modifier
                 )
             },
             expensesHistoryScreenContent = {
-                ExpensesHistoryScreen(
-                    onUpdateTopAppBar = { newState -> topAppBarState = newState },
-                    onUpdateFabState = { newState -> fabState = newState },
-                    onShowSnackbar = { message -> snackbarHostState.showSnackbar(message) },
+                HistoryScreen(
                     onNavigateBack = { navigationState.navHostController.popBackStack() },
+                    modifier = modifier
                 )
             },
             incomesHistoryScreenContent = {
-                IncomesHistoryScreen(
-                    onUpdateTopAppBar = { newState -> topAppBarState = newState },
-                    onUpdateFabState = { newState -> fabState = newState },
-                    onShowSnackbar = { message -> snackbarHostState.showSnackbar(message) },
+                HistoryScreen(
                     onNavigateBack = { navigationState.navHostController.popBackStack() },
+                    modifier = modifier
                 )
-            }
+            },
+            editAccountScreenContent = {
+                EditAccountScreen(
+                    onNavigateBack = { navigationState.navHostController.popBackStack() },
+                    modifier = modifier,
+                )
+            },
         )
     }
 }

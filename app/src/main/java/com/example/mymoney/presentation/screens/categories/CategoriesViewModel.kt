@@ -1,11 +1,22 @@
 package com.example.mymoney.presentation.screens.categories
 
 import androidx.lifecycle.viewModelScope
+import com.example.mymoney.domain.entity.Category
 import com.example.mymoney.domain.usecase.GetCategoriesUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
 import com.example.mymoney.utils.NetworkMonitor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,6 +38,22 @@ class CategoriesViewModel @Inject constructor(
     CategoriesUiState()
 ) {
 
+    private var allCategories: List<Category> = emptyList()
+
+    override val uiState: StateFlow<CategoriesUiState> = combine(
+        super.uiState,
+        super.uiState.map { it.searchQuery }.distinctUntilChanged()
+    ) { state, query ->
+        val filtered = if (query.isBlank()) {
+            allCategories
+        } else {
+            allCategories.filter {
+                it.name.contains(query.trim(), ignoreCase = true)
+            }
+        }
+        state.copy(categories = filtered)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), super.uiState.value)
+
     init {
         handleEvent(CategoriesEvent.LoadCategories)
     }
@@ -38,8 +65,11 @@ class CategoriesViewModel @Inject constructor(
             }
             is CategoriesEvent.OnCategoryClicked -> {
                 viewModelScope.launch {
-                    _sideEffect.emit(CategoriesSideEffect.NavigateToCategoryDetails)
+                    emitEffect(CategoriesSideEffect.NavigateToCategoryDetails)
                 }
+            }
+            is CategoriesEvent.OnSearchQueryChanged -> {
+                _uiState.update { it.copy(searchQuery = event.query) }
             }
         }
     }
@@ -51,9 +81,10 @@ class CategoriesViewModel @Inject constructor(
             val result = getCategoriesUseCase()
             result
                 .onSuccess { categories ->
+                    allCategories = categories
                     _uiState.update {
                         it.copy(
-                            categories = categories,
+                            /*categories = categories,*/
                             isLoading = false,
                             error = null
                         )

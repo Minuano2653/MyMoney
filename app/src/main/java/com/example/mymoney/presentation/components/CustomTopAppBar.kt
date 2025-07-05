@@ -1,5 +1,7 @@
 package com.example.mymoney.presentation.components
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -12,29 +14,30 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.mymoney.R
-import com.example.mymoney.presentation.components.model.TopAppBarState
 import com.example.mymoney.presentation.theme.MyMoneyTheme
 
-/**
- * Компонент верхнего AppBar с центрированным заголовком и опциональными иконками слева и справа.
- *
- * @param state Состояние AppBar, содержащее ресурсы заголовка, иконок и обработчики кликов.
- */
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CustomTopAppBar(state: TopAppBarState) {
+fun CustomTopAppBar(
+    @StringRes titleRes: Int = R.string.top_bar_title_expenses,
+    @DrawableRes leadingIconRes: Int? = null,
+    @DrawableRes trailingIconRes: Int? = null,
+    onLeadingClick: (() -> Unit)? = null,
+    onTrailingClick: (() -> Unit)? = null
+) {
     CenterAlignedTopAppBar(
         title = {
             Text(
-                text = stringResource(state.titleRes),
+                text = stringResource(titleRes),
                 style = MaterialTheme.typography.titleLarge
             )
         },
         navigationIcon = {
-            if (state.leadingIconRes != null && state.onLeadingClick != null) {
-                IconButton(onClick = state.onLeadingClick) {
+            if (leadingIconRes != null && onLeadingClick != null) {
+                IconButton(onClick = onLeadingClick) {
                     Icon(
-                        painter = painterResource(state.leadingIconRes),
+                        painter = painterResource(leadingIconRes),
                         tint = MaterialTheme.colorScheme.onSurface,
                         contentDescription = null
                     )
@@ -42,10 +45,10 @@ fun CustomTopAppBar(state: TopAppBarState) {
             }
         },
         actions = {
-            if (state.trailingIconRes != null && state.onTrailingClick != null) {
-                IconButton(onClick = state.onTrailingClick) {
+            if (trailingIconRes != null && onTrailingClick != null) {
+                IconButton(onClick = onTrailingClick) {
                     Icon(
-                        painter = painterResource(state.trailingIconRes),
+                        painter = painterResource(trailingIconRes),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -64,11 +67,9 @@ fun CustomTopAppBar(state: TopAppBarState) {
 fun MyTopAppBarPreview() {
     MyMoneyTheme {
         CustomTopAppBar(
-            TopAppBarState(
-                titleRes = R.string.top_bar_title_expenses,
-                trailingIconRes = R.drawable.ic_history,
-                onTrailingClick = {}
-            )
+            titleRes = R.string.top_bar_title_expenses,
+            trailingIconRes = R.drawable.ic_history,
+            onTrailingClick = {}
         )
     }
 }

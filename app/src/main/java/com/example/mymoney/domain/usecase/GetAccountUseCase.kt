@@ -11,11 +11,18 @@ import javax.inject.Inject
  * @param repository Репозиторий аккаунтов.
  */
 class GetAccountUseCase @Inject constructor(
-    private val repository: AccountsRepository
+    private val repository: AccountsRepository,
+    private val getAccountIdUseCase: GetAccountIdUseCase
 ) {
-    suspend operator fun invoke(
-        accountId: Int = 38,
-    ): Result<Account> {
-        return repository.getAccountById(accountId)
+    suspend operator fun invoke(): Result<Account> {
+        return getAccountIdUseCase()
+            .fold(
+                onSuccess = { accountId ->
+                    repository.getAccountById(accountId)
+                },
+                onFailure = { exception ->
+                    Result.failure(exception)
+                }
+            )
     }
 }

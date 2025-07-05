@@ -30,6 +30,12 @@ sealed class Screen(
     object Account: Screen(
         route = ROUTE_ACCOUNT,
     )
+    object AccountInfo: Screen(
+        route = ROUTE_ACCOUNT_INFO,
+    )
+    object EditAccount: Screen(
+        route = ROUTE_EDIT_ACCOUNT,
+    )
     object Categories: Screen(
         route = ROUTE_CATEGORIES,
     )
@@ -37,8 +43,10 @@ sealed class Screen(
         route = ROUTE_SETTINGS,
     )
 
-
     companion object {
+        const val ARGUMENT_HISTORY = "isIncome"
+        const val ARGUMENT_ACCOUNT_ID = "accountId"
+
         const val ROUTE_EXPENSES = "Expenses"
         const val ROUTE_INCOMES = "Incomes"
         const val ROUTE_ACCOUNT = "Account"
@@ -48,5 +56,7 @@ sealed class Screen(
         const val ROUTE_EXPENSES_TODAY = "ExpensesToday"
         const val ROUTE_INCOMES_HISTORY = "IncomesHistory"
         const val ROUTE_INCOMES_TODAY = "IncomesToday"
+        const val ROUTE_ACCOUNT_INFO = "AccountInfo"
+        const val ROUTE_EDIT_ACCOUNT = "EditAccount"
     }
 }

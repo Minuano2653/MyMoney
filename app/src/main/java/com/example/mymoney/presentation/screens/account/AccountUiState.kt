@@ -15,6 +15,7 @@ import java.math.BigDecimal
  */
 data class AccountUiState(
     val isLoading: Boolean = false,
+    val accountId: Int = -1,
     val name: String = "",
     val balance: BigDecimal = BigDecimal(0),
     val currency: String = "",

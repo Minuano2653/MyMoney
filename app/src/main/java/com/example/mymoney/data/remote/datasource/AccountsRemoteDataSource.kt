@@ -2,6 +2,9 @@ package com.example.mymoney.data.remote.datasource
 
 import com.example.mymoney.data.remote.api.AccountsApi
 import com.example.mymoney.data.remote.dto.AccountDto
+import com.example.mymoney.data.remote.dto.ShortAccountDto
+import com.example.mymoney.data.remote.dto.UpdateAccountRequest
+import com.example.mymoney.data.remote.dto.UpdateAccountResponse
 import javax.inject.Inject
 
 /**
@@ -14,5 +17,13 @@ class AccountsRemoteDataSource @Inject constructor(
 )  {
     suspend fun getAccountById(id: Int): AccountDto {
         return api.getAccountById(id)
+    }
+
+    suspend fun getAccounts(): List<ShortAccountDto> {
+        return api.getAccounts()
+    }
+
+    suspend fun updateAccount(id: Int, request: UpdateAccountRequest): UpdateAccountResponse {
+        return api.updateAccount(id, request)
     }
 }

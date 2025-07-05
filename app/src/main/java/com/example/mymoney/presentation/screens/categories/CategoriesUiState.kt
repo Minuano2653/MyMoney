@@ -14,6 +14,7 @@ import com.example.mymoney.presentation.base.contract.BaseUiState
 data class CategoriesUiState(
     val isLoading: Boolean = false,
     val categories: List<Category> = emptyList(),
+    val searchQuery: String = "",
     val error: String? = null,
     val isNetworkAvailable: Boolean = true
 ): BaseUiState

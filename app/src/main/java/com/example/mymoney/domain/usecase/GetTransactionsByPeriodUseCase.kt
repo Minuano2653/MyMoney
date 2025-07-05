@@ -1,0 +1,29 @@
+package com.example.mymoney.domain.usecase
+
+import com.example.mymoney.domain.entity.Transaction
+import com.example.mymoney.domain.repository.TransactionsRepository
+import com.example.mymoney.utils.DateUtils
+import javax.inject.Inject
+
+class GetTransactionsByPeriodUseCase @Inject constructor(
+    private val repository: TransactionsRepository,
+    private val getAccountIdUseCase: GetAccountIdUseCase
+) {
+    suspend operator fun invoke(
+        isIncome: Boolean,
+        startDate: String = DateUtils.getTodayFormatted(),
+        endDate: String = DateUtils.getTodayFormatted()
+    ): Result<List<Transaction>> {
+        return getAccountIdUseCase().fold(
+            onSuccess = { accountId ->
+                repository.getTransactionsByPeriod(accountId, startDate, endDate)
+                    .map { transactions ->
+                        transactions.filter { it.category.isIncome == isIncome }
+                    }
+            },
+            onFailure = { exception ->
+                Result.failure(exception)
+            }
+        )
+    }
+}

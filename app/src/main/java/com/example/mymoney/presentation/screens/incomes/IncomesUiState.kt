@@ -17,6 +17,7 @@ data class IncomesUiState(
     val isLoading: Boolean = false,
     val incomes: List<Transaction> = emptyList(),
     val total: BigDecimal = BigDecimal(0),
+    val currency: String = "",
     val error: String? = null,
     val isNetworkAvailable: Boolean = true
 ): BaseUiState

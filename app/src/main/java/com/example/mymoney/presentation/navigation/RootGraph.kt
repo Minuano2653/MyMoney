@@ -5,7 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.mymoney.presentation.screens.MainScreen
+import com.example.mymoney.presentation.screens.main.MainScreen
 import com.example.mymoney.presentation.screens.splash.SplashScreen
 
 
