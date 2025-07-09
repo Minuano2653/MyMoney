@@ -26,7 +26,6 @@ import com.example.mymoney.presentation.components.ListItemComponent
 import com.example.mymoney.presentation.components.TrailingIcon
 import com.example.mymoney.presentation.theme.MyMoneyTheme
 import com.example.mymoney.utils.formatAmount
-import com.example.mymoney.utils.formatAmountWithCurrency
 import com.example.mymoney.utils.toSymbol
 import kotlinx.coroutines.flow.collectLatest
 

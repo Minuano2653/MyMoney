@@ -1,12 +1,12 @@
 package com.example.mymoney.presentation.screens.history
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.example.mymoney.domain.usecase.GetCurrentAccountUseCase
 import com.example.mymoney.domain.usecase.GetTransactionsByPeriodUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
-import com.example.mymoney.presentation.navigation.Screen
+import com.example.mymoney.presentation.navigation.TransactionsHistory
 import com.example.mymoney.utils.DateUtils
 import com.example.mymoney.utils.NetworkMonitor
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,9 +38,10 @@ class HistoryViewModel @Inject constructor(
     networkMonitor,
     HistoryUiState()
 ) {
-    private val isIncome: Boolean by lazy {
+    private val isIncome: Boolean = savedStateHandle.toRoute<TransactionsHistory>().isIncome
+    /*private val isIncome: Boolean by lazy {
         savedStateHandle.get<Boolean>(Screen.Companion.ARGUMENT_HISTORY)!!
-    }
+    }*/
     private var loadTransactionsJob: Job? = null
 
     init {

@@ -31,5 +31,10 @@
     <string name="settings_item_lang">Язык</string>
     <string name="settings_item_about">О программе</string>
 
+    <string name="bottom_label_expenses">Расходы</string>
+    <string name="bottom_label_incomes">Доходы</string>
+    <string name="bottom_label_account">Счет</string>
+    <string name="bottom_label_categories">Статьи</string>
+    <string name="bottom_label_settings">Настройки</string>
 
 </resources>

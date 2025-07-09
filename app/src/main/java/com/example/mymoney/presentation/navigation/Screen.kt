@@ -1,62 +1,34 @@
 package com.example.mymoney.presentation.navigation
 
+import kotlinx.serialization.Serializable
 
-/**
- * Навигационные маршруты приложения, представленные в виде sealed-класса.
- *
- * @property route Строковое значение маршрута для использования в NavHost.
- */
-sealed class Screen(
-    val route: String,
-) {
-    object Expenses: Screen(
-        route = ROUTE_EXPENSES,
-    )
-    object ExpensesHistory: Screen(
-        route = ROUTE_EXPENSES_HISTORY
-    )
-    object ExpensesToday: Screen(
-        route = ROUTE_EXPENSES_TODAY
-    )
-    object Incomes: Screen(
-        route = ROUTE_INCOMES,
-    )
-    object IncomesHistory: Screen(
-        route = ROUTE_INCOMES_HISTORY
-    )
-    object IncomesToday: Screen(
-        route = ROUTE_INCOMES_TODAY
-    )
-    object Account: Screen(
-        route = ROUTE_ACCOUNT,
-    )
-    object AccountInfo: Screen(
-        route = ROUTE_ACCOUNT_INFO,
-    )
-    object EditAccount: Screen(
-        route = ROUTE_EDIT_ACCOUNT,
-    )
-    object Categories: Screen(
-        route = ROUTE_CATEGORIES,
-    )
-    object Settings: Screen(
-        route = ROUTE_SETTINGS,
-    )
+@Serializable
+object Expenses
 
-    companion object {
-        const val ARGUMENT_HISTORY = "isIncome"
-        const val ARGUMENT_ACCOUNT_ID = "accountId"
+@Serializable
+object Incomes
 
-        const val ROUTE_EXPENSES = "Expenses"
-        const val ROUTE_INCOMES = "Incomes"
-        const val ROUTE_ACCOUNT = "Account"
-        const val ROUTE_CATEGORIES = "Categories"
-        const val ROUTE_SETTINGS = "Settings"
-        const val ROUTE_EXPENSES_HISTORY = "ExpensesHistory"
-        const val ROUTE_EXPENSES_TODAY = "ExpensesToday"
-        const val ROUTE_INCOMES_HISTORY = "IncomesHistory"
-        const val ROUTE_INCOMES_TODAY = "IncomesToday"
-        const val ROUTE_ACCOUNT_INFO = "AccountInfo"
-        const val ROUTE_EDIT_ACCOUNT = "EditAccount"
-    }
-}
+@Serializable
+object Account
+
+@Serializable
+object Categories
+
+@Serializable
+object Settings
+
+@Serializable
+object ExpensesToday
+
+@Serializable
+object IncomesToday
+
+@Serializable
+data class TransactionsHistory(val isIncome: Boolean)
+
+@Serializable
+object AccountInfo
+
+@Serializable
+data class EditAccount(val accountId: Int)
+

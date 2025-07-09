@@ -26,41 +26,41 @@ fun AppNavGraph(
     navHostController: NavHostController,
     modifier: Modifier = Modifier,
     expensesTodayScreenContent: @Composable () -> Unit,
-    expensesHistoryScreenContent: @Composable () -> Unit,
+    expensesHistoryScreenContent: @Composable (Boolean) -> Unit,
     incomesTodayScreenContent: @Composable () -> Unit,
-    incomesHistoryScreenContent: @Composable () -> Unit,
+    incomesHistoryScreenContent: @Composable (Boolean) -> Unit,
     accountInfoScreenContent: @Composable () -> Unit,
-    editAccountScreenContent: @Composable () -> Unit,
+    editAccountScreenContent: @Composable (Int) -> Unit,
     categoriesScreenContent: @Composable () -> Unit,
     settingsScreenContent: @Composable () -> Unit,
 ) {
     NavHost(
         navController = navHostController,
-        startDestination = Screen.Expenses.route,
-        enterTransition = {
-            EnterTransition.None
-        },
-        exitTransition = {
-            ExitTransition.None
-        },
+        startDestination = Expenses,
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None },
         modifier = modifier
     ) {
         expensesNavGraph(
             expensesTodayScreenContent = expensesTodayScreenContent,
             expensesHistoryScreenContent = expensesHistoryScreenContent
         )
+
         incomesNavGraph(
             incomesTodayScreenContent = incomesTodayScreenContent,
             incomesHistoryScreenContent = incomesHistoryScreenContent
         )
+
         accountNavGraph(
             accountInfoScreenContent = accountInfoScreenContent,
             editAccountScreenContent = editAccountScreenContent
         )
-        composable(Screen.Categories.route) {
+
+        composable<Categories> {
             categoriesScreenContent()
         }
-        composable(Screen.Settings.route) {
+
+        composable<Settings> {
             settingsScreenContent()
         }
     }

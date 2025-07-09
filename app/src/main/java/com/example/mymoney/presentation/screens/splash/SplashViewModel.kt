@@ -32,19 +32,13 @@ class SplashViewModel @Inject constructor(
             val result = getInitAccountUseCase()
             result.fold(
                 onSuccess = {
-                    _uiState.update { it.copy(isLoading = false, error = null) }
+                    _uiState.update { it.copy(isLoading = false) }
                 },
                 onFailure = { e ->
-                    _uiState.update { it.copy(isLoading = false, error = e.message) }
+                    _uiState.update { it.copy(isLoading = false) }
                 }
             )
             emitEffect(SplashSideEffect.NavigateToMain)
-        }
-    }
-
-    override fun onNetworkStateChanged(isConnected: Boolean) {
-        if (!isConnected) {
-            emitEffect(SplashSideEffect.ShowError("Нет подключения к интернету"))
         }
     }
 }

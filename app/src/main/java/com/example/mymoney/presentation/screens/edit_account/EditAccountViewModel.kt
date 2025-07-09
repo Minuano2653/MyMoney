@@ -2,10 +2,11 @@ package com.example.mymoney.presentation.screens.edit_account
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.example.mymoney.domain.usecase.GetAccountUseCase
 import com.example.mymoney.domain.usecase.UpdateAccountUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
-import com.example.mymoney.presentation.navigation.Screen
+import com.example.mymoney.presentation.navigation.EditAccount
 import com.example.mymoney.utils.NetworkMonitor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -27,9 +28,8 @@ class EditAccountViewModel @Inject constructor(
     private var loadAccountJob: Job? = null
     private var saveChangesJob: Job? = null
 
-    private val accountId: Int by lazy {
-        savedStateHandle.get<Int>(Screen.Companion.ARGUMENT_ACCOUNT_ID)!!
-    }
+    private val accountId = savedStateHandle.toRoute<EditAccount>().accountId
+
     private var originalName: String = ""
     private var originalBalance: String = ""
     private var originalCurrency: String = ""

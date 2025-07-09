@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.dagger.hilt)
+    alias(libs.plugins.kotlin.serialization)
     kotlin("kapt")
 }
 
@@ -94,5 +95,7 @@ dependencies {
     implementation(libs.logging.interceptor)
 
     implementation(libs.androidx.datastore.preferences)
+
+    implementation(libs.kotlinx.serialization.json)
 
 }

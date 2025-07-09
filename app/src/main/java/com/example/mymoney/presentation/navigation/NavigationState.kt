@@ -14,8 +14,9 @@ import androidx.navigation.compose.rememberNavController
 class NavigationState(
     val navHostController: NavHostController
 ) {
-    fun navigateTo(route: String) {
-        navHostController.navigate(route) {
+
+    fun navigateTo(destination: Any) {
+        navHostController.navigate(destination) {
             popUpTo(navHostController.graph.findStartDestination().id) {
                 saveState = true
             }
@@ -23,20 +24,16 @@ class NavigationState(
             restoreState = true
         }
     }
-    fun navigateToHistory(route: String, isIncome: Boolean) {
-        when(isIncome) {
-            true -> {
-                navHostController.navigate("$route/true")
-            }
-            false -> {
-                navHostController.navigate("$route/false")
-            }
-        }
+
+    fun navigateToEditAccount(accountId: Int) {
+        navHostController.navigate(EditAccount(accountId = accountId))
     }
-    fun navigateToEditAccount(route: String, accountId: Int) {
-        navHostController.navigate("$route/$accountId")
+
+    fun navigateBack() {
+        navHostController.popBackStack()
     }
 }
+
 
 /**
  * Хелпер-функция для запоминания [NavigationState] внутри Composable.

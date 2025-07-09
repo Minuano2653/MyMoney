@@ -16,14 +16,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.mymoney.R
+import com.example.mymoney.presentation.navigation.Account
 import com.example.mymoney.presentation.navigation.AppNavGraph
 import com.example.mymoney.presentation.navigation.BottomNavItem
-import com.example.mymoney.presentation.navigation.Screen
+import com.example.mymoney.presentation.navigation.Categories
+import com.example.mymoney.presentation.navigation.Expenses
+import com.example.mymoney.presentation.navigation.Incomes
+import com.example.mymoney.presentation.navigation.Settings
 import com.example.mymoney.presentation.navigation.rememberNavigationState
 import com.example.mymoney.presentation.screens.account.AccountScreen
 import com.example.mymoney.presentation.screens.categories.CategoriesScreen
@@ -33,14 +39,8 @@ import com.example.mymoney.presentation.screens.history.HistoryScreen
 import com.example.mymoney.presentation.screens.incomes.IncomesScreen
 import com.example.mymoney.presentation.screens.settings.SettingsScreen
 import com.example.mymoney.presentation.theme.MyMoneyTheme
-
-@Preview
-@Composable
-fun MainScreenPreview() {
-    MyMoneyTheme {
-        MainScreen()
-    }
-}
+import androidx.navigation.NavDestination.Companion.hasRoute
+import com.example.mymoney.presentation.navigation.TransactionsHistory
 
 @Composable
 fun MainScreen(
@@ -54,34 +54,33 @@ fun MainScreen(
         containerColor = MaterialTheme.colorScheme.surface,
         bottomBar = {
             val navBackStackEntry by navigationState.navHostController.currentBackStackEntryAsState()
+            val currentDestination = navBackStackEntry?.destination
 
             val navigationList = listOf(
-                BottomNavItem.Expenses,
-                BottomNavItem.Incomes,
-                BottomNavItem.Account,
-                BottomNavItem.Categories,
-                BottomNavItem.Settings
-            )
+                BottomNavItem(Expenses, R.string.bottom_label_expenses, R.drawable.ic_expenses),
+                BottomNavItem(Incomes, R.string.bottom_label_incomes, R.drawable.ic_incomes),
+                BottomNavItem(Account, R.string.bottom_label_account, R.drawable.ic_account),
+                BottomNavItem(Categories, R.string.bottom_label_categories, R.drawable.ic_categories),
+                BottomNavItem(Settings, R.string.bottom_label_settings, R.drawable.ic_settings)
+                )
 
             NavigationBar(containerColor = MaterialTheme.colorScheme.surfaceContainer) {
                 navigationList.forEach { item ->
-                    val selected = navBackStackEntry?.destination?.hierarchy?.any {
-                        it.route == item.screen.route
-                    } == true
+                    val selected = currentDestination?.hierarchy?.any { it.hasRoute(item.route::class) } == true
                     NavigationBarItem(
                         selected = selected,
                         onClick = {
-                            navigationState.navigateTo(item.screen.route)
+                            navigationState.navigateTo(item.route)
                         },
                         icon = {
                             Icon(
                                 painter = painterResource(item.iconRes),
-                                contentDescription = item.label
+                                contentDescription = stringResource(item.labelRes)
                             )
                         },
                         label = {
                             Text(
-                                text = item.label,
+                                text = stringResource(item.labelRes),
                                 style = MaterialTheme.typography.labelMedium.copy(
                                     fontWeight = if (selected) FontWeight.W600 else FontWeight.Medium
                                 )
@@ -106,10 +105,7 @@ fun MainScreen(
             expensesTodayScreenContent = {
                 ExpensesScreen(
                     onNavigateToHistory = {
-                        navigationState.navigateToHistory(
-                            route = Screen.ROUTE_EXPENSES_HISTORY,
-                            isIncome = false
-                        )
+                        navigationState.navHostController.navigate(TransactionsHistory(false))
                     },
                     onNavigateToAddExpense = { /*navigationState.navigateTo("навигация на экран добавления")*/ },
                     onNavigateToTransactionDetail = { /*navigationState.navigateTo("навигация на детальную инфу")*/ },
@@ -119,10 +115,7 @@ fun MainScreen(
             incomesTodayScreenContent = {
                 IncomesScreen(
                     onNavigateToHistory = {
-                        navigationState.navigateToHistory(
-                            route = Screen.ROUTE_INCOMES_HISTORY,
-                            isIncome = true
-                        )
+                        navigationState.navHostController.navigate(TransactionsHistory(true))
                     },
                     onNavigateToAddIncome = { /*navigationState.navigateTo("навигация на экран добавления")*/ },
                     onNavigateToTransactionDetail = { /*navigationState.navigateTo("навигация на экран добавления")*/ },
@@ -132,10 +125,7 @@ fun MainScreen(
             accountInfoScreenContent = {
                 AccountScreen(
                     onNavigateToEditAccount = { accountId ->
-                        navigationState.navigateToEditAccount(
-                            route = Screen.ROUTE_EDIT_ACCOUNT,
-                            accountId = accountId
-                        )
+                        navigationState.navigateToEditAccount(accountId = accountId)
                     },
                     modifier = modifier
                 )
@@ -153,22 +143,30 @@ fun MainScreen(
             },
             expensesHistoryScreenContent = {
                 HistoryScreen(
-                    onNavigateBack = { navigationState.navHostController.popBackStack() },
+                    onNavigateBack = { navigationState.navigateBack() },
                     modifier = modifier
                 )
             },
             incomesHistoryScreenContent = {
                 HistoryScreen(
-                    onNavigateBack = { navigationState.navHostController.popBackStack() },
+                    onNavigateBack = { navigationState.navigateBack() },
                     modifier = modifier
                 )
             },
             editAccountScreenContent = {
                 EditAccountScreen(
-                    onNavigateBack = { navigationState.navHostController.popBackStack() },
+                    onNavigateBack = { navigationState.navigateBack() },
                     modifier = modifier,
                 )
-            },
+            }
         )
+    }
+}
+
+@Preview
+@Composable
+fun MainScreenPreview() {
+    MyMoneyTheme {
+        MainScreen()
     }
 }
