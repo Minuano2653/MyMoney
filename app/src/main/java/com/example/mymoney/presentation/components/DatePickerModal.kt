@@ -19,13 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.mymoney.R
 
-/**
- * Диалоговое окно выбора даты с кнопками подтверждения, отмены и очистки выбора.
- *
- * @param initialSelectedDateMillis Начальное выбранное значение даты в миллисекундах (или null).
- * @param onDateSelected Колбэк, вызываемый при подтверждении выбора даты, передаёт выбранное время в миллисекундах или null.
- * @param onDismiss Колбэк для закрытия диалогового окна.
- */
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerModal(

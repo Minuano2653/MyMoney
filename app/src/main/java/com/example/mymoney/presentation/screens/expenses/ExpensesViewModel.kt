@@ -14,15 +14,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/**
- * ViewModel для экрана расходов.
- *
- * Отвечает за загрузку списка расходов через [getTransactionsByPeriodUseCase],
- * обработку событий UI, управление состоянием [ExpensesUiState] и генерацию сайд-эффектов [ExpensesSideEffect].
- *
- * @property getTransactionsByPeriodUseCase Юзкейс для получения списка расходов.
- * @property networkMonitor Монитор состояния сети, обновляет UI при изменении подключения.
- */
+
 @HiltViewModel
 class ExpensesViewModel @Inject constructor(
     private val getTransactionsByPeriodUseCase: GetTransactionsByPeriodUseCase,
@@ -33,7 +25,7 @@ class ExpensesViewModel @Inject constructor(
     ExpensesUiState()
 ) {
     init {
-        handleEvent(ExpensesEvent.LoadExpenses)
+        //handleEvent(ExpensesEvent.LoadExpenses)
         observeAccountChanges()
     }
 
@@ -49,14 +41,13 @@ class ExpensesViewModel @Inject constructor(
                 emitEffect(ExpensesSideEffect.NavigateToAddExpense)
             }
             is ExpensesEvent.OnTransactionClicked -> {
-                emitEffect(ExpensesSideEffect.NavigateToTransactionDetail)
+                emitEffect(ExpensesSideEffect.NavigateToTransactionDetail(event.expense.id))
             }
         }
     }
 
     private fun loadExpenses() {
         viewModelScope.launch(Dispatchers.IO) {
-            Log.d("VIEW_MODEL", "load expenses")
             _uiState.update { it.copy(isLoading = true, error = null) }
 
             val result = getTransactionsByPeriodUseCase(isIncome = false)

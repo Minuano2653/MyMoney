@@ -1,5 +1,6 @@
 package com.example.mymoney.presentation.screens.expenses
 
+import com.example.mymoney.domain.entity.Transaction
 import com.example.mymoney.presentation.base.contract.BaseEvent
 
 /**
@@ -10,5 +11,5 @@ sealed class ExpensesEvent: BaseEvent {
     object LoadExpenses: ExpensesEvent()
     object OnHistoryClicked: ExpensesEvent()
     object OnAddClicked: ExpensesEvent()
-    object OnTransactionClicked: ExpensesEvent()
+    data class OnTransactionClicked(val expense: Transaction): ExpensesEvent()
 }

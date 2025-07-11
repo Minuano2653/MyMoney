@@ -40,11 +40,14 @@ import kotlinx.coroutines.flow.collectLatest
 fun ExpensesScreen(
     onNavigateToHistory: () -> Unit,
     onNavigateToAddExpense: () -> Unit,
-    onNavigateToTransactionDetail: () -> Unit,
+    onNavigateToTransactionDetail: (Int) -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     viewModel: ExpensesViewModel = hiltViewModel(),
 ) {
+    LaunchedEffect(Unit) {
+        viewModel.handleEvent(ExpensesEvent.LoadExpenses)
+    }
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.surface,
@@ -86,10 +89,10 @@ fun ExpensesScreen(
                     onNavigateToHistory()
                 }
                 is ExpensesSideEffect.NavigateToAddExpense -> {
-                    /*onNavigateToAddExpense()*/
+                    onNavigateToAddExpense()
                 }
                 is ExpensesSideEffect.NavigateToTransactionDetail -> {
-                    /*onNavigateToTransactionDetail()*/
+                    onNavigateToTransactionDetail(effect.transactionId)
                 }
             }
         }
@@ -118,14 +121,17 @@ fun ExpensesScreenContent(
             )
             Divider()
             LazyColumn {
-                itemsIndexed(uiState.expenses) { _, expense ->
+                itemsIndexed(
+                    uiState.expenses,
+                    key = { _, expense -> expense.id }
+                ) { _, expense ->
                     ListItemComponent(
                         title = expense.category.name,
                         subtitle = expense.comment,
                         trailingText = "${expense.amount.formatAmount()} ${uiState.currency.toSymbol()}",
                         leadingIcon = { EmojiIcon(emoji = expense.category.emoji) },
                         trailingIcon = { TrailingIcon() },
-                        onClick = { onEvent(ExpensesEvent.OnTransactionClicked) }
+                        onClick = { onEvent(ExpensesEvent.OnTransactionClicked(expense)) }
                     )
                     Divider()
                 }

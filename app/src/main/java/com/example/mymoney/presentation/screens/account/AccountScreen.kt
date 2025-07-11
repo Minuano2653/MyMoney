@@ -65,7 +65,7 @@ fun AccountScreen(
                     snackbarHostState.showSnackbar(effect.message)
                 }
                 is AccountSideEffect.NavigateToEditAccount -> {
-                    onNavigateToEditAccount(effect.accountId) //TODO: пока захардкожено
+                    onNavigateToEditAccount(effect.accountId)
                 }
             }
         }

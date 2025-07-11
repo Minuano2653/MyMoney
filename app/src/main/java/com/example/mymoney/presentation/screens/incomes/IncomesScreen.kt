@@ -31,7 +31,6 @@ import com.example.mymoney.presentation.components.ListItemComponent
 import com.example.mymoney.presentation.components.CustomFloatingActionButton
 import com.example.mymoney.presentation.theme.MyMoneyTheme
 import com.example.mymoney.utils.formatAmount
-import com.example.mymoney.utils.formatAmountWithCurrency
 import com.example.mymoney.utils.toSymbol
 import kotlinx.coroutines.flow.collectLatest
 
@@ -39,11 +38,14 @@ import kotlinx.coroutines.flow.collectLatest
 fun IncomesScreen(
     onNavigateToHistory: () -> Unit,
     onNavigateToAddIncome: () -> Unit,
-    onNavigateToTransactionDetail: () -> Unit,
+    onNavigateToTransactionDetail: (Int?) -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     viewModel: IncomesViewModel = hiltViewModel(),
 ) {
+    LaunchedEffect(Unit) {
+        viewModel.handleEvent(IncomesEvent.LoadIncomes)
+    }
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.surface,
@@ -85,10 +87,10 @@ fun IncomesScreen(
                     onNavigateToHistory()
                 }
                 is IncomesSideEffect.NavigateToAddIncome -> {
-                    /*onNavigateToAddIncome()*/
+                    onNavigateToAddIncome()
                 }
                 is IncomesSideEffect.NavigateToTransactionDetail -> {
-                    /*onNavigateToTransactionDetail()*/
+                    onNavigateToTransactionDetail(effect.transactionId)
                 }
             }
         }
@@ -125,7 +127,8 @@ fun IncomesScreenContent(
                         },
                         trailingIcon = {
                             TrailingIcon()
-                        }
+                        },
+                        onClick = { onEvent(IncomesEvent.OnTransactionClicked(income)) }
                     )
                     Divider()
                 }

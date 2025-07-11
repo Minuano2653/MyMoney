@@ -1,6 +1,8 @@
 package com.example.mymoney.presentation.screens.history
 
+import com.example.mymoney.domain.entity.Transaction
 import com.example.mymoney.presentation.base.contract.BaseEvent
+import com.example.mymoney.presentation.screens.expenses.ExpensesEvent
 
 /**
  * События, которые может обрабатывать ViewModel экрана истории транзакций.
@@ -21,4 +23,5 @@ sealed class HistoryEvent: BaseEvent {
     data class OnEndDateSelected(val date: String) : HistoryEvent()
     object OnBackPressed : HistoryEvent()
     object OnAnalysisClicked : HistoryEvent()
+    data class OnTransactionClicked(val transaction: Transaction): HistoryEvent()
 }

@@ -15,7 +15,10 @@ import androidx.navigation.toRoute
 fun NavGraphBuilder.incomesNavGraph(
     incomesTodayScreenContent: @Composable () -> Unit,
     incomesHistoryScreenContent: @Composable (Boolean) -> Unit,
-) {
+    addIncomeScreenContent: @Composable (Boolean) -> Unit,
+    editIncomeScreenContent: @Composable (Boolean, Int?) -> Unit,
+
+    ) {
     navigation<Incomes>(
         startDestination = IncomesToday
     ) {
@@ -25,6 +28,14 @@ fun NavGraphBuilder.incomesNavGraph(
         composable<TransactionsHistory> { backStackEntry ->
             val args = backStackEntry.toRoute<TransactionsHistory>()
             incomesHistoryScreenContent(args.isIncome)
+        }
+        composable<TransactionDetail> { backStackEntry ->
+            val args = backStackEntry.toRoute<TransactionDetail>()
+            addIncomeScreenContent(args.isIncome)
+        }
+        composable<EditTransaction> { backStackEntry ->
+            val args = backStackEntry.toRoute<EditTransaction>()
+            editIncomeScreenContent(args.isIncome, args.transactionId)
         }
     }
 }

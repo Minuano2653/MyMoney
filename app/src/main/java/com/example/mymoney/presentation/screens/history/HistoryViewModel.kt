@@ -19,15 +19,7 @@ import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/**
- * ViewModel для экрана истории расходов.
- *
- * Отвечает за загрузку списка расходов за выбранный период, обработку выбора дат начала и конца периода,
- * а также управление состояниями загрузки, ошибками и навигационными эффектами.
- *
- * @property getTransactionsByPeriodUseCase UseCase для получения списка расходов.
- * @property networkMonitor Мониторинг состояния сети для реагирования на изменения подключения.
- */
+
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
@@ -39,13 +31,10 @@ class HistoryViewModel @Inject constructor(
     HistoryUiState()
 ) {
     private val isIncome: Boolean = savedStateHandle.toRoute<TransactionsHistory>().isIncome
-    /*private val isIncome: Boolean by lazy {
-        savedStateHandle.get<Boolean>(Screen.Companion.ARGUMENT_HISTORY)!!
-    }*/
+
     private var loadTransactionsJob: Job? = null
 
     init {
-        handleEvent(HistoryEvent.LoadTransactions)
         observeAccountChanges()
     }
 
@@ -78,6 +67,10 @@ class HistoryViewModel @Inject constructor(
             }
             is HistoryEvent.OnAnalysisClicked -> {
                 emitEffect(HistorySideEffect.NavigateToAnalysis)
+            }
+
+            is HistoryEvent.OnTransactionClicked -> {
+                emitEffect(HistorySideEffect.NavigateToEditTransaction(event.transaction.id))
             }
         }
     }

@@ -15,4 +15,8 @@ class CategoriesRemoteDataSource @Inject constructor(
     suspend fun getAllCategories(): List<CategoryDto> {
         return api.getAllCategories()
     }
+
+    suspend fun getCategoriesByType(isIncome: Boolean): List<CategoryDto> {
+        return api.getCategoriesByType(isIncome)
+    }
 }

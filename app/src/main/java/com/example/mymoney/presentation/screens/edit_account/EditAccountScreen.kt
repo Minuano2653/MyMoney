@@ -204,69 +204,6 @@ fun EditAccountScreenContent(
     }
 }
 
-/*@Composable
-fun EditAccountScreenContent(
-    modifier: Modifier = Modifier,
-    uiState: EditAccountUiState,
-    onEvent: (EditAccountEvent) -> Unit
-) {
-    Column(modifier = modifier.fillMaxSize()) {
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = uiState.name,
-            onValueChange = {},
-            placeholder = {
-                Text(
-                    text = "Название счёта",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            },
-            textStyle = MaterialTheme.typography.bodyLarge.copy(
-                textAlign = TextAlign.End
-            ),
-            shape = RectangleShape,
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color.White,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-            ),
-        )
-        Divider()
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = uiState.name,
-            onValueChange = {},
-            placeholder = {
-                Text(
-                    text = "Баланс",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            },
-            textStyle = MaterialTheme.typography.bodyLarge.copy(
-                textAlign = TextAlign.End
-            ),
-            shape = RectangleShape,
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color.White,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-            ),
-        )
-        ListItemComponent(
-            title = stringResource(R.string.list_item_text_currency),
-            trailingText = uiState.currency.toSymbol(),
-            trailingIcon = {
-                TrailingIcon()
-            },
-            onClick = { *//*onEvent()*//* },
-            itemHeight = 56.dp,
-            backgroundColor = Color.White,
-        )
-    }
-}*/
-
 @Preview()
 @Composable
 fun EditAccountScreenContentPreview() {

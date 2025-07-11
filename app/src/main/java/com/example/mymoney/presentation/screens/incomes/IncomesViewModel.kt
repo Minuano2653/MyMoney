@@ -33,7 +33,7 @@ class IncomesViewModel @Inject constructor(
     IncomesUiState()
 ) {
     init {
-        handleEvent(IncomesEvent.LoadIncomes)
+        //handleEvent(IncomesEvent.LoadIncomes)
         observeAccountChanges()
     }
 
@@ -49,7 +49,7 @@ class IncomesViewModel @Inject constructor(
                 emitEffect(IncomesSideEffect.NavigateToAddIncome)
             }
             is IncomesEvent.OnTransactionClicked -> {
-                emitEffect(IncomesSideEffect.NavigateToTransactionDetail)
+                emitEffect(IncomesSideEffect.NavigateToTransactionDetail(event.income.id))
             }
         }
     }

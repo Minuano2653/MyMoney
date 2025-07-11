@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.datastore.preferences.core.emptyPreferences
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mymoney.R
@@ -23,23 +24,17 @@ import com.example.mymoney.presentation.theme.MyMoneyTheme
 import com.example.mymoney.utils.DateUtils
 import kotlinx.coroutines.flow.collectLatest
 
-@Preview
-@Composable
-fun HistoryScreenPreview() {
-    MyMoneyTheme {
-        HistoryScreen(
-            onNavigateBack = {},
-        )
-    }
-}
-
 @Composable
 fun HistoryScreen(
     modifier: Modifier = Modifier,
     onNavigateBack: () -> Unit,
+    onNavigateToEditTransaction: (Int) -> Unit,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     viewModel: HistoryViewModel = hiltViewModel()
 ) {
+    LaunchedEffect(Unit) {
+        viewModel.handleEvent(HistoryEvent.LoadTransactions)
+    }
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         contentWindowInsets = WindowInsets(bottom = 0.dp),
@@ -100,15 +95,27 @@ fun HistoryScreen(
                 is HistorySideEffect.ShowError -> {
                     snackbarHostState.showSnackbar(effect.message)
                 }
-
-                HistorySideEffect.NavigateBack -> {
+                is HistorySideEffect.NavigateBack -> {
                     onNavigateBack()
                 }
-
-                HistorySideEffect.NavigateToAnalysis -> {
+                is HistorySideEffect.NavigateToEditTransaction -> {
+                    onNavigateToEditTransaction(effect.transactionId)
+                }
+                is HistorySideEffect.NavigateToAnalysis -> {
                     // TODO: навигация на экран анализа
                 }
             }
         }
+    }
+}
+
+@Preview
+@Composable
+fun HistoryScreenPreview() {
+    MyMoneyTheme {
+        HistoryScreen(
+            onNavigateBack = {},
+            onNavigateToEditTransaction = {}
+        )
     }
 }

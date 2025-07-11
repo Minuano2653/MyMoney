@@ -37,4 +37,7 @@
     <string name="bottom_label_categories">Статьи</string>
     <string name="bottom_label_settings">Настройки</string>
 
+    <string name="button_delete_expense">Удалить расход</string>
+    <string name="button_delete_income">Удалить доход</string>
+
 </resources>

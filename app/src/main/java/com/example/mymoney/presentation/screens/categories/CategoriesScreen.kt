@@ -87,7 +87,10 @@ fun CategoriesScreenContent(
             )
             Divider()
             LazyColumn {
-                itemsIndexed(uiState.categories) { _, category ->
+                itemsIndexed(
+                    uiState.categories,
+                    key = { _, category -> category.id }
+                ) { _, category ->
                     ListItemComponent(
                         title = category.name,
                         leadingIcon = {

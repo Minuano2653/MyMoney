@@ -1,6 +1,7 @@
 package com.example.mymoney.di
 
 import com.example.mymoney.data.remote.interceptor.AuthInterceptor
+import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -40,10 +41,14 @@ object NetworkModule {
     fun provideRetrofit(
         okHttpClient: OkHttpClient,
     ): Retrofit {
+        val gson = GsonBuilder()
+            .serializeNulls()
+            .create()
+
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
     }
 }

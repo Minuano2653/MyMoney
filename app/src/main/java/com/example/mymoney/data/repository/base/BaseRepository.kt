@@ -20,7 +20,8 @@ abstract class BaseRepository {
         while (currentAttempt <= times) {
             try {
                 Log.d("RETRY", "Current Attempt: $currentAttempt")
-                return Result.success(block())
+                val result = block()
+                return Result.success(result)
             } catch (e: Throwable) {
                 if (!retryCondition(e)) return Result.failure(e)
                 lastError = e

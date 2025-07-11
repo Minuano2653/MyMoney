@@ -11,8 +11,8 @@ class GetTransactionsByPeriodUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         isIncome: Boolean,
-        startDate: String = DateUtils.getTodayFormatted(),
-        endDate: String = DateUtils.getTodayFormatted()
+        startDate: String = DateUtils.getTodayYearMonthDayFormatted(),
+        endDate: String = DateUtils.getTodayYearMonthDayFormatted()
     ): Result<List<Transaction>> {
         return getAccountIdUseCase().fold(
             onSuccess = { accountId ->
