@@ -4,5 +4,4 @@ import com.example.mymoney.presentation.base.contract.BaseUiState
 
 data class SplashUiState(
     val isLoading: Boolean = true,
-    val error: String? = null
 ): BaseUiState

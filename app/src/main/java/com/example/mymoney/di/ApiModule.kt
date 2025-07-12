@@ -5,33 +5,19 @@ import com.example.mymoney.data.remote.api.CategoriesApi
 import com.example.mymoney.data.remote.api.TransactionsApi
 import dagger.Module
 import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
-import javax.inject.Singleton
 
-/**
- * Модуль Dagger-Hilt для предоставления API-интерфейсов.
- */
 @Module
-@InstallIn(SingletonComponent::class)
 object ApiModule {
+    @Provides
+    fun provideTransactionsApi(retrofit: Retrofit): TransactionsApi =
+        retrofit.create(TransactionsApi::class.java)
 
     @Provides
-    @Singleton
-    fun provideTransactionsApi(retrofit: Retrofit): TransactionsApi {
-        return retrofit.create(TransactionsApi::class.java)
-    }
+    fun provideAccountsApi(retrofit: Retrofit): AccountsApi =
+        retrofit.create(AccountsApi::class.java)
 
     @Provides
-    @Singleton
-    fun provideAccountsApi(retrofit: Retrofit): AccountsApi {
-        return retrofit.create(AccountsApi::class.java)
-    }
-
-    @Provides
-    @Singleton
-    fun provideCategoriesApi(retrofit: Retrofit): CategoriesApi {
-        return retrofit.create(CategoriesApi::class.java)
-    }
+    fun provideCategoriesApi(retrofit: Retrofit): CategoriesApi =
+        retrofit.create(CategoriesApi::class.java)
 }

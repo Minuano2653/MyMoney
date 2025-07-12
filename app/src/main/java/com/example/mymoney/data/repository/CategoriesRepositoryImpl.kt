@@ -19,4 +19,10 @@ class CategoriesRepositoryImpl @Inject constructor(
             remoteDataSource.getAllCategories().map { it.toDomain() }
         }
     }
+
+    override suspend fun getCategoriesByType(isIncome: Boolean): Result<List<Category>> {
+        return callWithRetry {
+            remoteDataSource.getCategoriesByType(isIncome).map { it.toDomain() }
+        }
+    }
 }

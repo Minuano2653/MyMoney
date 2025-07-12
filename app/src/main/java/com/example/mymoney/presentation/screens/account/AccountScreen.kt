@@ -16,9 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mymoney.R
+import com.example.mymoney.presentation.base.viewmodel.provideViewModelFactory
 import com.example.mymoney.presentation.components.CustomTopAppBar
 import com.example.mymoney.presentation.components.Divider
 import com.example.mymoney.presentation.components.EmojiIcon
@@ -26,7 +27,6 @@ import com.example.mymoney.presentation.components.ListItemComponent
 import com.example.mymoney.presentation.components.TrailingIcon
 import com.example.mymoney.presentation.theme.MyMoneyTheme
 import com.example.mymoney.utils.formatAmount
-import com.example.mymoney.utils.formatAmountWithCurrency
 import com.example.mymoney.utils.toSymbol
 import kotlinx.coroutines.flow.collectLatest
 
@@ -35,7 +35,7 @@ fun AccountScreen(
     onNavigateToEditAccount: (Int) -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    viewModel: AccountViewModel = hiltViewModel()
+    viewModel: AccountViewModel = viewModel(factory = provideViewModelFactory())
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -66,7 +66,7 @@ fun AccountScreen(
                     snackbarHostState.showSnackbar(effect.message)
                 }
                 is AccountSideEffect.NavigateToEditAccount -> {
-                    onNavigateToEditAccount(effect.accountId) //TODO: пока захардкожено
+                    onNavigateToEditAccount(effect.accountId)
                 }
             }
         }

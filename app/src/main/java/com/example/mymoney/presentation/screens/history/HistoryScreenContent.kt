@@ -12,13 +12,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.mymoney.R
 import com.example.mymoney.presentation.components.Divider
 import com.example.mymoney.presentation.components.EmojiIcon
 import com.example.mymoney.presentation.components.ListItemComponent
 import com.example.mymoney.presentation.components.TrailingIcon
 import com.example.mymoney.utils.DateUtils
-import com.example.mymoney.utils.formatAmountWithCurrency
-import com.example.mymoney.R
 import com.example.mymoney.utils.formatAmount
 import com.example.mymoney.utils.toSymbol
 
@@ -62,7 +61,10 @@ fun HistoryScreenContent(
             }
         } else {
             LazyColumn {
-                itemsIndexed(uiState.transactions) { _, transaction ->
+                itemsIndexed(
+                    items = uiState.transactions,
+                    key = { _, transaction -> transaction.id }
+                ) { _, transaction ->
                     ListItemComponent(
                         title = transaction.category.name,
                         subtitle = transaction.comment,
@@ -73,6 +75,9 @@ fun HistoryScreenContent(
                         },
                         trailingIcon = {
                             TrailingIcon()
+                        },
+                        onClick = {
+                            onEvent(HistoryEvent.OnTransactionClicked(transaction))
                         }
                     )
                     Divider()

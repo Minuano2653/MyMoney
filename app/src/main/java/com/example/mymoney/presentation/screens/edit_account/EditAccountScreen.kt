@@ -7,13 +7,11 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.ModalBottomSheetDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -31,12 +29,12 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mymoney.R
+import com.example.mymoney.presentation.base.viewmodel.provideViewModelFactory
 import com.example.mymoney.presentation.components.CurrencyBottomSheetContent
 import com.example.mymoney.presentation.components.CustomTopAppBar
 import com.example.mymoney.presentation.components.Divider
@@ -49,11 +47,15 @@ import kotlinx.coroutines.flow.collectLatest
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditAccountScreen(
+    accountId: Int,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    viewModel: EditAccountViewModel = hiltViewModel()
+    viewModel: EditAccountViewModel = viewModel(factory = provideViewModelFactory())
 ) {
+    LaunchedEffect(Unit) {
+        viewModel.handleEvent(EditAccountEvent.LoadAccount(accountId))
+    }
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         contentWindowInsets = WindowInsets(bottom = 0.dp),
@@ -66,7 +68,7 @@ fun EditAccountScreen(
                     viewModel.handleEvent(EditAccountEvent.OnCancelChangesClicked)
                 },
                 onTrailingClick = {
-                    viewModel.handleEvent(EditAccountEvent.OnSaveChangesClicked)
+                    viewModel.handleEvent(EditAccountEvent.OnSaveChangesClicked(accountId))
                 }
             )
         },
@@ -203,69 +205,6 @@ fun EditAccountScreenContent(
         }
     }
 }
-
-/*@Composable
-fun EditAccountScreenContent(
-    modifier: Modifier = Modifier,
-    uiState: EditAccountUiState,
-    onEvent: (EditAccountEvent) -> Unit
-) {
-    Column(modifier = modifier.fillMaxSize()) {
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = uiState.name,
-            onValueChange = {},
-            placeholder = {
-                Text(
-                    text = "Название счёта",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            },
-            textStyle = MaterialTheme.typography.bodyLarge.copy(
-                textAlign = TextAlign.End
-            ),
-            shape = RectangleShape,
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color.White,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-            ),
-        )
-        Divider()
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = uiState.name,
-            onValueChange = {},
-            placeholder = {
-                Text(
-                    text = "Баланс",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            },
-            textStyle = MaterialTheme.typography.bodyLarge.copy(
-                textAlign = TextAlign.End
-            ),
-            shape = RectangleShape,
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color.White,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-            ),
-        )
-        ListItemComponent(
-            title = stringResource(R.string.list_item_text_currency),
-            trailingText = uiState.currency.toSymbol(),
-            trailingIcon = {
-                TrailingIcon()
-            },
-            onClick = { *//*onEvent()*//* },
-            itemHeight = 56.dp,
-            backgroundColor = Color.White,
-        )
-    }
-}*/
 
 @Preview()
 @Composable

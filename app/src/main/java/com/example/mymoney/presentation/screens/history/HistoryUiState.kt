@@ -23,7 +23,7 @@ data class HistoryUiState(
     val total: BigDecimal = BigDecimal(0),
     val currency: String = "",
     val startDate: String = DateUtils.getFirstDayOfCurrentMonth(),
-    val endDate: String = DateUtils.getTodayFormatted(),
+    val endDate: String = DateUtils.getTodayYearMonthDayFormatted(),
     val showStartDatePicker: Boolean = false,
     val showEndDatePicker: Boolean = false,
     val error: String? = null,

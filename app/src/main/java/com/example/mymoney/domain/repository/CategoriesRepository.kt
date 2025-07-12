@@ -8,4 +8,5 @@ import com.example.mymoney.domain.entity.Category
  */
 interface CategoriesRepository {
     suspend fun getAllCategories(): Result<List<Category>>
+    suspend fun getCategoriesByType(isIncome: Boolean): Result<List<Category>>
 }

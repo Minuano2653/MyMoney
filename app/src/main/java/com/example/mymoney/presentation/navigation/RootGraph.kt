@@ -7,22 +7,24 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.mymoney.presentation.screens.main.MainScreen
 import com.example.mymoney.presentation.screens.splash.SplashScreen
+import kotlinx.serialization.Serializable
 
+@Serializable
+object Splash
 
-/**
- * Корневой граф навигации приложения.
- *
- * Содержит начальный экран загрузки ("splash") и основной экран приложения ("main").
- *
- * @param navController Контроллер навигации (по умолчанию создаётся с помощью [rememberNavController]).
- */
+@Serializable
+object Main
+
 @Composable
 fun RootGraph(navController: NavHostController = rememberNavController()) {
-    NavHost(navController = navController, startDestination = "splash") {
-        composable("splash") {
+    NavHost(
+        navController = navController,
+        startDestination = Splash
+    ) {
+        composable<Splash> {
             SplashScreen(navController)
         }
-        composable("main") {
+        composable<Main> {
             MainScreen()
         }
     }

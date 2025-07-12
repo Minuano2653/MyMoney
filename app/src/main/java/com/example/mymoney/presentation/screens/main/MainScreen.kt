@@ -16,14 +16,25 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.mymoney.R
+import com.example.mymoney.presentation.navigation.Account
+import com.example.mymoney.presentation.navigation.TransactionDetail
 import com.example.mymoney.presentation.navigation.AppNavGraph
 import com.example.mymoney.presentation.navigation.BottomNavItem
-import com.example.mymoney.presentation.navigation.Screen
+import com.example.mymoney.presentation.navigation.Categories
+import com.example.mymoney.presentation.navigation.EditTransaction
+import com.example.mymoney.presentation.navigation.Expenses
+import com.example.mymoney.presentation.navigation.Incomes
+import com.example.mymoney.presentation.navigation.NavigationState
+import com.example.mymoney.presentation.navigation.Settings
+import com.example.mymoney.presentation.navigation.TransactionsHistory
 import com.example.mymoney.presentation.navigation.rememberNavigationState
 import com.example.mymoney.presentation.screens.account.AccountScreen
 import com.example.mymoney.presentation.screens.categories.CategoriesScreen
@@ -32,56 +43,48 @@ import com.example.mymoney.presentation.screens.expenses.ExpensesScreen
 import com.example.mymoney.presentation.screens.history.HistoryScreen
 import com.example.mymoney.presentation.screens.incomes.IncomesScreen
 import com.example.mymoney.presentation.screens.settings.SettingsScreen
+import com.example.mymoney.presentation.add_transaction.AddTransactionScreen
+import com.example.mymoney.presentation.screens.edit_transaction.EditTransactionScreen
 import com.example.mymoney.presentation.theme.MyMoneyTheme
-
-@Preview
-@Composable
-fun MainScreenPreview() {
-    MyMoneyTheme {
-        MainScreen()
-    }
-}
 
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
-    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    navigationState: NavigationState = rememberNavigationState()
 ) {
-    val navigationState = rememberNavigationState()
-
     Scaffold(
         contentWindowInsets = WindowInsets(0.dp),
         containerColor = MaterialTheme.colorScheme.surface,
         bottomBar = {
             val navBackStackEntry by navigationState.navHostController.currentBackStackEntryAsState()
+            val currentDestination = navBackStackEntry?.destination
 
             val navigationList = listOf(
-                BottomNavItem.Expenses,
-                BottomNavItem.Incomes,
-                BottomNavItem.Account,
-                BottomNavItem.Categories,
-                BottomNavItem.Settings
+                BottomNavItem(Expenses, R.string.bottom_label_expenses, R.drawable.ic_expenses),
+                BottomNavItem(Incomes, R.string.bottom_label_incomes, R.drawable.ic_incomes),
+                BottomNavItem(Account, R.string.bottom_label_account, R.drawable.ic_account),
+                BottomNavItem(Categories, R.string.bottom_label_categories, R.drawable.ic_categories),
+                BottomNavItem(Settings, R.string.bottom_label_settings, R.drawable.ic_settings)
             )
 
             NavigationBar(containerColor = MaterialTheme.colorScheme.surfaceContainer) {
                 navigationList.forEach { item ->
-                    val selected = navBackStackEntry?.destination?.hierarchy?.any {
-                        it.route == item.screen.route
-                    } == true
+                    val selected = currentDestination?.hierarchy?.any { it.hasRoute(item.route::class) } == true
                     NavigationBarItem(
                         selected = selected,
                         onClick = {
-                            navigationState.navigateTo(item.screen.route)
+                            navigationState.navigateTo(item.route)
                         },
                         icon = {
                             Icon(
                                 painter = painterResource(item.iconRes),
-                                contentDescription = item.label
+                                contentDescription = stringResource(item.labelRes)
                             )
                         },
                         label = {
                             Text(
-                                text = item.label,
+                                text = stringResource(item.labelRes),
                                 style = MaterialTheme.typography.labelMedium.copy(
                                     fontWeight = if (selected) FontWeight.W600 else FontWeight.Medium
                                 )
@@ -106,36 +109,35 @@ fun MainScreen(
             expensesTodayScreenContent = {
                 ExpensesScreen(
                     onNavigateToHistory = {
-                        navigationState.navigateToHistory(
-                            route = Screen.ROUTE_EXPENSES_HISTORY,
-                            isIncome = false
+                        navigationState.navHostController.navigate(TransactionsHistory(false))
+                    },
+                    onNavigateToAddExpense = { navigationState.navHostController.navigate(TransactionDetail(false)) },
+                    onNavigateToTransactionDetail = { transactionId ->
+                        navigationState.navHostController.navigate(
+                            EditTransaction(false, transactionId)
                         )
                     },
-                    onNavigateToAddExpense = { /*navigationState.navigateTo("навигация на экран добавления")*/ },
-                    onNavigateToTransactionDetail = { /*navigationState.navigateTo("навигация на детальную инфу")*/ },
                     modifier = modifier
                 )
             },
             incomesTodayScreenContent = {
                 IncomesScreen(
                     onNavigateToHistory = {
-                        navigationState.navigateToHistory(
-                            route = Screen.ROUTE_INCOMES_HISTORY,
-                            isIncome = true
+                        navigationState.navHostController.navigate(TransactionsHistory(true))
+                    },
+                    onNavigateToAddIncome = { navigationState.navHostController.navigate(TransactionDetail(true)) },
+                    onNavigateToTransactionDetail = { transactionId ->
+                        navigationState.navHostController.navigate(
+                            EditTransaction(true, transactionId)
                         )
                     },
-                    onNavigateToAddIncome = { /*navigationState.navigateTo("навигация на экран добавления")*/ },
-                    onNavigateToTransactionDetail = { /*navigationState.navigateTo("навигация на экран добавления")*/ },
                     modifier = modifier
                 )
             },
             accountInfoScreenContent = {
                 AccountScreen(
                     onNavigateToEditAccount = { accountId ->
-                        navigationState.navigateToEditAccount(
-                            route = Screen.ROUTE_EDIT_ACCOUNT,
-                            accountId = accountId
-                        )
+                        navigationState.navigateToEditAccount(accountId = accountId)
                     },
                     modifier = modifier
                 )
@@ -151,24 +153,71 @@ fun MainScreen(
                     modifier = modifier
                 )
             },
-            expensesHistoryScreenContent = {
+            expensesHistoryScreenContent = { isIncome ->
                 HistoryScreen(
-                    onNavigateBack = { navigationState.navHostController.popBackStack() },
+                    isIncome = isIncome,
+                    onNavigateBack = { navigationState.navigateBack() },
+                    onNavigateToEditTransaction = {transactionId ->
+                        navigationState.navHostController.navigate(EditTransaction(false, transactionId))
+                    },
                     modifier = modifier
                 )
             },
-            incomesHistoryScreenContent = {
+            incomesHistoryScreenContent = { isIncome ->
                 HistoryScreen(
-                    onNavigateBack = { navigationState.navHostController.popBackStack() },
+                    isIncome = isIncome,
+                    onNavigateBack = { navigationState.navigateBack() },
+                    onNavigateToEditTransaction = { transactionId ->
+                        navigationState.navHostController.navigate(EditTransaction(true, transactionId))
+                    },
                     modifier = modifier
                 )
             },
-            editAccountScreenContent = {
+            editAccountScreenContent = { accountId ->
                 EditAccountScreen(
-                    onNavigateBack = { navigationState.navHostController.popBackStack() },
+                    accountId = accountId,
+                    onNavigateBack = { navigationState.navigateBack() },
                     modifier = modifier,
                 )
             },
+            addExpenseScreenContent = { isIncome ->
+                AddTransactionScreen(
+                    isIncome = isIncome,
+                    onNavigateBack = { navigationState.navigateBack() },
+                    modifier = modifier
+                )
+            },
+            addIncomeScreenContent = { isIncome ->
+                AddTransactionScreen(
+                    isIncome = isIncome,
+                    onNavigateBack = { navigationState.navigateBack() },
+                    modifier = modifier
+                )
+            },
+            editExpenseScreenContent = { isIncome, transactionId ->
+                EditTransactionScreen(
+                    isIncome = isIncome,
+                    transactionId = transactionId,
+                    onNavigateBack = { navigationState.navigateBack() },
+                    modifier = modifier
+                )
+            },
+            editIncomeScreenContent = { isIncome, transactionId ->
+                EditTransactionScreen(
+                    isIncome = isIncome,
+                    transactionId = transactionId,
+                    onNavigateBack = { navigationState.navigateBack() },
+                    modifier = modifier
+                )
+            }
         )
+    }
+}
+
+@Preview
+@Composable
+fun MainScreenPreview() {
+    MyMoneyTheme {
+        MainScreen()
     }
 }

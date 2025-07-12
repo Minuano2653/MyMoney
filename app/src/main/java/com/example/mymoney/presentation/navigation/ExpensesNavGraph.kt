@@ -2,10 +2,9 @@ package com.example.mymoney.presentation.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import androidx.navigation.toRoute
 
 /**
  * Добавляет вложенный граф навигации для раздела "Расходы" в основной [NavGraphBuilder].
@@ -15,24 +14,27 @@ import androidx.navigation.navigation
  */
 fun NavGraphBuilder.expensesNavGraph(
     expensesTodayScreenContent: @Composable () -> Unit,
-    expensesHistoryScreenContent: @Composable () -> Unit,
+    expensesHistoryScreenContent: @Composable (Boolean) -> Unit,
+    addExpenseScreenContent: @Composable (Boolean) -> Unit,
+    editExpenseScreenContent: @Composable (Boolean, Int) -> Unit,
 ) {
-    navigation(
-        startDestination = Screen.ExpensesToday.route,
-        route = Screen.Expenses.route
+    navigation<Expenses>(
+        startDestination = ExpensesToday
     ) {
-        composable(
-            route = Screen.ExpensesToday.route,
-        ) {
+        composable<ExpensesToday> {
             expensesTodayScreenContent()
         }
-        composable(
-            route = "${Screen.ExpensesHistory.route}/{${Screen.ARGUMENT_HISTORY}}",
-            arguments = listOf(
-                navArgument(Screen.ARGUMENT_HISTORY) { type = NavType.BoolType }
-            )
-        ) {
-            expensesHistoryScreenContent()
+        composable<TransactionsHistory> { backStackEntry ->
+            val args = backStackEntry.toRoute<TransactionsHistory>()
+            expensesHistoryScreenContent(args.isIncome)
+        }
+        composable<TransactionDetail> { backStackEntry ->
+            val args = backStackEntry.toRoute<TransactionDetail>()
+            addExpenseScreenContent(args.isIncome)
+        }
+        composable<EditTransaction> { backStackEntry ->
+            val args = backStackEntry.toRoute<EditTransaction>()
+            editExpenseScreenContent(args.isIncome, args.transactionId)
         }
     }
 }

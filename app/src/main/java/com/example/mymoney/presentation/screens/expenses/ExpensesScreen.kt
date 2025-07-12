@@ -22,9 +22,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mymoney.R
+import com.example.mymoney.presentation.base.viewmodel.provideViewModelFactory
 import com.example.mymoney.presentation.components.CustomTopAppBar
 import com.example.mymoney.presentation.components.Divider
 import com.example.mymoney.presentation.components.EmojiIcon
@@ -40,11 +41,14 @@ import kotlinx.coroutines.flow.collectLatest
 fun ExpensesScreen(
     onNavigateToHistory: () -> Unit,
     onNavigateToAddExpense: () -> Unit,
-    onNavigateToTransactionDetail: () -> Unit,
+    onNavigateToTransactionDetail: (Int) -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    viewModel: ExpensesViewModel = hiltViewModel(),
+    viewModel: ExpensesViewModel = viewModel(factory = provideViewModelFactory())
 ) {
+    LaunchedEffect(Unit) {
+        viewModel.handleEvent(ExpensesEvent.LoadExpenses)
+    }
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.surface,
@@ -86,10 +90,10 @@ fun ExpensesScreen(
                     onNavigateToHistory()
                 }
                 is ExpensesSideEffect.NavigateToAddExpense -> {
-                    /*onNavigateToAddExpense()*/
+                    onNavigateToAddExpense()
                 }
                 is ExpensesSideEffect.NavigateToTransactionDetail -> {
-                    /*onNavigateToTransactionDetail()*/
+                    onNavigateToTransactionDetail(effect.transactionId)
                 }
             }
         }
@@ -118,14 +122,17 @@ fun ExpensesScreenContent(
             )
             Divider()
             LazyColumn {
-                itemsIndexed(uiState.expenses) { _, expense ->
+                itemsIndexed(
+                    uiState.expenses,
+                    key = { _, expense -> expense.id }
+                ) { _, expense ->
                     ListItemComponent(
                         title = expense.category.name,
                         subtitle = expense.comment,
                         trailingText = "${expense.amount.formatAmount()} ${uiState.currency.toSymbol()}",
                         leadingIcon = { EmojiIcon(emoji = expense.category.emoji) },
                         trailingIcon = { TrailingIcon() },
-                        onClick = { onEvent(ExpensesEvent.OnTransactionClicked) }
+                        onClick = { onEvent(ExpensesEvent.OnTransactionClicked(expense)) }
                     )
                     Divider()
                 }

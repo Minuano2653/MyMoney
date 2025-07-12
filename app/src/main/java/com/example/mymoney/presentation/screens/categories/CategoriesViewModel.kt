@@ -5,15 +5,10 @@ import com.example.mymoney.domain.entity.Category
 import com.example.mymoney.domain.usecase.GetCategoriesUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
 import com.example.mymoney.utils.NetworkMonitor
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -29,7 +24,6 @@ import javax.inject.Inject
  * @property getCategoriesUseCase UseCase для получения списка категорий.
  * @property networkMonitor Мониторинг состояния сети.
  */
-@HiltViewModel
 class CategoriesViewModel @Inject constructor(
     private val getCategoriesUseCase: GetCategoriesUseCase,
     networkMonitor: NetworkMonitor

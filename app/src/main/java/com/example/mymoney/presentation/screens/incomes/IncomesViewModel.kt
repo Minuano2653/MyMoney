@@ -5,13 +5,14 @@ import com.example.mymoney.domain.usecase.GetCurrentAccountUseCase
 import com.example.mymoney.domain.usecase.GetTransactionsByPeriodUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
 import com.example.mymoney.presentation.screens.expenses.ExpensesSideEffect
-import com.example.mymoney.presentation.screens.expenses.ExpensesUiState
 import com.example.mymoney.utils.NetworkMonitor
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import javax.inject.Inject
 
 /**
@@ -23,7 +24,6 @@ import javax.inject.Inject
  * @property getTransactionsByPeriodUseCase Юзкейс для получения списка доходов.
  * @property networkMonitor Монитор состояния сети, обновляет UI при изменении подключения.
  */
-@HiltViewModel
 class IncomesViewModel @Inject constructor(
     private val getTransactionsByPeriodUseCase: GetTransactionsByPeriodUseCase,
     private val getCurrentAccountUseCase: GetCurrentAccountUseCase,
@@ -33,7 +33,7 @@ class IncomesViewModel @Inject constructor(
     IncomesUiState()
 ) {
     init {
-        handleEvent(IncomesEvent.LoadIncomes)
+        //handleEvent(IncomesEvent.LoadIncomes)
         observeAccountChanges()
     }
 
@@ -49,7 +49,7 @@ class IncomesViewModel @Inject constructor(
                 emitEffect(IncomesSideEffect.NavigateToAddIncome)
             }
             is IncomesEvent.OnTransactionClicked -> {
-                emitEffect(IncomesSideEffect.NavigateToTransactionDetail)
+                emitEffect(IncomesSideEffect.NavigateToTransactionDetail(event.income.id))
             }
         }
     }
@@ -70,11 +70,20 @@ class IncomesViewModel @Inject constructor(
                         )
                     }
                 }
-                .onFailure { e ->
-                    _uiState.update {
-                        it.copy(isLoading = false, error = e.message)
+                .onFailure { error ->
+                    _uiState.update { it.copy(isLoading = false) }
+                    val message = when (error) {
+                        is UnknownHostException -> "Нет подключения к интернету"
+                        is SocketTimeoutException -> "Превышено время ожидания ответа"
+                        is HttpException -> when (error.code()) {
+                            400 -> "Неверный формат ID счета или некорректный формат дат"
+                            401 -> "Неавторизованный доступ"
+                            500 -> "Внутренняя ошибка сервера"
+                            else -> "Ошибка сервера (${error.code()})"
+                        }
+                        else -> "Не удалось загрузить данные"
                     }
-                    _sideEffect.emit(IncomesSideEffect.ShowError(e.message ?: "Неизвестная ошибка"))
+                    _sideEffect.emit(IncomesSideEffect.ShowError(message))
                 }
         }
     }

@@ -4,13 +4,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.mymoney.domain.usecase.GetInitAccountUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
 import com.example.mymoney.utils.NetworkMonitor
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@HiltViewModel
 class SplashViewModel @Inject constructor(
     private val getInitAccountUseCase: GetInitAccountUseCase,
     networkMonitor: NetworkMonitor
@@ -32,19 +30,13 @@ class SplashViewModel @Inject constructor(
             val result = getInitAccountUseCase()
             result.fold(
                 onSuccess = {
-                    _uiState.update { it.copy(isLoading = false, error = null) }
+                    _uiState.update { it.copy(isLoading = false) }
                 },
                 onFailure = { e ->
-                    _uiState.update { it.copy(isLoading = false, error = e.message) }
+                    _uiState.update { it.copy(isLoading = false) }
                 }
             )
             emitEffect(SplashSideEffect.NavigateToMain)
-        }
-    }
-
-    override fun onNetworkStateChanged(isConnected: Boolean) {
-        if (!isConnected) {
-            emitEffect(SplashSideEffect.ShowError("Нет подключения к интернету"))
         }
     }
 }
