@@ -35,8 +35,8 @@ fun AppNavGraph(
     settingsScreenContent: @Composable () -> Unit,
     addExpenseScreenContent: @Composable (Boolean) -> Unit,
     addIncomeScreenContent: @Composable (Boolean) -> Unit,
-    editExpenseScreenContent: @Composable (Boolean, Int?) -> Unit,
-    editIncomeScreenContent: @Composable (Boolean, Int?) -> Unit
+    editExpenseScreenContent: @Composable (Boolean, Int) -> Unit,
+    editIncomeScreenContent: @Composable (Boolean, Int) -> Unit
 ) {
     NavHost(
         navController = navHostController,

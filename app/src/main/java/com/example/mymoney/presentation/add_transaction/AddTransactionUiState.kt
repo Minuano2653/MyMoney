@@ -5,7 +5,7 @@ import com.example.mymoney.domain.entity.Category
 import com.example.mymoney.presentation.base.contract.BaseUiState
 import com.example.mymoney.utils.DateUtils
 
-data class TransactionDetailUiState(
+data class AddTransactionUiState(
     val isLoadingCategories: Boolean = false,
     val isLoadingTransaction: Boolean = false,
     val isDeleting: Boolean = false,

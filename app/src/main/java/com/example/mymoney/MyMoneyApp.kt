@@ -1,10 +1,17 @@
 package com.example.mymoney
 
 import android.app.Application
-import dagger.hilt.android.HiltAndroidApp
+import com.example.mymoney.di.AppComponent
+import com.example.mymoney.di.DaggerAppComponent
 
 /**
  * Класс приложения, точка входа для Hilt Dependency Injection.
  */
-@HiltAndroidApp
-class MyMoneyApp(): Application()
+class MyMoneyApp : Application() {
+    lateinit var appComponent: AppComponent
+
+    override fun onCreate() {
+        super.onCreate()
+        appComponent = DaggerAppComponent.factory().create(applicationContext)
+    }
+}

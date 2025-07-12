@@ -23,9 +23,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mymoney.R
+import com.example.mymoney.presentation.base.viewmodel.provideViewModelFactory
 import com.example.mymoney.presentation.components.AmountInputDialog
 import com.example.mymoney.presentation.components.CategoriesBottomSheetContent
 import com.example.mymoney.presentation.components.CustomTopAppBar
@@ -43,11 +44,15 @@ import kotlinx.coroutines.flow.collectLatest
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTransactionScreen(
+    isIncome: Boolean,
     modifier: Modifier = Modifier,
     onNavigateBack: () -> Unit,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    viewModel: TransactionDetailViewModel = hiltViewModel()
+    viewModel: AddTransactionViewModel = viewModel(factory = provideViewModelFactory())
 ) {
+    LaunchedEffect(Unit) {
+        viewModel.handleEvent(AddTransactionEvent.LoadCategories(isIncome))
+    }
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         contentWindowInsets = WindowInsets(bottom = 0.dp),
@@ -57,10 +62,10 @@ fun AddTransactionScreen(
                 leadingIconRes = R.drawable.ic_cancel,
                 trailingIconRes = R.drawable.ic_check,
                 onLeadingClick = {
-                    viewModel.handleEvent(TransactionDetailEvent.CancelChangesClicked)
+                    viewModel.handleEvent(AddTransactionEvent.CancelChangesClicked)
                 },
                 onTrailingClick = {
-                    viewModel.handleEvent(TransactionDetailEvent.SaveChangesClicked)
+                    viewModel.handleEvent(AddTransactionEvent.SaveChangesClicked)
                 }
             )
         },
@@ -76,15 +81,15 @@ fun AddTransactionScreen(
         if (uiState.showCategorySheet) {
             ModalBottomSheet(
                 onDismissRequest = {
-                    viewModel.handleEvent(TransactionDetailEvent.DismissCategorySheet)
+                    viewModel.handleEvent(AddTransactionEvent.DismissCategorySheet)
                 },
                 containerColor = MaterialTheme.colorScheme.surface
             ) {
                 CategoriesBottomSheetContent(
                     categories = uiState.categories,
                     onCategoryClicked = { category ->
-                        viewModel.handleEvent(TransactionDetailEvent.OnCategorySelected(category))
-                        viewModel.handleEvent(TransactionDetailEvent.DismissCategorySheet)
+                        viewModel.handleEvent(AddTransactionEvent.OnCategorySelected(category))
+                        viewModel.handleEvent(AddTransactionEvent.DismissCategorySheet)
                     }
                 )
             }
@@ -93,11 +98,11 @@ fun AddTransactionScreen(
             AmountInputDialog(
                 initialAmount = uiState.amount,
                 onConfirm = { amount ->
-                    viewModel.handleEvent(TransactionDetailEvent.OnAmountChanged(amount))
-                    viewModel.handleEvent(TransactionDetailEvent.DismissAmountDialog)
+                    viewModel.handleEvent(AddTransactionEvent.OnAmountChanged(amount))
+                    viewModel.handleEvent(AddTransactionEvent.DismissAmountDialog)
                 },
                 onDismiss = {
-                    viewModel.handleEvent(TransactionDetailEvent.DismissAmountDialog)
+                    viewModel.handleEvent(AddTransactionEvent.DismissAmountDialog)
                 }
             )
         }
@@ -107,11 +112,11 @@ fun AddTransactionScreen(
                 onDateSelected = { millis ->
                     millis?.let {
                         val date = DateUtils.formatToDayMonthYear(it)
-                        viewModel.handleEvent(TransactionDetailEvent.OnDateSelected(date))
-                        viewModel.handleEvent(TransactionDetailEvent.DismissDatePicker)
+                        viewModel.handleEvent(AddTransactionEvent.OnDateSelected(date))
+                        viewModel.handleEvent(AddTransactionEvent.DismissDatePicker)
                     }
                 },
-                onDismiss = { viewModel.handleEvent(TransactionDetailEvent.DismissDatePicker) }
+                onDismiss = { viewModel.handleEvent(AddTransactionEvent.DismissDatePicker) }
             )
         }
         if (uiState.showTimePicker) {
@@ -121,10 +126,10 @@ fun AddTransactionScreen(
                 minute = minute,
                 onConfirm = { h, m ->
                     val formatted = "%02d:%02d".format(h, m)
-                    viewModel.handleEvent(TransactionDetailEvent.OnTimeSelected(formatted))
-                    viewModel.handleEvent(TransactionDetailEvent.DismissTimePicker)
+                    viewModel.handleEvent(AddTransactionEvent.OnTimeSelected(formatted))
+                    viewModel.handleEvent(AddTransactionEvent.DismissTimePicker)
                 },
-                onDismiss = { viewModel.handleEvent(TransactionDetailEvent.DismissTimePicker) }
+                onDismiss = { viewModel.handleEvent(AddTransactionEvent.DismissTimePicker) }
             )
         }
     }
@@ -132,10 +137,10 @@ fun AddTransactionScreen(
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collectLatest { effect ->
             when(effect) {
-                is TransactionDetailSideEffect.NavigateBack -> {
+                is AddTransactionSideEffect.NavigateBack -> {
                     onNavigateBack()
                 }
-                is TransactionDetailSideEffect.ShowSnackbar -> {
+                is AddTransactionSideEffect.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(effect.message)
                 }
             }
@@ -146,8 +151,8 @@ fun AddTransactionScreen(
 @Composable
 fun TransactionScreenContent(
     modifier: Modifier = Modifier,
-    uiState: TransactionDetailUiState,
-    onEvent: (TransactionDetailEvent) -> Unit,
+    uiState: AddTransactionUiState,
+    onEvent: (AddTransactionEvent) -> Unit,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         ListItemComponent(
@@ -160,31 +165,31 @@ fun TransactionScreenContent(
             title = "Статья",
             trailingText = uiState.selectedCategory?.name,
             trailingIcon = { TrailingIcon() },
-            onClick = { onEvent(TransactionDetailEvent.ShowCategorySheet) }
+            onClick = { onEvent(AddTransactionEvent.ShowCategorySheet) }
         )
         Divider()
         ListItemComponent(
             title = "Cумма",
             trailingText = uiState.account?.let { "${uiState.amount} ${it.currency.toSymbol()}" } ?: uiState.amount,
-            onClick = { onEvent(TransactionDetailEvent.ShowAmountDialog) }
+            onClick = { onEvent(AddTransactionEvent.ShowAmountDialog) }
         )
         Divider()
         ListItemComponent(
             title = "Дата",
             trailingText = uiState.date,
-            onClick = { onEvent(TransactionDetailEvent.ShowDatePicker) }
+            onClick = { onEvent(AddTransactionEvent.ShowDatePicker) }
         )
         Divider()
         ListItemComponent(
             title = "Время",
             trailingText = uiState.time,
-            onClick = { onEvent(TransactionDetailEvent.ShowTimePicker) }
+            onClick = { onEvent(AddTransactionEvent.ShowTimePicker) }
         )
         Divider()
         TextField(
             modifier = Modifier.fillMaxWidth(),
             value = uiState.comment ?: "",
-            onValueChange = { onEvent(TransactionDetailEvent.OnCommentChanged(it)) },
+            onValueChange = { onEvent(AddTransactionEvent.OnCommentChanged(it)) },
             placeholder = {
                 Text(
                     text = "Комментарий",
@@ -209,7 +214,7 @@ fun TransactionScreenContent(
 fun TransactionDetailScreenPreview() {
     MyMoneyTheme {
         TransactionScreenContent(
-            uiState = TransactionDetailUiState(),
+            uiState = AddTransactionUiState(),
             onEvent = {}
         )
     }

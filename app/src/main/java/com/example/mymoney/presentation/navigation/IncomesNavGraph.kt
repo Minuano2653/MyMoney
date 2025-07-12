@@ -16,7 +16,7 @@ fun NavGraphBuilder.incomesNavGraph(
     incomesTodayScreenContent: @Composable () -> Unit,
     incomesHistoryScreenContent: @Composable (Boolean) -> Unit,
     addIncomeScreenContent: @Composable (Boolean) -> Unit,
-    editIncomeScreenContent: @Composable (Boolean, Int?) -> Unit,
+    editIncomeScreenContent: @Composable (Boolean, Int) -> Unit,
 
     ) {
     navigation<Incomes>(

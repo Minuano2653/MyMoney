@@ -1,21 +1,21 @@
 package com.example.mymoney.presentation.screens.expenses
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.example.mymoney.data.remote.datasource.AccountDataStore
 import com.example.mymoney.domain.usecase.GetCurrentAccountUseCase
 import com.example.mymoney.domain.usecase.GetTransactionsByPeriodUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
+import com.example.mymoney.presentation.screens.edit_transaction.EditTransactionSideEffect
 import com.example.mymoney.utils.NetworkMonitor
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import javax.inject.Inject
 
 
-@HiltViewModel
 class ExpensesViewModel @Inject constructor(
     private val getTransactionsByPeriodUseCase: GetTransactionsByPeriodUseCase,
     private val getCurrentAccountUseCase: GetCurrentAccountUseCase,
@@ -25,7 +25,6 @@ class ExpensesViewModel @Inject constructor(
     ExpensesUiState()
 ) {
     init {
-        //handleEvent(ExpensesEvent.LoadExpenses)
         observeAccountChanges()
     }
 
@@ -62,11 +61,20 @@ class ExpensesViewModel @Inject constructor(
                         )
                     }
                 }
-                .onFailure { e ->
-                    _uiState.update {
-                        it.copy(isLoading = false, error = e.message)
+                .onFailure { error ->
+                    _uiState.update { it.copy(isLoading = false) }
+                    val message = when (error) {
+                        is UnknownHostException -> "Нет подключения к интернету"
+                        is SocketTimeoutException -> "Превышено время ожидания ответа"
+                        is HttpException -> when (error.code()) {
+                            400 -> "Неверный формат ID счета или некорректный формат дат"
+                            401 -> "Неавторизованный доступ"
+                            500 -> "Внутренняя ошибка сервера"
+                            else -> "Ошибка сервера (${error.code()})"
+                        }
+                        else -> "Не удалось загрузить данные"
                     }
-                    _sideEffect.emit(ExpensesSideEffect.ShowError(e.message ?: "Неизвестная ошибка"))
+                    _sideEffect.emit(ExpensesSideEffect.ShowError(message))
                 }
         }
     }

@@ -153,8 +153,9 @@ fun MainScreen(
                     modifier = modifier
                 )
             },
-            expensesHistoryScreenContent = {
+            expensesHistoryScreenContent = { isIncome ->
                 HistoryScreen(
+                    isIncome = isIncome,
                     onNavigateBack = { navigationState.navigateBack() },
                     onNavigateToEditTransaction = {transactionId ->
                         navigationState.navHostController.navigate(EditTransaction(false, transactionId))
@@ -162,8 +163,9 @@ fun MainScreen(
                     modifier = modifier
                 )
             },
-            incomesHistoryScreenContent = {
+            incomesHistoryScreenContent = { isIncome ->
                 HistoryScreen(
+                    isIncome = isIncome,
                     onNavigateBack = { navigationState.navigateBack() },
                     onNavigateToEditTransaction = { transactionId ->
                         navigationState.navHostController.navigate(EditTransaction(true, transactionId))
@@ -171,32 +173,39 @@ fun MainScreen(
                     modifier = modifier
                 )
             },
-            editAccountScreenContent = {
+            editAccountScreenContent = { accountId ->
                 EditAccountScreen(
+                    accountId = accountId,
                     onNavigateBack = { navigationState.navigateBack() },
                     modifier = modifier,
                 )
             },
-            addExpenseScreenContent = {
+            addExpenseScreenContent = { isIncome ->
                 AddTransactionScreen(
+                    isIncome = isIncome,
                     onNavigateBack = { navigationState.navigateBack() },
                     modifier = modifier
                 )
             },
-            addIncomeScreenContent = {
+            addIncomeScreenContent = { isIncome ->
                 AddTransactionScreen(
+                    isIncome = isIncome,
                     onNavigateBack = { navigationState.navigateBack() },
                     modifier = modifier
                 )
             },
             editExpenseScreenContent = { isIncome, transactionId ->
                 EditTransactionScreen(
+                    isIncome = isIncome,
+                    transactionId = transactionId,
                     onNavigateBack = { navigationState.navigateBack() },
                     modifier = modifier
                 )
             },
             editIncomeScreenContent = { isIncome, transactionId ->
                 EditTransactionScreen(
+                    isIncome = isIncome,
+                    transactionId = transactionId,
                     onNavigateBack = { navigationState.navigateBack() },
                     modifier = modifier
                 )

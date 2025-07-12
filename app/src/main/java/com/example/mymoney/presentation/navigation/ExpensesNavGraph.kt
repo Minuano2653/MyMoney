@@ -16,7 +16,7 @@ fun NavGraphBuilder.expensesNavGraph(
     expensesTodayScreenContent: @Composable () -> Unit,
     expensesHistoryScreenContent: @Composable (Boolean) -> Unit,
     addExpenseScreenContent: @Composable (Boolean) -> Unit,
-    editExpenseScreenContent: @Composable (Boolean, Int?) -> Unit,
+    editExpenseScreenContent: @Composable (Boolean, Int) -> Unit,
 ) {
     navigation<Expenses>(
         startDestination = ExpensesToday

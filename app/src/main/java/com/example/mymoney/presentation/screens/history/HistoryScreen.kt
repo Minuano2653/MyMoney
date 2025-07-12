@@ -13,27 +13,27 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.datastore.preferences.core.emptyPreferences
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mymoney.R
+import com.example.mymoney.presentation.base.viewmodel.provideViewModelFactory
 import com.example.mymoney.presentation.components.CustomTopAppBar
 import com.example.mymoney.presentation.components.DatePickerModal
-import com.example.mymoney.presentation.screens.history.HistoryViewModel
 import com.example.mymoney.presentation.theme.MyMoneyTheme
 import com.example.mymoney.utils.DateUtils
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun HistoryScreen(
+    isIncome: Boolean,
     modifier: Modifier = Modifier,
     onNavigateBack: () -> Unit,
     onNavigateToEditTransaction: (Int) -> Unit,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    viewModel: HistoryViewModel = hiltViewModel()
+    viewModel: HistoryViewModel = viewModel(factory = provideViewModelFactory())
 ) {
     LaunchedEffect(Unit) {
-        viewModel.handleEvent(HistoryEvent.LoadTransactions)
+        viewModel.handleEvent(HistoryEvent.LoadTransactions(isIncome))
     }
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -67,7 +67,7 @@ fun HistoryScreen(
                 onDateSelected = { millis ->
                     millis?.let {
                         val date = DateUtils.formatDateFromMillis(it)
-                        viewModel.handleEvent(HistoryEvent.OnStartDateSelected(date))
+                        viewModel.handleEvent(HistoryEvent.OnStartDateSelected(isIncome, date))
                     }
                 },
                 onDismiss = { viewModel.handleEvent(HistoryEvent.OnStartDateClicked) }
@@ -80,7 +80,7 @@ fun HistoryScreen(
                 onDateSelected = { millis ->
                     millis?.let {
                         val date = DateUtils.formatDateFromMillis(it)
-                        viewModel.handleEvent(HistoryEvent.OnEndDateSelected(date))
+                        viewModel.handleEvent(HistoryEvent.OnEndDateSelected(isIncome, date))
                     }
                 },
                 onDismiss = { viewModel.handleEvent(HistoryEvent.OnEndDateClicked) }
@@ -114,6 +114,7 @@ fun HistoryScreen(
 fun HistoryScreenPreview() {
     MyMoneyTheme {
         HistoryScreen(
+            isIncome = true,
             onNavigateBack = {},
             onNavigateToEditTransaction = {}
         )

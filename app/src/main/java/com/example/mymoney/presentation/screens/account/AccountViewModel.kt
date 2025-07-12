@@ -5,7 +5,6 @@ import com.example.mymoney.domain.usecase.GetAccountUseCase
 import com.example.mymoney.domain.usecase.GetCurrentAccountUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
 import com.example.mymoney.utils.NetworkMonitor
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
@@ -20,7 +19,6 @@ import javax.inject.Inject
  * @property getAccountUseCase UseCase для получения данных счёта.
  * @property networkMonitor Монитор состояния сети.
  */
-@HiltViewModel
 class AccountViewModel @Inject constructor(
     private val getAccountUseCase: GetAccountUseCase,
     private val getCurrentAccountUseCase: GetCurrentAccountUseCase,

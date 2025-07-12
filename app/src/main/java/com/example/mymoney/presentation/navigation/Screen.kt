@@ -36,4 +36,4 @@ data class EditAccount(val accountId: Int)
 data class TransactionDetail(val isIncome: Boolean)
 
 @Serializable
-data class EditTransaction(val isIncome: Boolean, val transactionId: Int?)
+data class EditTransaction(val isIncome: Boolean, val transactionId: Int)

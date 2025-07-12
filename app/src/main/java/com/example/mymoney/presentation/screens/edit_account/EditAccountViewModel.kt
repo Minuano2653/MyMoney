@@ -8,18 +8,16 @@ import com.example.mymoney.domain.usecase.UpdateAccountUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
 import com.example.mymoney.presentation.navigation.EditAccount
 import com.example.mymoney.utils.NetworkMonitor
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@HiltViewModel
 class EditAccountViewModel @Inject constructor(
     private val getAccountUseCase: GetAccountUseCase,
     private val updateAccountUseCase: UpdateAccountUseCase,
-    savedStateHandle: SavedStateHandle,
+    //savedStateHandle: SavedStateHandle,
     networkMonitor: NetworkMonitor,
 ): BaseViewModel<EditAccountUiState, EditAccountEvent, EditAccountSideEffect>(
         networkMonitor,
@@ -28,14 +26,14 @@ class EditAccountViewModel @Inject constructor(
     private var loadAccountJob: Job? = null
     private var saveChangesJob: Job? = null
 
-    private val accountId = savedStateHandle.toRoute<EditAccount>().accountId
+    //private val accountId = savedStateHandle.toRoute<EditAccount>().accountId
 
     private var originalName: String = ""
     private var originalBalance: String = ""
     private var originalCurrency: String = ""
 
     init {
-        handleEvent(EditAccountEvent.LoadAccount)
+        //handleEvent(EditAccountEvent.LoadAccount)
     }
 
     override fun handleEvent(event: EditAccountEvent) {
@@ -47,7 +45,7 @@ class EditAccountViewModel @Inject constructor(
                 emitEffect(EditAccountSideEffect.NavigateBack)
             }
             is EditAccountEvent.OnSaveChangesClicked -> {
-                saveChanges()
+                saveChanges(event.accountId)
             }
             is EditAccountEvent.OnNameChanged -> {
                 _uiState.update {
@@ -110,7 +108,7 @@ class EditAccountViewModel @Inject constructor(
         }
     }
 
-    private fun saveChanges() {
+    private fun saveChanges(accountId: Int) {
         saveChangesJob?.cancel()
 
         val currentState = _uiState.value

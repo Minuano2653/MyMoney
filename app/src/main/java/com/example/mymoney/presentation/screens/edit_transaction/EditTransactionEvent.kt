@@ -22,4 +22,5 @@ sealed class EditTransactionEvent: BaseEvent {
     data class OnDateSelected(val date: String) : EditTransactionEvent()
     data class OnTimeSelected(val time: String) : EditTransactionEvent()
     data class OnCategorySelected(val selectedCategory: Category) : EditTransactionEvent()
+    data class SetInitData(val isIncome: Boolean, val transactionId: Int): EditTransactionEvent()
 }

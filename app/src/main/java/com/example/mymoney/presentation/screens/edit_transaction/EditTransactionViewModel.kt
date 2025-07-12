@@ -1,20 +1,16 @@
 package com.example.mymoney.presentation.screens.edit_transaction
 
 import android.util.Log
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
 import com.example.mymoney.domain.usecase.DeleteTransactionUseCase
 import com.example.mymoney.domain.usecase.GetCategoriesByTypeUseCase
 import com.example.mymoney.domain.usecase.GetCurrentAccountUseCase
 import com.example.mymoney.domain.usecase.GetTransactionUseCase
 import com.example.mymoney.domain.usecase.UpdateTransactionUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
-import com.example.mymoney.presentation.navigation.EditTransaction
 import com.example.mymoney.utils.DateUtils
 import com.example.mymoney.utils.NetworkMonitor
 import com.example.mymoney.utils.formatAmount
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
@@ -24,9 +20,7 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import javax.inject.Inject
 
-@HiltViewModel
 class EditTransactionViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
     networkMonitor: NetworkMonitor,
     private val getCurrentAccountUseCase: GetCurrentAccountUseCase,
     private val getCategoriesByTypeUseCase: GetCategoriesByTypeUseCase,
@@ -37,14 +31,10 @@ class EditTransactionViewModel @Inject constructor(
     networkMonitor,
     EditTransactionUiState()
 ) {
-    private val isIncome: Boolean = savedStateHandle.toRoute<EditTransaction>().isIncome
-    private val transactionId: Int? = savedStateHandle.toRoute<EditTransaction>().transactionId
-
+    private var isIncome: Boolean? = null
+    private var transactionId: Int? = null
     init {
         observeAccount()
-        loadCategories()
-        loadTransaction()
-        _uiState.update { it.copy(isIncome = isIncome) }
     }
 
     override fun handleEvent(event: EditTransactionEvent) {
@@ -121,6 +111,14 @@ class EditTransactionViewModel @Inject constructor(
             is EditTransactionEvent.UpdateTransaction -> {
                 updateTransaction()
             }
+
+            is EditTransactionEvent.SetInitData -> {
+                isIncome = event.isIncome
+                _uiState.update { it.copy(event.isIncome) }
+                transactionId = event.transactionId
+                loadCategories()
+                loadTransaction()
+            }
         }
     }
 
@@ -154,7 +152,7 @@ class EditTransactionViewModel @Inject constructor(
                     amount = currentState.amount.replace(" ", ""),
                     transactionDate = transactionDate,
                     comment = currentState.comment,
-                    transactionId = transactionId
+                    transactionId = transactionId!!
                 ).fold(
                     onSuccess = { createdTransaction ->
                         _uiState.update { it.copy(isSaving = false) }
@@ -186,7 +184,7 @@ class EditTransactionViewModel @Inject constructor(
             _uiState.update { it.copy(isLoadingTransaction = true) }
 
             transactionId?.let {
-                getTransactionUseCase(transactionId).fold(
+                getTransactionUseCase(transactionId!!).fold(
                     onSuccess = { transaction ->
                         val (date, time) = DateUtils
                             .splitIsoToDateAndTime(transaction.transactionDate)
@@ -264,7 +262,7 @@ class EditTransactionViewModel @Inject constructor(
     private fun loadCategories() {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update { it.copy(isLoadingCategories = true) }
-            getCategoriesByTypeUseCase(isIncome).fold(
+            getCategoriesByTypeUseCase(isIncome!!).fold(
                 onSuccess = { categories ->
                     _uiState.update {
                         it.copy(

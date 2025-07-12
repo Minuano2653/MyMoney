@@ -10,7 +10,6 @@ import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
 import com.example.mymoney.presentation.navigation.TransactionDetail
 import com.example.mymoney.utils.DateUtils.combineDateAndTimeToIso
 import com.example.mymoney.utils.NetworkMonitor
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
@@ -20,91 +19,89 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import javax.inject.Inject
 
-@HiltViewModel
-class TransactionDetailViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
+class AddTransactionViewModel @Inject constructor(
+    //savedStateHandle: SavedStateHandle,
     networkMonitor: NetworkMonitor,
     private val getCurrentAccountUseCase: GetCurrentAccountUseCase,
     private val getCategoriesByTypeUseCase: GetCategoriesByTypeUseCase,
     private val createTransactionUseCase: CreateTransactionUseCase,
-) : BaseViewModel<TransactionDetailUiState, TransactionDetailEvent, TransactionDetailSideEffect>(
+) : BaseViewModel<AddTransactionUiState, AddTransactionEvent, AddTransactionSideEffect>(
     networkMonitor,
-    TransactionDetailUiState()
+    AddTransactionUiState()
 ) {
-    private val isIncome: Boolean = savedStateHandle.toRoute<TransactionDetail>().isIncome
+    //private val isIncome: Boolean = savedStateHandle.toRoute<TransactionDetail>().isIncome
 
     init {
         observeAccount()
-        loadCategories()
-        _uiState.update { it.copy(isIncome = isIncome) }
+        //_uiState.update { it.copy(isIncome = isIncome) }
     }
 
-    override fun handleEvent(event: TransactionDetailEvent) {
+    override fun handleEvent(event: AddTransactionEvent) {
         when (event) {
-            is TransactionDetailEvent.ShowAmountDialog -> {
+            is AddTransactionEvent.ShowAmountDialog -> {
                 _uiState.update { it.copy(showAmountDialog = true) }
             }
 
-            is TransactionDetailEvent.DismissAmountDialog -> {
+            is AddTransactionEvent.DismissAmountDialog -> {
                 _uiState.update { it.copy(showAmountDialog = false) }
             }
 
-            is TransactionDetailEvent.OnAmountChanged -> {
+            is AddTransactionEvent.OnAmountChanged -> {
                 _uiState.update { it.copy(amount = event.amount) }
             }
 
-            is TransactionDetailEvent.CancelChangesClicked -> {
-                emitEffect(TransactionDetailSideEffect.NavigateBack)
+            is AddTransactionEvent.CancelChangesClicked -> {
+                emitEffect(AddTransactionSideEffect.NavigateBack)
             }
 
-            is TransactionDetailEvent.ShowCategorySheet -> {
+            is AddTransactionEvent.ShowCategorySheet -> {
                 _uiState.update { it.copy(showCategorySheet = true) }
             }
 
-            is TransactionDetailEvent.DismissCategorySheet -> {
+            is AddTransactionEvent.DismissCategorySheet -> {
                 _uiState.update { it.copy(showCategorySheet = false) }
             }
 
-            is TransactionDetailEvent.OnCategorySelected -> {
+            is AddTransactionEvent.OnCategorySelected -> {
                 _uiState.update {
                     it.copy(selectedCategory = event.selectedCategory)
                 }
             }
 
-            is TransactionDetailEvent.OnCommentChanged -> {
+            is AddTransactionEvent.OnCommentChanged -> {
                 _uiState.update { it.copy(comment = event.comment) }
             }
 
-            is TransactionDetailEvent.ShowDatePicker -> {
+            is AddTransactionEvent.ShowDatePicker -> {
                 _uiState.update { it.copy(showDatePicker = true) }
             }
 
-            is TransactionDetailEvent.DismissDatePicker -> {
+            is AddTransactionEvent.DismissDatePicker -> {
                 _uiState.update { it.copy(showDatePicker = false) }
             }
 
-            is TransactionDetailEvent.OnDateSelected -> {
+            is AddTransactionEvent.OnDateSelected -> {
                 _uiState.update { it.copy(date = event.date) }
             }
 
-            is TransactionDetailEvent.SaveChangesClicked -> {
+            is AddTransactionEvent.SaveChangesClicked -> {
                 saveTransaction()
             }
 
-            is TransactionDetailEvent.ShowTimePicker -> {
+            is AddTransactionEvent.ShowTimePicker -> {
                 _uiState.update { it.copy(showTimePicker = true) }
             }
 
-            is TransactionDetailEvent.DismissTimePicker -> {
+            is AddTransactionEvent.DismissTimePicker -> {
                 _uiState.update { it.copy(showTimePicker = false) }
             }
 
-            is TransactionDetailEvent.OnTimeSelected -> {
+            is AddTransactionEvent.OnTimeSelected -> {
                 _uiState.update { it.copy(time = event.time) }
             }
 
-            is TransactionDetailEvent.LoadCategories -> {
-                loadCategories()
+            is AddTransactionEvent.LoadCategories -> {
+                loadCategories(event.isIncome)
             }
         }
     }
@@ -113,11 +110,11 @@ class TransactionDetailViewModel @Inject constructor(
         val currentState = _uiState.value
 
         if (currentState.selectedCategory == null) {
-            emitEffect(TransactionDetailSideEffect.ShowSnackbar("Выберите категорию"))
+            emitEffect(AddTransactionSideEffect.ShowSnackbar("Выберите категорию"))
             return
         }
         if (currentState.amount.toBigDecimalOrNull() == null) {
-            emitEffect(TransactionDetailSideEffect.ShowSnackbar("Неверный формат суммы"))
+            emitEffect(AddTransactionSideEffect.ShowSnackbar("Неверный формат суммы"))
             return
         }
 
@@ -141,7 +138,7 @@ class TransactionDetailViewModel @Inject constructor(
                 ).fold(
                     onSuccess = { createdTransaction ->
                         _uiState.update { it.copy(isSaving = false) }
-                        emitEffect(TransactionDetailSideEffect.NavigateBack)
+                        emitEffect(AddTransactionSideEffect.NavigateBack)
                     },
                     onFailure = { error ->
                         _uiState.update { it.copy(isSaving = false) }
@@ -157,14 +154,14 @@ class TransactionDetailViewModel @Inject constructor(
                             }
                             else -> "Не удалось сохранить транзакцию"
                         }
-                        emitEffect(TransactionDetailSideEffect.ShowSnackbar(message))
+                        emitEffect(AddTransactionSideEffect.ShowSnackbar(message))
                     }
                 )
             }
         }
     }
 
-    private fun loadCategories() {
+    private fun loadCategories(isIncome: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update { it.copy(isLoadingCategories = true) }
             getCategoriesByTypeUseCase(isIncome).fold(
@@ -183,7 +180,7 @@ class TransactionDetailViewModel @Inject constructor(
                         is SocketTimeoutException -> "Превышено время ожидания ответа"
                         else -> "Ошибка загрузки категорий"
                     }
-                    emitEffect(TransactionDetailSideEffect.ShowSnackbar(message))
+                    emitEffect(AddTransactionSideEffect.ShowSnackbar(message))
                 }
             )
         }

@@ -5,13 +5,12 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
-import android.os.Build
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Класс для мониторинга состояния интернет-соединения устройства в режиме реального времени.
@@ -21,10 +20,10 @@ import javax.inject.Inject
  * @property context Контекст приложения, внедряется через Hilt с аннотацией [ApplicationContext].
  *
  * @constructor Создает экземпляр [NetworkMonitor], который начинает отслеживать сеть сразу после создания.
-
  */
+@Singleton
 class NetworkMonitor @Inject constructor(
-    @ApplicationContext private val context: Context
+    private val context: Context
 ) {
     private val connectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
