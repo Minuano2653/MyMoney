@@ -1,4 +1,4 @@
-package com.example.mymoney.presentation.add_transaction
+package com.example.mymoney.presentation.screens.add_transaction
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -24,9 +24,8 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mymoney.R
-import com.example.mymoney.presentation.base.viewmodel.provideViewModelFactory
+import com.example.mymoney.presentation.base.viewmodel.daggerViewModel
 import com.example.mymoney.presentation.components.AmountInputDialog
 import com.example.mymoney.presentation.components.CategoriesBottomSheetContent
 import com.example.mymoney.presentation.components.CustomTopAppBar
@@ -44,15 +43,11 @@ import kotlinx.coroutines.flow.collectLatest
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTransactionScreen(
-    isIncome: Boolean,
     modifier: Modifier = Modifier,
     onNavigateBack: () -> Unit,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    viewModel: AddTransactionViewModel = viewModel(factory = provideViewModelFactory())
+    viewModel: AddTransactionViewModel = daggerViewModel()
 ) {
-    LaunchedEffect(Unit) {
-        viewModel.handleEvent(AddTransactionEvent.LoadCategories(isIncome))
-    }
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         contentWindowInsets = WindowInsets(bottom = 0.dp),

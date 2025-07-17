@@ -11,7 +11,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -19,7 +18,7 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.mymoney.R
-import com.example.mymoney.presentation.base.viewmodel.provideViewModelFactory
+import com.example.mymoney.presentation.base.viewmodel.daggerViewModel
 import com.example.mymoney.presentation.navigation.Main
 import com.example.mymoney.presentation.navigation.Splash
 
@@ -27,7 +26,7 @@ import com.example.mymoney.presentation.navigation.Splash
 @Composable
 fun SplashScreen(
     navController: NavHostController,
-    viewModel: SplashViewModel = viewModel(factory = provideViewModelFactory())
+    viewModel: SplashViewModel = daggerViewModel()
 ) {
     LaunchedEffect(Unit) {
         viewModel.handleEvent(SplashEvent.LoadAccount)

@@ -36,8 +36,10 @@ fun AppNavGraph(
     addExpenseScreenContent: @Composable (Boolean) -> Unit,
     addIncomeScreenContent: @Composable (Boolean) -> Unit,
     editExpenseScreenContent: @Composable (Boolean, Int) -> Unit,
-    editIncomeScreenContent: @Composable (Boolean, Int) -> Unit
-) {
+    editIncomeScreenContent: @Composable (Boolean, Int) -> Unit,
+    expensesAnalysisScreenContent: @Composable (Boolean) -> Unit,
+    incomesAnalysisScreenContent: @Composable (Boolean) -> Unit,
+    ) {
     NavHost(
         navController = navHostController,
         startDestination = Expenses,
@@ -49,14 +51,16 @@ fun AppNavGraph(
             expensesTodayScreenContent = expensesTodayScreenContent,
             expensesHistoryScreenContent = expensesHistoryScreenContent,
             addExpenseScreenContent = addExpenseScreenContent,
-            editExpenseScreenContent = editExpenseScreenContent
+            editExpenseScreenContent = editExpenseScreenContent,
+            expensesAnalysisScreenContent = expensesAnalysisScreenContent
         )
 
         incomesNavGraph(
             incomesTodayScreenContent = incomesTodayScreenContent,
             incomesHistoryScreenContent = incomesHistoryScreenContent,
             addIncomeScreenContent = addIncomeScreenContent,
-            editIncomeScreenContent = editIncomeScreenContent
+            editIncomeScreenContent = editIncomeScreenContent,
+            incomesAnalysisScreenContent = incomesAnalysisScreenContent
         )
 
         accountNavGraph(

@@ -1,4 +1,4 @@
-package com.example.mymoney.presentation.add_transaction
+package com.example.mymoney.presentation.screens.add_transaction
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -10,6 +10,8 @@ import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
 import com.example.mymoney.presentation.navigation.TransactionDetail
 import com.example.mymoney.utils.DateUtils.combineDateAndTimeToIso
 import com.example.mymoney.utils.NetworkMonitor
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
@@ -19,21 +21,22 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import javax.inject.Inject
 
-class AddTransactionViewModel @Inject constructor(
-    //savedStateHandle: SavedStateHandle,
-    networkMonitor: NetworkMonitor,
+class AddTransactionViewModel @AssistedInject constructor(
     private val getCurrentAccountUseCase: GetCurrentAccountUseCase,
     private val getCategoriesByTypeUseCase: GetCategoriesByTypeUseCase,
     private val createTransactionUseCase: CreateTransactionUseCase,
+    @Assisted private val savedStateHandle: SavedStateHandle,
+    networkMonitor: NetworkMonitor,
 ) : BaseViewModel<AddTransactionUiState, AddTransactionEvent, AddTransactionSideEffect>(
     networkMonitor,
     AddTransactionUiState()
 ) {
-    //private val isIncome: Boolean = savedStateHandle.toRoute<TransactionDetail>().isIncome
+    private val isIncome: Boolean = savedStateHandle.toRoute<TransactionDetail>().isIncome
 
     init {
         observeAccount()
-        //_uiState.update { it.copy(isIncome = isIncome) }
+        loadCategories()
+        _uiState.update { it.copy(isIncome = isIncome) }
     }
 
     override fun handleEvent(event: AddTransactionEvent) {
@@ -41,67 +44,52 @@ class AddTransactionViewModel @Inject constructor(
             is AddTransactionEvent.ShowAmountDialog -> {
                 _uiState.update { it.copy(showAmountDialog = true) }
             }
-
             is AddTransactionEvent.DismissAmountDialog -> {
                 _uiState.update { it.copy(showAmountDialog = false) }
             }
-
             is AddTransactionEvent.OnAmountChanged -> {
                 _uiState.update { it.copy(amount = event.amount) }
             }
-
             is AddTransactionEvent.CancelChangesClicked -> {
                 emitEffect(AddTransactionSideEffect.NavigateBack)
             }
-
             is AddTransactionEvent.ShowCategorySheet -> {
                 _uiState.update { it.copy(showCategorySheet = true) }
             }
-
             is AddTransactionEvent.DismissCategorySheet -> {
                 _uiState.update { it.copy(showCategorySheet = false) }
             }
-
             is AddTransactionEvent.OnCategorySelected -> {
                 _uiState.update {
                     it.copy(selectedCategory = event.selectedCategory)
                 }
             }
-
             is AddTransactionEvent.OnCommentChanged -> {
                 _uiState.update { it.copy(comment = event.comment) }
             }
-
             is AddTransactionEvent.ShowDatePicker -> {
                 _uiState.update { it.copy(showDatePicker = true) }
             }
-
             is AddTransactionEvent.DismissDatePicker -> {
                 _uiState.update { it.copy(showDatePicker = false) }
             }
-
             is AddTransactionEvent.OnDateSelected -> {
                 _uiState.update { it.copy(date = event.date) }
             }
-
             is AddTransactionEvent.SaveChangesClicked -> {
                 saveTransaction()
             }
-
             is AddTransactionEvent.ShowTimePicker -> {
                 _uiState.update { it.copy(showTimePicker = true) }
             }
-
             is AddTransactionEvent.DismissTimePicker -> {
                 _uiState.update { it.copy(showTimePicker = false) }
             }
-
             is AddTransactionEvent.OnTimeSelected -> {
                 _uiState.update { it.copy(time = event.time) }
             }
-
             is AddTransactionEvent.LoadCategories -> {
-                loadCategories(event.isIncome)
+                loadCategories()
             }
         }
     }
@@ -161,7 +149,7 @@ class AddTransactionViewModel @Inject constructor(
         }
     }
 
-    private fun loadCategories(isIncome: Boolean) {
+    private fun loadCategories() {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update { it.copy(isLoadingCategories = true) }
             getCategoriesByTypeUseCase(isIncome).fold(

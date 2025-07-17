@@ -8,6 +8,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -177,6 +181,14 @@ fun ListItemExamples() {
                 subtitle = "Нажми меня",
                 leadingIcon = { EmojiIcon("👆") },
                 onClick = { }
+            )
+
+            ListItemComponent(
+                title = "На собачку",
+                trailingText = "1500₽",
+                trailingSubText = "25 февраля",
+                leadingIcon = { EmojiIcon("\uD83D\uDC36") },
+                trailingIcon = { TrailingIcon() }
             )
         }
     }

@@ -10,6 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,7 +25,8 @@ fun CustomTopAppBar(
     @DrawableRes leadingIconRes: Int? = null,
     @DrawableRes trailingIconRes: Int? = null,
     onLeadingClick: (() -> Unit)? = null,
-    onTrailingClick: (() -> Unit)? = null
+    onTrailingClick: (() -> Unit)? = null,
+    containerColor: Color = MaterialTheme.colorScheme.primary
 ) {
     CenterAlignedTopAppBar(
         title = {
@@ -56,7 +58,7 @@ fun CustomTopAppBar(
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary,
+            containerColor = containerColor,
             titleContentColor = MaterialTheme.colorScheme.onSurface
         )
     )

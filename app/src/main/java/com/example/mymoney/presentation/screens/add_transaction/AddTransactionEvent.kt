@@ -1,10 +1,10 @@
-package com.example.mymoney.presentation.add_transaction
+package com.example.mymoney.presentation.screens.add_transaction
 
 import com.example.mymoney.domain.entity.Category
 import com.example.mymoney.presentation.base.contract.BaseEvent
 
 sealed class AddTransactionEvent : BaseEvent {
-    data class LoadCategories(val isIncome: Boolean) : AddTransactionEvent()
+    object LoadCategories : AddTransactionEvent()
     object ShowCategorySheet : AddTransactionEvent()
     object DismissCategorySheet : AddTransactionEvent()
     object CancelChangesClicked : AddTransactionEvent()

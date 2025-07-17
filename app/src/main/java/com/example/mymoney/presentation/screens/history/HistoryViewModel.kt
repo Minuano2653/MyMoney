@@ -1,11 +1,16 @@
 package com.example.mymoney.presentation.screens.history
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.example.mymoney.domain.usecase.GetCurrentAccountUseCase
 import com.example.mymoney.domain.usecase.GetTransactionsByPeriodUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
+import com.example.mymoney.presentation.navigation.TransactionsHistory
 import com.example.mymoney.utils.DateUtils
 import com.example.mymoney.utils.NetworkMonitor
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
@@ -16,18 +21,20 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
-import javax.inject.Inject
 
 
-class HistoryViewModel @Inject constructor(
+class HistoryViewModel @AssistedInject constructor(
     private val getTransactionsByPeriodUseCase: GetTransactionsByPeriodUseCase,
     private val getCurrentAccountUseCase: GetCurrentAccountUseCase,
+    @Assisted private val  savedStateHandle: SavedStateHandle,
     networkMonitor: NetworkMonitor
 ): BaseViewModel<HistoryUiState, HistoryEvent, HistorySideEffect>(
     networkMonitor,
     HistoryUiState()
 ) {
     private var loadTransactionsJob: Job? = null
+
+    private val isIncome: Boolean = savedStateHandle.toRoute<TransactionsHistory>().isIncome
 
     init {
         observeAccountChanges()
@@ -41,7 +48,7 @@ class HistoryViewModel @Inject constructor(
     override fun handleEvent(event: HistoryEvent) {
         when (event) {
             is HistoryEvent.LoadTransactions -> {
-                loadTransactions(event.isIncome)
+                loadTransactions()
             }
             is HistoryEvent.OnStartDateClicked -> {
                 _uiState.update { it.copy(showStartDatePicker = !it.showStartDatePicker) }
@@ -51,26 +58,25 @@ class HistoryViewModel @Inject constructor(
             }
             is HistoryEvent.OnStartDateSelected -> {
                 _uiState.update { it.copy(startDate = event.date) }
-                handleEvent(HistoryEvent.LoadTransactions(event.isIncome))
+                handleEvent(HistoryEvent.LoadTransactions)
             }
             is HistoryEvent.OnEndDateSelected -> {
                 _uiState.update { it.copy(endDate = event.date) }
-                handleEvent(HistoryEvent.LoadTransactions(event.isIncome))
+                handleEvent(HistoryEvent.LoadTransactions)
             }
             is HistoryEvent.OnBackPressed -> {
                 cancelLoadingAndNavigateBack()
             }
             is HistoryEvent.OnAnalysisClicked -> {
-                emitEffect(HistorySideEffect.NavigateToAnalysis)
+                emitEffect(HistorySideEffect.NavigateToAnalysis(isIncome))
             }
-
             is HistoryEvent.OnTransactionClicked -> {
                 emitEffect(HistorySideEffect.NavigateToEditTransaction(event.transaction.id))
             }
         }
     }
 
-    private fun loadTransactions(isIncome: Boolean) {
+    private fun loadTransactions() {
         loadTransactionsJob?.job?.cancel()
         loadTransactionsJob = viewModelScope.launch(Dispatchers.IO) {
             _uiState.update { it.copy(isLoading = true, error = null) }

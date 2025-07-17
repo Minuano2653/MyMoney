@@ -1,6 +1,7 @@
 package com.example.mymoney.di
 
 import android.content.Context
+import com.example.mymoney.di.viewmodel.ViewModelComponent
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton

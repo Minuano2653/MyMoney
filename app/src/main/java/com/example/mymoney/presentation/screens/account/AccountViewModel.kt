@@ -11,14 +11,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/**
- * ViewModel для экрана счёта.
- *
- * Отвечает за загрузку данных аккаунта, обработку пользовательских событий и управление состоянием UI.
- *
- * @property getAccountUseCase UseCase для получения данных счёта.
- * @property networkMonitor Монитор состояния сети.
- */
+
 class AccountViewModel @Inject constructor(
     private val getAccountUseCase: GetAccountUseCase,
     private val getCurrentAccountUseCase: GetCurrentAccountUseCase,

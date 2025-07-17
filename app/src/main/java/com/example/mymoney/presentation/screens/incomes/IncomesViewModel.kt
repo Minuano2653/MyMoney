@@ -15,15 +15,6 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import javax.inject.Inject
 
-/**
- * ViewModel для экрана доходов.
- *
- * Отвечает за загрузку списка доходов через [getTransactionsByPeriodUseCase],
- * обработку событий UI, управление состоянием [IncomesUiState] и генерацию сайд-эффектов [ExpensesSideEffect].
- *
- * @property getTransactionsByPeriodUseCase Юзкейс для получения списка доходов.
- * @property networkMonitor Монитор состояния сети, обновляет UI при изменении подключения.
- */
 class IncomesViewModel @Inject constructor(
     private val getTransactionsByPeriodUseCase: GetTransactionsByPeriodUseCase,
     private val getCurrentAccountUseCase: GetCurrentAccountUseCase,
@@ -33,7 +24,6 @@ class IncomesViewModel @Inject constructor(
     IncomesUiState()
 ) {
     init {
-        //handleEvent(IncomesEvent.LoadIncomes)
         observeAccountChanges()
     }
 

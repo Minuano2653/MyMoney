@@ -28,9 +28,8 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mymoney.R
-import com.example.mymoney.presentation.base.viewmodel.provideViewModelFactory
+import com.example.mymoney.presentation.base.viewmodel.daggerViewModel
 import com.example.mymoney.presentation.components.AmountInputDialog
 import com.example.mymoney.presentation.components.CategoriesBottomSheetContent
 import com.example.mymoney.presentation.components.CustomTopAppBar
@@ -39,7 +38,6 @@ import com.example.mymoney.presentation.components.Divider
 import com.example.mymoney.presentation.components.ListItemComponent
 import com.example.mymoney.presentation.components.TimeInputDialog
 import com.example.mymoney.presentation.components.TrailingIcon
-import com.example.mymoney.presentation.screens.edit_account.EditAccountEvent
 import com.example.mymoney.utils.DateUtils
 import com.example.mymoney.utils.toSymbol
 import kotlinx.coroutines.flow.collectLatest
@@ -47,16 +45,11 @@ import kotlinx.coroutines.flow.collectLatest
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditTransactionScreen(
-    isIncome: Boolean,
-    transactionId: Int,
     modifier: Modifier = Modifier,
     onNavigateBack: () -> Unit,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    viewModel: EditTransactionViewModel = viewModel(factory = provideViewModelFactory())
+    viewModel: EditTransactionViewModel = daggerViewModel()
 ) {
-    LaunchedEffect(Unit) {
-        viewModel.handleEvent(EditTransactionEvent.SetInitData(isIncome, transactionId))
-    }
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         contentWindowInsets = WindowInsets(bottom = 0.dp),

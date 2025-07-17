@@ -120,4 +120,12 @@ object DateUtils {
         val minute = calendar.get(Calendar.MINUTE)
         return String.format(Locale("ru", "RU") ,"%02d:%02d", hour, minute)
     }
+
+    fun formatDateWithMonthInGenitive(dateString: String): String {
+
+        val outputFormat = SimpleDateFormat("d MMMM yyyy", Locale("ru", "RU"))
+
+        val date = yearMonthDayFormatter.parse(dateString) ?: return ""
+        return outputFormat.format(date)
+    }
 }

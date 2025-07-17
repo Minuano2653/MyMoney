@@ -1,5 +1,4 @@
 package com.example.mymoney.presentation.screens.edit_account
-
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
@@ -8,16 +7,17 @@ import com.example.mymoney.domain.usecase.UpdateAccountUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
 import com.example.mymoney.presentation.navigation.EditAccount
 import com.example.mymoney.utils.NetworkMonitor
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-class EditAccountViewModel @Inject constructor(
+class EditAccountViewModel @AssistedInject constructor(
     private val getAccountUseCase: GetAccountUseCase,
     private val updateAccountUseCase: UpdateAccountUseCase,
-    //savedStateHandle: SavedStateHandle,
+    @Assisted private val savedStateHandle: SavedStateHandle,
     networkMonitor: NetworkMonitor,
 ): BaseViewModel<EditAccountUiState, EditAccountEvent, EditAccountSideEffect>(
         networkMonitor,
@@ -26,14 +26,14 @@ class EditAccountViewModel @Inject constructor(
     private var loadAccountJob: Job? = null
     private var saveChangesJob: Job? = null
 
-    //private val accountId = savedStateHandle.toRoute<EditAccount>().accountId
+    private val accountId = savedStateHandle.toRoute<EditAccount>().accountId
 
     private var originalName: String = ""
     private var originalBalance: String = ""
     private var originalCurrency: String = ""
 
     init {
-        //handleEvent(EditAccountEvent.LoadAccount)
+        handleEvent(EditAccountEvent.LoadAccount)
     }
 
     override fun handleEvent(event: EditAccountEvent) {
@@ -45,7 +45,7 @@ class EditAccountViewModel @Inject constructor(
                 emitEffect(EditAccountSideEffect.NavigateBack)
             }
             is EditAccountEvent.OnSaveChangesClicked -> {
-                saveChanges(event.accountId)
+                saveChanges()
             }
             is EditAccountEvent.OnNameChanged -> {
                 _uiState.update {
@@ -108,7 +108,7 @@ class EditAccountViewModel @Inject constructor(
         }
     }
 
-    private fun saveChanges(accountId: Int) {
+    private fun saveChanges() {
         saveChangesJob?.cancel()
 
         val currentState = _uiState.value

@@ -32,9 +32,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mymoney.R
-import com.example.mymoney.presentation.base.viewmodel.provideViewModelFactory
+import com.example.mymoney.presentation.base.viewmodel.daggerViewModel
 import com.example.mymoney.presentation.components.CurrencyBottomSheetContent
 import com.example.mymoney.presentation.components.CustomTopAppBar
 import com.example.mymoney.presentation.components.Divider
@@ -47,15 +46,11 @@ import kotlinx.coroutines.flow.collectLatest
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditAccountScreen(
-    accountId: Int,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    viewModel: EditAccountViewModel = viewModel(factory = provideViewModelFactory())
+    viewModel: EditAccountViewModel = daggerViewModel()
 ) {
-    LaunchedEffect(Unit) {
-        viewModel.handleEvent(EditAccountEvent.LoadAccount(accountId))
-    }
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         contentWindowInsets = WindowInsets(bottom = 0.dp),
@@ -68,7 +63,7 @@ fun EditAccountScreen(
                     viewModel.handleEvent(EditAccountEvent.OnCancelChangesClicked)
                 },
                 onTrailingClick = {
-                    viewModel.handleEvent(EditAccountEvent.OnSaveChangesClicked(accountId))
+                    viewModel.handleEvent(EditAccountEvent.OnSaveChangesClicked/*(accountId)*/)
                 }
             )
         },

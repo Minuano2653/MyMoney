@@ -1,7 +1,7 @@
 package com.example.mymoney.di
 
 import com.example.mymoney.data.remote.datasource.AccountDataStore
-import com.example.mymoney.di.scope.ViewModelScope
+import com.example.mymoney.di.viewmodel.scope.ViewModelScope
 import com.example.mymoney.domain.repository.AccountsRepository
 import com.example.mymoney.domain.repository.CategoriesRepository
 import com.example.mymoney.domain.repository.TransactionsRepository
@@ -9,6 +9,7 @@ import com.example.mymoney.domain.usecase.CreateTransactionUseCase
 import com.example.mymoney.domain.usecase.DeleteTransactionUseCase
 import com.example.mymoney.domain.usecase.GetAccountIdUseCase
 import com.example.mymoney.domain.usecase.GetAccountUseCase
+import com.example.mymoney.domain.usecase.GetAnalysisUseCase
 import com.example.mymoney.domain.usecase.GetCategoriesByTypeUseCase
 import com.example.mymoney.domain.usecase.GetCategoriesUseCase
 import com.example.mymoney.domain.usecase.GetCurrentAccountUseCase
@@ -96,4 +97,10 @@ class DomainModule {
     fun provideUpdateTransactionUseCase(
         repository: TransactionsRepository,
     ): UpdateTransactionUseCase = UpdateTransactionUseCase(repository)
+
+    @Provides
+    @ViewModelScope
+    fun provideGetAnalysisUseCase(
+        getTransactionsByPeriodUseCase: GetTransactionsByPeriodUseCase
+    ): GetAnalysisUseCase = GetAnalysisUseCase(getTransactionsByPeriodUseCase)
 }

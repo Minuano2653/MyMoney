@@ -8,12 +8,14 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Singleton
 
 @Module
 object NetworkModule {
     private const val BASE_URL = "https://shmr-finance.ru/api/v1/"
 
     @Provides
+    @Singleton
     fun provideOkHttpClient(
         authInterceptor: AuthInterceptor
     ): OkHttpClient = OkHttpClient.Builder()
@@ -24,6 +26,7 @@ object NetworkModule {
         .build()
 
     @Provides
+    @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit =
         Retrofit.Builder()
             .baseUrl(BASE_URL)

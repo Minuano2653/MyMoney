@@ -23,15 +23,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mymoney.R
-import com.example.mymoney.presentation.base.viewmodel.provideViewModelFactory
+import com.example.mymoney.presentation.base.viewmodel.daggerViewModel
+import com.example.mymoney.presentation.components.CustomFloatingActionButton
 import com.example.mymoney.presentation.components.CustomTopAppBar
 import com.example.mymoney.presentation.components.Divider
 import com.example.mymoney.presentation.components.EmojiIcon
 import com.example.mymoney.presentation.components.ListItemComponent
 import com.example.mymoney.presentation.components.TrailingIcon
-import com.example.mymoney.presentation.components.CustomFloatingActionButton
 import com.example.mymoney.presentation.theme.MyMoneyTheme
 import com.example.mymoney.utils.formatAmount
 import com.example.mymoney.utils.toSymbol
@@ -44,7 +43,7 @@ fun ExpensesScreen(
     onNavigateToTransactionDetail: (Int) -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    viewModel: ExpensesViewModel = viewModel(factory = provideViewModelFactory())
+    viewModel: ExpensesViewModel = daggerViewModel()
 ) {
     LaunchedEffect(Unit) {
         viewModel.handleEvent(ExpensesEvent.LoadExpenses)
