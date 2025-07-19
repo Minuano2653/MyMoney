@@ -25,6 +25,7 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.mymoney.R
 import com.example.mymoney.presentation.navigation.Account
+import com.example.mymoney.presentation.navigation.Analysis
 import com.example.mymoney.presentation.navigation.TransactionDetail
 import com.example.mymoney.presentation.navigation.AppNavGraph
 import com.example.mymoney.presentation.navigation.BottomNavItem
@@ -43,7 +44,8 @@ import com.example.mymoney.presentation.screens.expenses.ExpensesScreen
 import com.example.mymoney.presentation.screens.history.HistoryScreen
 import com.example.mymoney.presentation.screens.incomes.IncomesScreen
 import com.example.mymoney.presentation.screens.settings.SettingsScreen
-import com.example.mymoney.presentation.add_transaction.AddTransactionScreen
+import com.example.mymoney.presentation.screens.add_transaction.AddTransactionScreen
+import com.example.mymoney.presentation.screens.analysis.AnalysisScreen
 import com.example.mymoney.presentation.screens.edit_transaction.EditTransactionScreen
 import com.example.mymoney.presentation.theme.MyMoneyTheme
 
@@ -64,13 +66,18 @@ fun MainScreen(
                 BottomNavItem(Expenses, R.string.bottom_label_expenses, R.drawable.ic_expenses),
                 BottomNavItem(Incomes, R.string.bottom_label_incomes, R.drawable.ic_incomes),
                 BottomNavItem(Account, R.string.bottom_label_account, R.drawable.ic_account),
-                BottomNavItem(Categories, R.string.bottom_label_categories, R.drawable.ic_categories),
+                BottomNavItem(
+                    Categories,
+                    R.string.bottom_label_categories,
+                    R.drawable.ic_categories
+                ),
                 BottomNavItem(Settings, R.string.bottom_label_settings, R.drawable.ic_settings)
             )
 
             NavigationBar(containerColor = MaterialTheme.colorScheme.surfaceContainer) {
                 navigationList.forEach { item ->
-                    val selected = currentDestination?.hierarchy?.any { it.hasRoute(item.route::class) } == true
+                    val selected =
+                        currentDestination?.hierarchy?.any { it.hasRoute(item.route::class) } == true
                     NavigationBarItem(
                         selected = selected,
                         onClick = {
@@ -91,11 +98,11 @@ fun MainScreen(
                             )
                         },
                         colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = MaterialTheme.colorScheme.primary,
-                        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        selectedTextColor = MaterialTheme.colorScheme.onSurface,
-                        unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        indicatorColor = MaterialTheme.colorScheme.secondaryContainer
+                            selectedIconColor = MaterialTheme.colorScheme.primary,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            selectedTextColor = MaterialTheme.colorScheme.onSurface,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            indicatorColor = MaterialTheme.colorScheme.secondaryContainer
                         )
                     )
                 }
@@ -111,7 +118,11 @@ fun MainScreen(
                     onNavigateToHistory = {
                         navigationState.navHostController.navigate(TransactionsHistory(false))
                     },
-                    onNavigateToAddExpense = { navigationState.navHostController.navigate(TransactionDetail(false)) },
+                    onNavigateToAddExpense = {
+                        navigationState.navHostController.navigate(
+                            TransactionDetail(false)
+                        )
+                    },
                     onNavigateToTransactionDetail = { transactionId ->
                         navigationState.navHostController.navigate(
                             EditTransaction(false, transactionId)
@@ -125,7 +136,11 @@ fun MainScreen(
                     onNavigateToHistory = {
                         navigationState.navHostController.navigate(TransactionsHistory(true))
                     },
-                    onNavigateToAddIncome = { navigationState.navHostController.navigate(TransactionDetail(true)) },
+                    onNavigateToAddIncome = {
+                        navigationState.navHostController.navigate(
+                            TransactionDetail(true)
+                        )
+                    },
                     onNavigateToTransactionDetail = { transactionId ->
                         navigationState.navHostController.navigate(
                             EditTransaction(true, transactionId)
@@ -153,59 +168,78 @@ fun MainScreen(
                     modifier = modifier
                 )
             },
-            expensesHistoryScreenContent = { isIncome ->
+            expensesHistoryScreenContent = {
                 HistoryScreen(
-                    isIncome = isIncome,
                     onNavigateBack = { navigationState.navigateBack() },
-                    onNavigateToEditTransaction = {transactionId ->
-                        navigationState.navHostController.navigate(EditTransaction(false, transactionId))
+                    onNavigateToEditTransaction = { transactionId ->
+                        navigationState.navHostController.navigate(
+                            EditTransaction(
+                                false,
+                                transactionId
+                            )
+                        )
+                    },
+                    onNavigateToAnalysis = { isIncome ->
+                        navigationState.navHostController.navigate(Analysis(isIncome))
                     },
                     modifier = modifier
                 )
             },
-            incomesHistoryScreenContent = { isIncome ->
+            incomesHistoryScreenContent = {
                 HistoryScreen(
-                    isIncome = isIncome,
                     onNavigateBack = { navigationState.navigateBack() },
                     onNavigateToEditTransaction = { transactionId ->
-                        navigationState.navHostController.navigate(EditTransaction(true, transactionId))
+                        navigationState.navHostController.navigate(
+                            EditTransaction(
+                                true,
+                                transactionId
+                            )
+                        )
+                    },
+                    onNavigateToAnalysis = { isIncome ->
+                        navigationState.navHostController.navigate(Analysis(isIncome))
                     },
                     modifier = modifier
                 )
             },
             editAccountScreenContent = { accountId ->
                 EditAccountScreen(
-                    accountId = accountId,
                     onNavigateBack = { navigationState.navigateBack() },
                     modifier = modifier,
                 )
             },
             addExpenseScreenContent = { isIncome ->
                 AddTransactionScreen(
-                    isIncome = isIncome,
                     onNavigateBack = { navigationState.navigateBack() },
                     modifier = modifier
                 )
             },
             addIncomeScreenContent = { isIncome ->
                 AddTransactionScreen(
-                    isIncome = isIncome,
                     onNavigateBack = { navigationState.navigateBack() },
                     modifier = modifier
                 )
             },
             editExpenseScreenContent = { isIncome, transactionId ->
                 EditTransactionScreen(
-                    isIncome = isIncome,
-                    transactionId = transactionId,
                     onNavigateBack = { navigationState.navigateBack() },
                     modifier = modifier
                 )
             },
             editIncomeScreenContent = { isIncome, transactionId ->
                 EditTransactionScreen(
-                    isIncome = isIncome,
-                    transactionId = transactionId,
+                    onNavigateBack = { navigationState.navigateBack() },
+                    modifier = modifier
+                )
+            },
+            expensesAnalysisScreenContent = {
+                AnalysisScreen(
+                    onNavigateBack = { navigationState.navigateBack() },
+                    modifier = modifier
+                )
+            },
+            incomesAnalysisScreenContent = {
+                AnalysisScreen(
                     onNavigateBack = { navigationState.navigateBack() },
                     modifier = modifier
                 )

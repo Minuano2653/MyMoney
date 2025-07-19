@@ -18,12 +18,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mymoney.R
-import com.example.mymoney.presentation.base.viewmodel.provideViewModelFactory
+import com.example.mymoney.presentation.base.viewmodel.daggerViewModel
 import com.example.mymoney.presentation.components.CustomFloatingActionButton
 import com.example.mymoney.presentation.components.CustomTopAppBar
 import com.example.mymoney.presentation.components.Divider
@@ -42,11 +42,8 @@ fun IncomesScreen(
     onNavigateToTransactionDetail: (Int) -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    viewModel: IncomesViewModel = viewModel(factory = provideViewModelFactory()),
+    viewModel: IncomesViewModel = daggerViewModel()
 ) {
-    LaunchedEffect(Unit) {
-        viewModel.handleEvent(IncomesEvent.LoadIncomes)
-    }
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.surface,
@@ -113,7 +110,7 @@ fun IncomesScreenContent(
             ListItemComponent(
                 backgroundColor = MaterialTheme.colorScheme.secondary,
                 itemHeight = 56.dp,
-                title = "Всего",
+                title = stringResource(R.string.list_item_text_total),
                 trailingText = "${uiState.total.formatAmount()} ${uiState.currency.toSymbol()}"
             )
             Divider()

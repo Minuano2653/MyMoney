@@ -17,6 +17,7 @@ fun NavGraphBuilder.expensesNavGraph(
     expensesHistoryScreenContent: @Composable (Boolean) -> Unit,
     addExpenseScreenContent: @Composable (Boolean) -> Unit,
     editExpenseScreenContent: @Composable (Boolean, Int) -> Unit,
+    expensesAnalysisScreenContent: @Composable (Boolean) -> Unit,
 ) {
     navigation<Expenses>(
         startDestination = ExpensesToday
@@ -35,6 +36,10 @@ fun NavGraphBuilder.expensesNavGraph(
         composable<EditTransaction> { backStackEntry ->
             val args = backStackEntry.toRoute<EditTransaction>()
             editExpenseScreenContent(args.isIncome, args.transactionId)
+        }
+        composable<Analysis> { backStackEntry ->
+            val args = backStackEntry.toRoute<Analysis>()
+            expensesAnalysisScreenContent(args.isIncome)
         }
     }
 }

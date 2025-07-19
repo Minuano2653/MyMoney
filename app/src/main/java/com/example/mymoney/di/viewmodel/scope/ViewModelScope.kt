@@ -1,4 +1,4 @@
-package com.example.mymoney.di.scope
+package com.example.mymoney.di.viewmodel.scope
 
 import javax.inject.Scope
 

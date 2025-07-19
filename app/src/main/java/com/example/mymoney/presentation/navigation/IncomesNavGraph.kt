@@ -17,8 +17,8 @@ fun NavGraphBuilder.incomesNavGraph(
     incomesHistoryScreenContent: @Composable (Boolean) -> Unit,
     addIncomeScreenContent: @Composable (Boolean) -> Unit,
     editIncomeScreenContent: @Composable (Boolean, Int) -> Unit,
-
-    ) {
+    incomesAnalysisScreenContent: @Composable (Boolean) -> Unit,
+) {
     navigation<Incomes>(
         startDestination = IncomesToday
     ) {
@@ -36,6 +36,10 @@ fun NavGraphBuilder.incomesNavGraph(
         composable<EditTransaction> { backStackEntry ->
             val args = backStackEntry.toRoute<EditTransaction>()
             editIncomeScreenContent(args.isIncome, args.transactionId)
+        }
+        composable<Analysis> { backStackEntry ->
+            val args = backStackEntry.toRoute<Analysis>()
+            incomesAnalysisScreenContent(args.isIncome)
         }
     }
 }

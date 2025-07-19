@@ -85,6 +85,12 @@ object DateUtils {
         return dayMonthYearFormatter.format(Date())
     }
 
+    fun toIsoToday(yearMonthDayString: String): String {
+        val date = yearMonthDayFormatter.parse(yearMonthDayString)
+        return isoFormatter.format(date!!)
+    }
+
+
     fun combineDateAndTimeToIso(date: String, time: String): String? {
         return try {
             val combined = dayMonthYearTimeFormatter.parse("$date $time")
@@ -119,5 +125,13 @@ object DateUtils {
         val hour = calendar.get(Calendar.HOUR_OF_DAY)
         val minute = calendar.get(Calendar.MINUTE)
         return String.format(Locale("ru", "RU") ,"%02d:%02d", hour, minute)
+    }
+
+    fun formatDateWithMonthInGenitive(dateString: String): String {
+
+        val outputFormat = SimpleDateFormat("d MMMM yyyy", Locale("ru", "RU"))
+
+        val date = yearMonthDayFormatter.parse(dateString) ?: return ""
+        return outputFormat.format(date)
     }
 }

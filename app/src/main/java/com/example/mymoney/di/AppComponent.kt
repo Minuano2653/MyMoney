@@ -1,6 +1,7 @@
 package com.example.mymoney.di
 
 import android.content.Context
+import com.example.mymoney.di.viewmodel.ViewModelComponent
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -13,7 +14,9 @@ import javax.inject.Singleton
         NetworkModule::class,
         ApiModule::class,
         DataSourceModule::class,
-        RepositoryModule::class
+        RepositoryModule::class,
+        DatabaseModule::class,
+        DaoModule::class
     ]
 )
 interface AppComponent {

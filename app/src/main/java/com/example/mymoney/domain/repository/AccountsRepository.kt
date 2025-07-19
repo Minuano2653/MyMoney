@@ -1,6 +1,7 @@
 package com.example.mymoney.domain.repository
 
 import com.example.mymoney.domain.entity.Account
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Репозиторий для работы с аккаунтами.
@@ -20,4 +21,8 @@ interface AccountsRepository {
     suspend fun getInitAccountInfo(): Result<Account>
 
     suspend fun getAccountId(): Result<Int>
+
+    fun observeAccount(): Flow<Account?>
+
+    fun observeAccountById(accountId: Int): Flow<Account?>
 }

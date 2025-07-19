@@ -1,5 +1,6 @@
 package com.example.mymoney.data.remote.dto
 
+import com.example.mymoney.data.local.entity.LocalTransaction
 import com.example.mymoney.domain.entity.Transaction
 import java.math.BigDecimal
 
@@ -33,6 +34,17 @@ data class TransactionDto(
             amount = BigDecimal(amount),
             createdAt = createdAt,
             transactionDate = transactionDate,
+            updatedAt = updatedAt
+        )
+    }
+    fun toLocal(): LocalTransaction {
+        return LocalTransaction(
+            id = id,
+            categoryId = category.id,
+            amount = amount,
+            transactionDate = transactionDate,
+            comment = comment,
+            createdAt = createdAt,
             updatedAt = updatedAt
         )
     }

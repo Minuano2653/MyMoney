@@ -1,23 +1,29 @@
 package com.example.mymoney.presentation.screens.edit_account
-
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.example.mymoney.domain.usecase.GetAccountUseCase
+import com.example.mymoney.domain.usecase.ObserveAccountUseCase
 import com.example.mymoney.domain.usecase.UpdateAccountUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
 import com.example.mymoney.presentation.navigation.EditAccount
 import com.example.mymoney.utils.NetworkMonitor
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
+import retrofit2.HttpException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 
-class EditAccountViewModel @Inject constructor(
+class EditAccountViewModel @AssistedInject constructor(
     private val getAccountUseCase: GetAccountUseCase,
     private val updateAccountUseCase: UpdateAccountUseCase,
-    //savedStateHandle: SavedStateHandle,
+    private val observeAccountUseCase: ObserveAccountUseCase,
+    @Assisted private val savedStateHandle: SavedStateHandle,
     networkMonitor: NetworkMonitor,
 ): BaseViewModel<EditAccountUiState, EditAccountEvent, EditAccountSideEffect>(
         networkMonitor,
@@ -25,15 +31,15 @@ class EditAccountViewModel @Inject constructor(
 ) {
     private var loadAccountJob: Job? = null
     private var saveChangesJob: Job? = null
-
-    //private val accountId = savedStateHandle.toRoute<EditAccount>().accountId
+    private var observeAccountJob: Job? = null
+    private val accountId = savedStateHandle.toRoute<EditAccount>().accountId
 
     private var originalName: String = ""
     private var originalBalance: String = ""
     private var originalCurrency: String = ""
 
     init {
-        //handleEvent(EditAccountEvent.LoadAccount)
+        startObservingAccount()
     }
 
     override fun handleEvent(event: EditAccountEvent) {
@@ -45,7 +51,7 @@ class EditAccountViewModel @Inject constructor(
                 emitEffect(EditAccountSideEffect.NavigateBack)
             }
             is EditAccountEvent.OnSaveChangesClicked -> {
-                saveChanges(event.accountId)
+                saveChanges()
             }
             is EditAccountEvent.OnNameChanged -> {
                 _uiState.update {
@@ -108,7 +114,7 @@ class EditAccountViewModel @Inject constructor(
         }
     }
 
-    private fun saveChanges(accountId: Int) {
+    private fun saveChanges() {
         saveChangesJob?.cancel()
 
         val currentState = _uiState.value
@@ -145,11 +151,81 @@ class EditAccountViewModel @Inject constructor(
                     _sideEffect.emit(EditAccountSideEffect.NavigateBack)
                 }
                 .onFailure { e ->
+                    val errorMessage = mapErrorToMessage(e)
                     _uiState.update {
-                        it.copy(isSaving = false, error = e.message)
+                        it.copy(isSaving = false, error = errorMessage)
                     }
-                    _sideEffect.emit(EditAccountSideEffect.ShowError(e.message ?: "Ошибка при обновлении счёта"))
+                    _sideEffect.emit(EditAccountSideEffect.ShowError(errorMessage))
                 }
+        }
+    }
+
+    private fun startObservingAccount() {
+        observeAccountJob?.cancel()
+        observeAccountJob = viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null) }
+
+            observeAccountUseCase()
+                .catch { e ->
+                    val errorMessage = mapErrorToMessage(e)
+                    _uiState.update { it.copy(isLoading = false, error = errorMessage) }
+                    _sideEffect.emit(EditAccountSideEffect.ShowError(errorMessage))
+                }
+                .collect { account ->
+                    if (account != null) {
+                        val isFirstLoad = _uiState.value.isLoading
+                        val hasNoChanges = !_uiState.value.hasChanges
+
+                        if (isFirstLoad || hasNoChanges) {
+                            originalName = account.name
+                            originalBalance = account.balance.toString()
+                            originalCurrency = account.currency
+                        }
+
+                        _uiState.update { currentState ->
+                            if (hasNoChanges || isFirstLoad) {
+                                currentState.copy(
+                                    name = account.name,
+                                    balance = account.balance.toString(),
+                                    currency = account.currency,
+                                    isLoading = false,
+                                    error = null,
+                                    hasChanges = false
+                                )
+                            } else {
+                                    currentState.copy(
+                                    isLoading = false,
+                                    error = null,
+                                    hasChanges = checkHasChanges(currentState.name, currentState.balance, currentState.currency)
+                                )
+                            }
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                error = "Аккаунт не найден"
+                            )
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun mapErrorToMessage(error: Throwable?): String {
+        return when (error) {
+            is UnknownHostException -> "Нет подключения к интернету"
+            is SocketTimeoutException -> "Превышено время ожидания ответа"
+            is HttpException -> when (error.code()) {
+                400 -> "Некорректные данные или неверный формат ID"
+                401 -> "Неавторизованный доступ"
+                404 -> "Счет не найден"
+                500 -> "Внутренняя ошибка сервера"
+                else -> "Ошибка сервера (${error.code()})"
+            }
+            else -> {
+                "Не удалось загрузить данные"
+            }
         }
     }
 

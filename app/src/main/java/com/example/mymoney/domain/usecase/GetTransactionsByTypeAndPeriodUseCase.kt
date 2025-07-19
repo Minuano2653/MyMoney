@@ -5,7 +5,7 @@ import com.example.mymoney.domain.repository.TransactionsRepository
 import com.example.mymoney.utils.DateUtils
 import javax.inject.Inject
 
-class GetTransactionsByPeriodUseCase @Inject constructor(
+class GetTransactionsByTypeAndPeriodUseCase @Inject constructor(
     private val repository: TransactionsRepository,
     private val getAccountIdUseCase: GetAccountIdUseCase
 ) {
@@ -14,16 +14,11 @@ class GetTransactionsByPeriodUseCase @Inject constructor(
         startDate: String = DateUtils.getTodayYearMonthDayFormatted(),
         endDate: String = DateUtils.getTodayYearMonthDayFormatted()
     ): Result<List<Transaction>> {
-        return getAccountIdUseCase().fold(
-            onSuccess = { accountId ->
-                repository.getTransactionsByPeriod(accountId, startDate, endDate)
-                    .map { transactions ->
-                        transactions.filter { it.category.isIncome == isIncome }
-                    }
-            },
-            onFailure = { exception ->
-                Result.failure(exception)
-            }
-        )
+        return runCatching {
+            val accountId = getAccountIdUseCase().getOrThrow()
+            val transactions =
+                repository.getTransactionsByPeriod(accountId, startDate, endDate).getOrThrow()
+            transactions.filter { it.category.isIncome == isIncome }
+        }
     }
 }

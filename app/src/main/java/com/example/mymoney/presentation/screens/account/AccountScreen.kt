@@ -17,9 +17,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mymoney.R
-import com.example.mymoney.presentation.base.viewmodel.provideViewModelFactory
+import com.example.mymoney.presentation.base.viewmodel.daggerViewModel
 import com.example.mymoney.presentation.components.CustomTopAppBar
 import com.example.mymoney.presentation.components.Divider
 import com.example.mymoney.presentation.components.EmojiIcon
@@ -35,7 +34,7 @@ fun AccountScreen(
     onNavigateToEditAccount: (Int) -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    viewModel: AccountViewModel = viewModel(factory = provideViewModelFactory())
+    viewModel: AccountViewModel = daggerViewModel()
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -54,7 +53,6 @@ fun AccountScreen(
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         AccountScreenContent(
             uiState = uiState,
-            onEvent = viewModel::handleEvent,
             modifier = modifier.padding(paddingValues)
         )
     }
@@ -77,7 +75,6 @@ fun AccountScreen(
 fun AccountScreenContent(
     modifier: Modifier = Modifier,
     uiState: AccountUiState,
-    onEvent: (AccountEvent) -> Unit,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         ListItemComponent(
@@ -114,7 +111,6 @@ fun AccountScreenPreview() {
     MyMoneyTheme {
         AccountScreenContent(
             uiState = AccountUiState(),
-            onEvent = {}
         )
     }
 }

@@ -6,6 +6,7 @@
     <string name="top_bar_title_categories">Мои статьи</string>
     <string name="top_bar_title_settings">Настройки</string>
     <string name="top_bar_title_history">Моя история</string>
+    <string name="top_bar_title_analysis">Анализ</string>
 
     <string name="date_picker_clear_button">Очистить</string>
     <string name="date_picker_dismiss_button">Отмена</string>
@@ -16,6 +17,8 @@
     <string name="list_item_text_currency">Валюта</string>
     <string name="list_item_text_total">Всего</string>
     <string name="list_item_text_start">Начало</string>
+    <string name="list_item_text_period_start">Период: начало</string>
+    <string name="list_item_text_period_end">Период: конец</string>
     <string name="list_item_text_end">Конец</string>
     <string name="list_item_text_sum">Сумма</string>
 
@@ -39,5 +42,9 @@
 
     <string name="button_delete_expense">Удалить расход</string>
     <string name="button_delete_income">Удалить доход</string>
+
+    <string name="no_analysis_data">Нет данных для анализа</string>
+
+    <string name="no_history_data">Нет истории за выбранный период</string>
 
 </resources>
