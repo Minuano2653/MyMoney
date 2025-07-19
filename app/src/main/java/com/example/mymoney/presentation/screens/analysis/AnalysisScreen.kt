@@ -13,10 +13,11 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mymoney.R
@@ -31,7 +32,6 @@ import com.example.mymoney.presentation.components.ListItemComponent
 import com.example.mymoney.presentation.components.LoadingCircularIndicator
 import com.example.mymoney.presentation.components.TrailingIcon
 import com.example.mymoney.presentation.screens.analysis.model.CategoryAnalysis
-import com.example.mymoney.presentation.theme.MyMoneyTheme
 import com.example.mymoney.utils.DateUtils
 import com.example.mymoney.utils.DateUtils.formatDateWithMonthInGenitive
 import com.example.mymoney.utils.formatAmount
@@ -46,6 +46,8 @@ fun AnalysisScreen(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     viewModel: AnalysisViewModel = daggerViewModel()
 ) {
+    var showStartDatePicker by remember { mutableStateOf(false) }
+    var showEndDatePicker by remember { mutableStateOf(false) }
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         contentWindowInsets = WindowInsets(bottom = 0.dp),
@@ -71,13 +73,13 @@ fun AnalysisScreen(
             currency = uiState.currency,
             startDate = uiState.startDate,
             endDate = uiState.endDate,
-            onStartDateClick = { viewModel.handleEvent(AnalysisEvent.OnStartDateClicked) },
-            onEndDateClick = { viewModel.handleEvent(AnalysisEvent.OnEndDateClicked) },
+            onStartDateClick = { showStartDatePicker = true },
+            onEndDateClick = { showEndDatePicker = true },
             modifier = modifier.padding(paddingValues),
 
         )
 
-        if (uiState.showStartDatePicker) {
+        if (showStartDatePicker) {
             DatePickerModal(
                 initialSelectedDateMillis = DateUtils.toMillis(uiState.startDate),
                 onDateSelected = { millis ->
@@ -85,12 +87,13 @@ fun AnalysisScreen(
                         val date = DateUtils.formatDateFromMillis(it)
                         viewModel.handleEvent(AnalysisEvent.OnStartDateSelected(date))
                     }
+                    showStartDatePicker = false
                 },
-                onDismiss = { viewModel.handleEvent(AnalysisEvent.OnStartDateClicked) }
+                onDismiss = { showStartDatePicker = false }
             )
         }
 
-        if (uiState.showEndDatePicker) {
+        if (showEndDatePicker) {
             DatePickerModal(
                 initialSelectedDateMillis = DateUtils.toMillis(uiState.endDate),
                 onDateSelected = { millis ->
@@ -98,11 +101,11 @@ fun AnalysisScreen(
                         val date = DateUtils.formatDateFromMillis(it)
                         viewModel.handleEvent(AnalysisEvent.OnEndDateSelected(date))
                     }
+                    showEndDatePicker = false
                 },
-                onDismiss = { viewModel.handleEvent(AnalysisEvent.OnEndDateClicked) }
+                onDismiss = { showEndDatePicker = false }
             )
         }
-
     }
 
     LaunchedEffect(Unit) {

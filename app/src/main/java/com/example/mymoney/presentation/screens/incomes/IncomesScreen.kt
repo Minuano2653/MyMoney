@@ -18,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -43,9 +44,6 @@ fun IncomesScreen(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     viewModel: IncomesViewModel = daggerViewModel()
 ) {
-    LaunchedEffect(Unit) {
-        viewModel.handleEvent(IncomesEvent.LoadIncomes)
-    }
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.surface,
@@ -112,7 +110,7 @@ fun IncomesScreenContent(
             ListItemComponent(
                 backgroundColor = MaterialTheme.colorScheme.secondary,
                 itemHeight = 56.dp,
-                title = "Всего",
+                title = stringResource(R.string.list_item_text_total),
                 trailingText = "${uiState.total.formatAmount()} ${uiState.currency.toSymbol()}"
             )
             Divider()

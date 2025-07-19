@@ -5,7 +5,6 @@ import com.example.mymoney.presentation.base.contract.BaseUiState
 import com.example.mymoney.utils.DateUtils
 import java.math.BigDecimal
 
-
 data class HistoryUiState(
     val isLoading: Boolean = false,
     val transactions: List<Transaction> = emptyList(),
@@ -13,8 +12,6 @@ data class HistoryUiState(
     val currency: String = "",
     val startDate: String = DateUtils.getFirstDayOfCurrentMonth(),
     val endDate: String = DateUtils.getTodayYearMonthDayFormatted(),
-    val showStartDatePicker: Boolean = false,
-    val showEndDatePicker: Boolean = false,
     val error: String? = null,
     val isNetworkAvailable: Boolean = true
 ): BaseUiState

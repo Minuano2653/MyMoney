@@ -53,7 +53,6 @@ fun AccountScreen(
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         AccountScreenContent(
             uiState = uiState,
-            onEvent = viewModel::handleEvent,
             modifier = modifier.padding(paddingValues)
         )
     }
@@ -76,7 +75,6 @@ fun AccountScreen(
 fun AccountScreenContent(
     modifier: Modifier = Modifier,
     uiState: AccountUiState,
-    onEvent: (AccountEvent) -> Unit,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         ListItemComponent(
@@ -113,7 +111,6 @@ fun AccountScreenPreview() {
     MyMoneyTheme {
         AccountScreenContent(
             uiState = AccountUiState(),
-            onEvent = {}
         )
     }
 }

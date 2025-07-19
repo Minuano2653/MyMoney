@@ -5,7 +5,7 @@ import com.example.mymoney.domain.repository.TransactionsRepository
 import com.example.mymoney.utils.DateUtils
 import javax.inject.Inject
 
-class GetTransactionsByPeriodUseCase @Inject constructor(
+class GetTransactionsByTypeAndPeriodUseCase @Inject constructor(
     private val repository: TransactionsRepository,
     private val getAccountIdUseCase: GetAccountIdUseCase
 ) {

@@ -12,10 +12,10 @@ import com.example.mymoney.domain.usecase.GetAccountUseCase
 import com.example.mymoney.domain.usecase.GetAnalysisUseCase
 import com.example.mymoney.domain.usecase.GetCategoriesByTypeUseCase
 import com.example.mymoney.domain.usecase.GetCategoriesUseCase
-import com.example.mymoney.domain.usecase.GetCurrentAccountUseCase
+import com.example.mymoney.domain.usecase.ObserveAccountUseCase
 import com.example.mymoney.domain.usecase.GetInitAccountUseCase
 import com.example.mymoney.domain.usecase.GetTransactionUseCase
-import com.example.mymoney.domain.usecase.GetTransactionsByPeriodUseCase
+import com.example.mymoney.domain.usecase.GetTransactionsByTypeAndPeriodUseCase
 import com.example.mymoney.domain.usecase.UpdateAccountUseCase
 import com.example.mymoney.domain.usecase.UpdateTransactionUseCase
 import dagger.Module
@@ -63,9 +63,9 @@ class DomainModule {
 
     @Provides
     @ViewModelScope
-    fun provideGetCurrentAccountUseCase(
-        accountDataStore: AccountDataStore,
-    ): GetCurrentAccountUseCase = GetCurrentAccountUseCase(accountDataStore)
+    fun provideObserveAccountUseCase(
+        accountsRepository: AccountsRepository,
+    ): ObserveAccountUseCase = ObserveAccountUseCase(accountsRepository)
 
     @Provides
     @ViewModelScope
@@ -78,7 +78,7 @@ class DomainModule {
     fun provideGetTransactionsByPeriodUseCase(
         repository: TransactionsRepository,
         getAccountIdUseCase: GetAccountIdUseCase,
-    ): GetTransactionsByPeriodUseCase = GetTransactionsByPeriodUseCase(repository, getAccountIdUseCase)
+    ): GetTransactionsByTypeAndPeriodUseCase = GetTransactionsByTypeAndPeriodUseCase(repository, getAccountIdUseCase)
 
     @Provides
     @ViewModelScope
@@ -101,6 +101,6 @@ class DomainModule {
     @Provides
     @ViewModelScope
     fun provideGetAnalysisUseCase(
-        getTransactionsByPeriodUseCase: GetTransactionsByPeriodUseCase
-    ): GetAnalysisUseCase = GetAnalysisUseCase(getTransactionsByPeriodUseCase)
+        getTransactionsByTypeAndPeriodUseCase: GetTransactionsByTypeAndPeriodUseCase
+    ): GetAnalysisUseCase = GetAnalysisUseCase(getTransactionsByTypeAndPeriodUseCase)
 }

@@ -45,9 +45,6 @@ fun ExpensesScreen(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     viewModel: ExpensesViewModel = daggerViewModel()
 ) {
-    LaunchedEffect(Unit) {
-        viewModel.handleEvent(ExpensesEvent.LoadExpenses)
-    }
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.surface,

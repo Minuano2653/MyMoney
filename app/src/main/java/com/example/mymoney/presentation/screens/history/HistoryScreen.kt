@@ -1,7 +1,11 @@
 package com.example.mymoney.presentation.screens.history
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -9,18 +13,31 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mymoney.R
+import com.example.mymoney.domain.entity.Transaction
 import com.example.mymoney.presentation.base.viewmodel.daggerViewModel
 import com.example.mymoney.presentation.components.CustomTopAppBar
 import com.example.mymoney.presentation.components.DatePickerModal
+import com.example.mymoney.presentation.components.Divider
+import com.example.mymoney.presentation.components.EmojiIcon
+import com.example.mymoney.presentation.components.EmptyContent
+import com.example.mymoney.presentation.components.ListItemComponent
+import com.example.mymoney.presentation.components.LoadingCircularIndicator
+import com.example.mymoney.presentation.components.TrailingIcon
 import com.example.mymoney.presentation.theme.MyMoneyTheme
 import com.example.mymoney.utils.DateUtils
+import com.example.mymoney.utils.formatAmount
+import com.example.mymoney.utils.toSymbol
 import kotlinx.coroutines.flow.collectLatest
+import java.math.BigDecimal
 
 @Composable
 fun HistoryScreen(
@@ -31,9 +48,8 @@ fun HistoryScreen(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     viewModel: HistoryViewModel = daggerViewModel()
 ) {
-    LaunchedEffect(Unit) {
-        viewModel.handleEvent(HistoryEvent.LoadTransactions)
-    }
+    var showStartDatePicker by remember { mutableStateOf(false) }
+    var showEndDatePicker by remember { mutableStateOf(false) }
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         contentWindowInsets = WindowInsets(bottom = 0.dp),
@@ -55,12 +71,19 @@ fun HistoryScreen(
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
         HistoryScreenContent(
-            uiState = uiState,
-            onEvent = viewModel::handleEvent,
+            isLoading = uiState.isLoading,
+            transactions = uiState.transactions,
+            total = uiState.total,
+            currency = uiState.currency,
+            startDate = uiState.startDate,
+            endDate = uiState.endDate,
+            onStartDateClick = { showStartDatePicker = true },
+            onEndDateClick = { showEndDatePicker = true },
+            onTransactionClick = { transaction -> viewModel.handleEvent(HistoryEvent.OnTransactionClicked(transaction))},
             modifier = modifier.padding(paddingValues)
         )
 
-        if (uiState.showStartDatePicker) {
+        if (showStartDatePicker) {
             DatePickerModal(
                 initialSelectedDateMillis = DateUtils.toMillis(uiState.startDate),
                 onDateSelected = { millis ->
@@ -68,12 +91,13 @@ fun HistoryScreen(
                         val date = DateUtils.formatDateFromMillis(it)
                         viewModel.handleEvent(HistoryEvent.OnStartDateSelected(date))
                     }
+                    showStartDatePicker = false
                 },
-                onDismiss = { viewModel.handleEvent(HistoryEvent.OnStartDateClicked) }
+                onDismiss = { showStartDatePicker = false }
             )
         }
 
-        if (uiState.showEndDatePicker) {
+        if (showEndDatePicker) {
             DatePickerModal(
                 initialSelectedDateMillis = DateUtils.toMillis(uiState.endDate),
                 onDateSelected = { millis ->
@@ -81,8 +105,9 @@ fun HistoryScreen(
                         val date = DateUtils.formatDateFromMillis(it)
                         viewModel.handleEvent(HistoryEvent.OnEndDateSelected(date))
                     }
+                    showEndDatePicker = false
                 },
-                onDismiss = { viewModel.handleEvent(HistoryEvent.OnEndDateClicked) }
+                onDismiss = { showEndDatePicker = false }
             )
         }
     }
@@ -103,6 +128,120 @@ fun HistoryScreen(
                     onNavigateToAnalysis(effect.isIncome)
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun HistoryScreenContent(
+    modifier: Modifier = Modifier,
+    isLoading: Boolean,
+    transactions: List<Transaction>,
+    total: BigDecimal,
+    currency: String,
+    startDate: String,
+    endDate: String,
+    onStartDateClick: () -> Unit,
+    onEndDateClick: () -> Unit,
+    onTransactionClick: (Transaction) -> Unit,
+) {
+    Column(modifier = modifier.fillMaxSize()) {
+        HistoryFilterSection(
+            startDate = startDate,
+            endDate = endDate,
+            total = total,
+            currency = currency,
+            onStartDateClick = onStartDateClick,
+            onEndDateClick = onEndDateClick
+        )
+
+        when {
+            isLoading -> {
+                LoadingCircularIndicator(modifier = Modifier.fillMaxSize())
+            }
+            transactions.isEmpty() -> {
+                EmptyContent(
+                    noContentLabel = R.string.no_history_data,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+            else -> {
+                HistoryContent(
+                    transactions = transactions,
+                    currency = currency,
+                    onTransactionClick = onTransactionClick,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun HistoryFilterSection(
+    startDate: String,
+    endDate: String,
+    total: BigDecimal,
+    currency: String,
+    onStartDateClick: () -> Unit,
+    onEndDateClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
+        ListItemComponent(
+            title = stringResource(R.string.list_item_text_start),
+            trailingText = startDate,
+            itemHeight = 56.dp,
+            backgroundColor = MaterialTheme.colorScheme.secondary,
+            onClick = onStartDateClick
+        )
+        Divider()
+        ListItemComponent(
+            title = stringResource(R.string.list_item_text_end),
+            trailingText = endDate,
+            itemHeight = 56.dp,
+            backgroundColor = MaterialTheme.colorScheme.secondary,
+            onClick = onEndDateClick
+        )
+        Divider()
+        ListItemComponent(
+            title = stringResource(R.string.list_item_text_sum),
+            trailingText = "${total.formatAmount()} ${currency.toSymbol()}",
+            itemHeight = 56.dp,
+            backgroundColor = MaterialTheme.colorScheme.secondary,
+        )
+        Divider()
+    }
+}
+
+@Composable
+fun HistoryContent(
+    transactions: List<Transaction>,
+    currency: String,
+    onTransactionClick: (Transaction) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(modifier = modifier) {
+        itemsIndexed(
+            items = transactions,
+            key = { _, transaction -> transaction.id }
+        ) { _, transaction ->
+            ListItemComponent(
+                title = transaction.category.name,
+                subtitle = transaction.comment,
+                trailingText = "${transaction.amount.formatAmount()} ${currency.toSymbol()}",
+                trailingSubText = DateUtils.formatIsoToDayMonth(transaction.transactionDate),
+                leadingIcon = {
+                    EmojiIcon(emoji = transaction.category.emoji)
+                },
+                trailingIcon = {
+                    TrailingIcon()
+                },
+                onClick = {
+                    onTransactionClick(transaction)
+                }
+            )
+            Divider()
         }
     }
 }

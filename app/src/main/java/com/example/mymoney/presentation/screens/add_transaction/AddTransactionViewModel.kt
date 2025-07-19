@@ -3,9 +3,11 @@ package com.example.mymoney.presentation.screens.add_transaction
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.example.mymoney.data.utils.Resource
 import com.example.mymoney.domain.usecase.CreateTransactionUseCase
 import com.example.mymoney.domain.usecase.GetCategoriesByTypeUseCase
-import com.example.mymoney.domain.usecase.GetCurrentAccountUseCase
+import com.example.mymoney.domain.usecase.ObserveAccountUseCase
+import com.example.mymoney.domain.usecase.ObserveCategoriesByTypeUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
 import com.example.mymoney.presentation.navigation.TransactionDetail
 import com.example.mymoney.utils.DateUtils.combineDateAndTimeToIso
@@ -13,19 +15,22 @@ import com.example.mymoney.utils.NetworkMonitor
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
-import javax.inject.Inject
 
 class AddTransactionViewModel @AssistedInject constructor(
-    private val getCurrentAccountUseCase: GetCurrentAccountUseCase,
-    private val getCategoriesByTypeUseCase: GetCategoriesByTypeUseCase,
     private val createTransactionUseCase: CreateTransactionUseCase,
+    private val getCategoriesByTypeUseCase: GetCategoriesByTypeUseCase,
     @Assisted private val savedStateHandle: SavedStateHandle,
+    observeAccountUseCase: ObserveAccountUseCase,
+    observeCategoriesByTypeUseCase: ObserveCategoriesByTypeUseCase,
     networkMonitor: NetworkMonitor,
 ) : BaseViewModel<AddTransactionUiState, AddTransactionEvent, AddTransactionSideEffect>(
     networkMonitor,
@@ -33,31 +38,50 @@ class AddTransactionViewModel @AssistedInject constructor(
 ) {
     private val isIncome: Boolean = savedStateHandle.toRoute<TransactionDetail>().isIncome
 
+    override val uiState: StateFlow<AddTransactionUiState> = combine(
+        _uiState,
+        observeAccountUseCase(),
+        observeCategoriesByTypeUseCase(isIncome)
+    ) { state, account, categoriesResource ->
+
+        val newState = when (categoriesResource) {
+            is Resource.Loading -> state.copy(
+                account = account,
+                categories = categoriesResource.data ?: emptyList(),
+                isLoadingCategories = true,
+                error = null
+            )
+            is Resource.Success -> state.copy(
+                account = account,
+                categories = categoriesResource.data ?: emptyList(),
+                isLoadingCategories = false,
+                error = null
+            )
+            is Resource.Error -> state.copy(
+                account = account,
+                categories = categoriesResource.data ?: emptyList(),
+                isLoadingCategories = false,
+                error = mapErrorToMessage(categoriesResource.error)
+            )
+        }
+        newState
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        _uiState.value
+    )
+
     init {
-        observeAccount()
-        loadCategories()
         _uiState.update { it.copy(isIncome = isIncome) }
     }
 
     override fun handleEvent(event: AddTransactionEvent) {
         when (event) {
-            is AddTransactionEvent.ShowAmountDialog -> {
-                _uiState.update { it.copy(showAmountDialog = true) }
-            }
-            is AddTransactionEvent.DismissAmountDialog -> {
-                _uiState.update { it.copy(showAmountDialog = false) }
-            }
             is AddTransactionEvent.OnAmountChanged -> {
                 _uiState.update { it.copy(amount = event.amount) }
             }
             is AddTransactionEvent.CancelChangesClicked -> {
                 emitEffect(AddTransactionSideEffect.NavigateBack)
-            }
-            is AddTransactionEvent.ShowCategorySheet -> {
-                _uiState.update { it.copy(showCategorySheet = true) }
-            }
-            is AddTransactionEvent.DismissCategorySheet -> {
-                _uiState.update { it.copy(showCategorySheet = false) }
             }
             is AddTransactionEvent.OnCategorySelected -> {
                 _uiState.update {
@@ -67,23 +91,11 @@ class AddTransactionViewModel @AssistedInject constructor(
             is AddTransactionEvent.OnCommentChanged -> {
                 _uiState.update { it.copy(comment = event.comment) }
             }
-            is AddTransactionEvent.ShowDatePicker -> {
-                _uiState.update { it.copy(showDatePicker = true) }
-            }
-            is AddTransactionEvent.DismissDatePicker -> {
-                _uiState.update { it.copy(showDatePicker = false) }
-            }
             is AddTransactionEvent.OnDateSelected -> {
                 _uiState.update { it.copy(date = event.date) }
             }
             is AddTransactionEvent.SaveChangesClicked -> {
                 saveTransaction()
-            }
-            is AddTransactionEvent.ShowTimePicker -> {
-                _uiState.update { it.copy(showTimePicker = true) }
-            }
-            is AddTransactionEvent.DismissTimePicker -> {
-                _uiState.update { it.copy(showTimePicker = false) }
             }
             is AddTransactionEvent.OnTimeSelected -> {
                 _uiState.update { it.copy(time = event.time) }
@@ -95,7 +107,7 @@ class AddTransactionViewModel @AssistedInject constructor(
     }
 
     private fun saveTransaction() {
-        val currentState = _uiState.value
+        val currentState = uiState.value
 
         if (currentState.selectedCategory == null) {
             emitEffect(AddTransactionSideEffect.ShowSnackbar("Выберите категорию"))
@@ -106,7 +118,7 @@ class AddTransactionViewModel @AssistedInject constructor(
             return
         }
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _uiState.update { it.copy(isSaving = true, error = null) }
 
             val account = currentState.account
@@ -130,18 +142,7 @@ class AddTransactionViewModel @AssistedInject constructor(
                     },
                     onFailure = { error ->
                         _uiState.update { it.copy(isSaving = false) }
-                        val message = when (error) {
-                            is UnknownHostException -> "Нет подключения к интернету"
-                            is SocketTimeoutException -> "Превышено время ожидания ответа"
-                            is HttpException -> when (error.code()) {
-                                400 -> "Некорректные данные"
-                                401 -> "Неавторизованный доступ"
-                                404 -> "Счет или категория не найдены"
-                                500 -> "Внутренняя ошибка сервера"
-                                else -> "Ошибка сервера (${error.code()})"
-                            }
-                            else -> "Не удалось сохранить транзакцию"
-                        }
+                        val message = mapErrorToMessage(error)
                         emitEffect(AddTransactionSideEffect.ShowSnackbar(message))
                     }
                 )
@@ -157,32 +158,33 @@ class AddTransactionViewModel @AssistedInject constructor(
                     _uiState.update {
                         it.copy(
                             categories = categories,
-                            isLoadingCategories = false
+                            isLoadingCategories = false,
+                            error = null
                         )
                     }
                 },
                 onFailure = { error ->
+                    val message =mapErrorToMessage(error)
                     _uiState.update { it.copy(isLoadingCategories = false) }
-                    val message = when (error) {
-                        is UnknownHostException -> "Нет подключения к интернету"
-                        is SocketTimeoutException -> "Превышено время ожидания ответа"
-                        else -> "Ошибка загрузки категорий"
-                    }
                     emitEffect(AddTransactionSideEffect.ShowSnackbar(message))
                 }
             )
         }
     }
 
-    private fun observeAccount() {
-        viewModelScope.launch {
-            getCurrentAccountUseCase().collectLatest { account ->
-                account?.let {
-                    _uiState.update { currentState ->
-                        currentState.copy(account = it)
-                    }
-                }
+
+    private fun mapErrorToMessage(error: Throwable?): String {
+        return when (error) {
+            is UnknownHostException -> "Нет подключения к интернету"
+            is SocketTimeoutException -> "Превышено время ожидания ответа"
+            is HttpException -> when (error.code()) {
+                400 -> "Некорректные данные"
+                401 -> "Неавторизованный доступ"
+                404 -> "Счет или категория не найдены"
+                500 -> "Внутренняя ошибка сервера"
+                else -> "Ошибка сервера (${error.code()})"
             }
+            else -> "Не удалось сохранить транзакцию"
         }
     }
 }

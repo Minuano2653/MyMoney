@@ -1,7 +1,11 @@
 package com.example.mymoney.domain.repository
 
+import com.example.mymoney.data.utils.Resource
 import com.example.mymoney.domain.entity.SavedTransaction
 import com.example.mymoney.domain.entity.Transaction
+import com.example.mymoney.presentation.screens.analysis.model.CategoryAnalysis
+import kotlinx.coroutines.flow.Flow
+import java.math.BigDecimal
 
 /**
  * Репозиторий для работы с транзакциями.
@@ -35,4 +39,18 @@ interface TransactionsRepository {
     ): Result<Transaction>
 
     suspend fun deleteTransaction(transactionId: Int): Result<Unit>
+
+    fun observeTransactionsByTypeAndPeriod(
+        accountId: Int,
+        startDate: String,
+        endDate: String,
+        isIncome: Boolean
+    ): Flow<Resource<List<Transaction>>>
+
+    fun observeCategoryAnalysis(
+        accountId: Int,
+        isIncome: Boolean,
+        startDate: String,
+        endDate: String
+    ): Flow<Resource<Pair<BigDecimal, List<CategoryAnalysis>>>>
 }

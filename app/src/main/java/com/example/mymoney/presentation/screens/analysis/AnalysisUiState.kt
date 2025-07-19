@@ -10,8 +10,6 @@ data class AnalysisUiState(
     val categoryAnalysis: List<CategoryAnalysis> = emptyList(),
     val total: BigDecimal = BigDecimal(0),
     val currency: String = "",
-    val showStartDatePicker: Boolean = false,
-    val showEndDatePicker: Boolean = false,
     val startDate: String = DateUtils.getFirstDayOfCurrentMonth(),
     val endDate: String = DateUtils.getTodayYearMonthDayFormatted(),
 ): BaseUiState

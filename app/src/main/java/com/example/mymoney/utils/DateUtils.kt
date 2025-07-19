@@ -85,6 +85,12 @@ object DateUtils {
         return dayMonthYearFormatter.format(Date())
     }
 
+    fun toIsoToday(yearMonthDayString: String): String {
+        val date = yearMonthDayFormatter.parse(yearMonthDayString)
+        return isoFormatter.format(date!!)
+    }
+
+
     fun combineDateAndTimeToIso(date: String, time: String): String? {
         return try {
             val combined = dayMonthYearTimeFormatter.parse("$date $time")

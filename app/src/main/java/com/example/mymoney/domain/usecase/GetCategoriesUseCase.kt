@@ -2,7 +2,6 @@ package com.example.mymoney.domain.usecase
 
 import com.example.mymoney.domain.entity.Category
 import com.example.mymoney.domain.repository.CategoriesRepository
-import retrofit2.HttpException
 import javax.inject.Inject
 
 /**

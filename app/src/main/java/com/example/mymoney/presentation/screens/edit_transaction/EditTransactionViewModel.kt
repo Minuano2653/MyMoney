@@ -1,12 +1,11 @@
 package com.example.mymoney.presentation.screens.edit_transaction
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.example.mymoney.domain.usecase.DeleteTransactionUseCase
 import com.example.mymoney.domain.usecase.GetCategoriesByTypeUseCase
-import com.example.mymoney.domain.usecase.GetCurrentAccountUseCase
+import com.example.mymoney.domain.usecase.ObserveAccountUseCase
 import com.example.mymoney.domain.usecase.GetTransactionUseCase
 import com.example.mymoney.domain.usecase.UpdateTransactionUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
@@ -23,11 +22,10 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
-import javax.inject.Inject
 
 class EditTransactionViewModel @AssistedInject constructor(
     networkMonitor: NetworkMonitor,
-    private val getCurrentAccountUseCase: GetCurrentAccountUseCase,
+    private val observeAccountUseCase: ObserveAccountUseCase,
     private val getCategoriesByTypeUseCase: GetCategoriesByTypeUseCase,
     private val updateTransactionUseCase: UpdateTransactionUseCase,
     private val getTransactionUseCase: GetTransactionUseCase,
@@ -174,7 +172,6 @@ class EditTransactionViewModel @AssistedInject constructor(
                         val (date, time) = DateUtils
                             .splitIsoToDateAndTime(transaction.transactionDate)
                             ?: (DateUtils.getTodayDayMonthYearFormatted() to DateUtils.getCurrentTime())
-                        Log.d("TRANSACTION_DETAIL_VIEW_MODEL", "$date $time")
                         _uiState.update {
                             it.copy(
                                 amount = transaction.amount.formatAmount(),
@@ -220,8 +217,6 @@ class EditTransactionViewModel @AssistedInject constructor(
                     },
                     onFailure = { error ->
                         _uiState.update { it.copy(isDeleting = false) }
-                        Log.d("TRANSACTION_VIEW_MODEL", error.message.toString())
-
                         val message = when (error) {
                             is UnknownHostException -> "Нет подключения к интернету"
                             is SocketTimeoutException -> "Превышено время ожидания ответа"
@@ -270,7 +265,7 @@ class EditTransactionViewModel @AssistedInject constructor(
 
     private fun observeAccount() {
         viewModelScope.launch {
-            getCurrentAccountUseCase().collectLatest { account ->
+            observeAccountUseCase().collectLatest { account ->
                 account?.let {
                     _uiState.update { currentState ->
                         currentState.copy(account = it)

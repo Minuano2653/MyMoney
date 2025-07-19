@@ -1,5 +1,6 @@
 package com.example.mymoney.data.remote.dto
 
+import com.example.mymoney.data.local.entity.LocalCategory
 import com.example.mymoney.domain.entity.Category
 
 /**
@@ -18,6 +19,15 @@ data class CategoryDto(
 ) {
     fun toDomain(): Category {
         return Category(
+            id = id,
+            name = name,
+            emoji = emoji,
+            isIncome = isIncome
+        )
+    }
+
+    fun toLocal(): LocalCategory {
+        return LocalCategory(
             id = id,
             name = name,
             emoji = emoji,

@@ -5,16 +5,8 @@ import com.example.mymoney.presentation.base.contract.BaseEvent
 
 sealed class AddTransactionEvent : BaseEvent {
     object LoadCategories : AddTransactionEvent()
-    object ShowCategorySheet : AddTransactionEvent()
-    object DismissCategorySheet : AddTransactionEvent()
     object CancelChangesClicked : AddTransactionEvent()
     object SaveChangesClicked : AddTransactionEvent()
-    object ShowAmountDialog : AddTransactionEvent()
-    object DismissAmountDialog : AddTransactionEvent()
-    object ShowDatePicker : AddTransactionEvent()
-    object DismissDatePicker : AddTransactionEvent()
-    object ShowTimePicker : AddTransactionEvent()
-    object DismissTimePicker : AddTransactionEvent()
     data class OnAmountChanged(val amount: String) : AddTransactionEvent()
     data class OnCommentChanged(val comment: String) : AddTransactionEvent()
     data class OnDateSelected(val date: String) : AddTransactionEvent()

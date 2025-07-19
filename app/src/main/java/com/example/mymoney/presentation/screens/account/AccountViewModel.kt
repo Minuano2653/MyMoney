@@ -2,7 +2,7 @@ package com.example.mymoney.presentation.screens.account
 
 import androidx.lifecycle.viewModelScope
 import com.example.mymoney.domain.usecase.GetAccountUseCase
-import com.example.mymoney.domain.usecase.GetCurrentAccountUseCase
+import com.example.mymoney.domain.usecase.ObserveAccountUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
 import com.example.mymoney.utils.NetworkMonitor
 import kotlinx.coroutines.Dispatchers
@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 class AccountViewModel @Inject constructor(
     private val getAccountUseCase: GetAccountUseCase,
-    private val getCurrentAccountUseCase: GetCurrentAccountUseCase,
+    private val observeAccountUseCase: ObserveAccountUseCase,
     networkMonitor: NetworkMonitor
 ): BaseViewModel<AccountUiState, AccountEvent, AccountSideEffect>(
     networkMonitor,
@@ -65,10 +65,11 @@ class AccountViewModel @Inject constructor(
 
     private fun observeAccountChanges() {
         viewModelScope.launch {
-            getCurrentAccountUseCase().collectLatest { account ->
+            observeAccountUseCase().collectLatest { account ->
                 account?.let {
                     _uiState.update { currentState ->
                         currentState.copy(
+                            accountId = it.id,
                             name = it.name,
                             balance = it.balance,
                             currency = it.currency

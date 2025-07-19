@@ -1,5 +1,6 @@
 package com.example.mymoney.data.remote.dto
 
+import com.example.mymoney.data.local.entity.LocalAccount
 import com.example.mymoney.domain.entity.Account
 import java.math.BigDecimal
 
@@ -16,6 +17,12 @@ data class UpdateAccountResponse(
         id = id,
         name = name,
         balance = BigDecimal(balance),
+        currency = currency
+    )
+    fun toLocal() = LocalAccount(
+        id = id,
+        name = name,
+        balance = balance,
         currency = currency
     )
 }

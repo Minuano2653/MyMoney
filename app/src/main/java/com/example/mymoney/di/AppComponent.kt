@@ -14,7 +14,9 @@ import javax.inject.Singleton
         NetworkModule::class,
         ApiModule::class,
         DataSourceModule::class,
-        RepositoryModule::class
+        RepositoryModule::class,
+        DatabaseModule::class,
+        DaoModule::class
     ]
 )
 interface AppComponent {

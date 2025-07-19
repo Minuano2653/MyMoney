@@ -7,14 +7,14 @@ import java.math.RoundingMode
 import javax.inject.Inject
 
 class GetAnalysisUseCase @Inject constructor(
-    private val getTransactionsByPeriodUseCase: GetTransactionsByPeriodUseCase
+    private val getTransactionsByTypeAndPeriodUseCase: GetTransactionsByTypeAndPeriodUseCase
 ) {
     suspend operator fun invoke(
         isIncome: Boolean,
         startDate: String,
         endDate: String
     ): Result<Pair<BigDecimal, List<CategoryAnalysis>>> {
-        return getTransactionsByPeriodUseCase(isIncome, startDate, endDate).map { transactions ->
+        return getTransactionsByTypeAndPeriodUseCase(isIncome, startDate, endDate).map { transactions ->
             val totalAmount = transactions.fold(BigDecimal.ZERO) { acc, tx -> acc + tx.amount }
 
             val grouped = transactions.groupBy { it.category }

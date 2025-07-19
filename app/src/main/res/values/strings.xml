@@ -45,4 +45,6 @@
 
     <string name="no_analysis_data">Нет данных для анализа</string>
 
+    <string name="no_history_data">Нет истории за выбранный период</string>
+
 </resources>
