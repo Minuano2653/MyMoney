@@ -23,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -74,14 +75,23 @@ fun AddTransactionScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
         TransactionScreenContent(
-            uiState = uiState,
             modifier = modifier.padding(paddingValues),
             onCategoryClicked = { showCategorySheet = true },
             onAmountClicked = { showAmountDialog = true },
             onDateClicked = { showDatePicker = true },
             onTimeClicked = { showTimePicker = true },
-            onValueChange = { comment -> viewModel.handleEvent(AddTransactionEvent.OnCommentChanged(comment)) }
+            onValueChange = { comment ->
+                viewModel.handleEvent(AddTransactionEvent.OnCommentChanged(comment))
+            },
+            accountName = uiState.account?.name,
+            selectedCategory = uiState.selectedCategory?.name,
+            amount = uiState.amount,
+            currency = uiState.account?.currency,
+            date = uiState.date,
+            time = uiState.time,
+            comment = uiState.comment
         )
 
         if (showCategorySheet) {
@@ -158,7 +168,13 @@ fun AddTransactionScreen(
 @Composable
 fun TransactionScreenContent(
     modifier: Modifier = Modifier,
-    uiState: AddTransactionUiState,
+    date: String,
+    time: String,
+    accountName: String? = null,
+    selectedCategory: String? = null,
+    amount: String,
+    currency: String? = null,
+    comment: String? = null,
     onCategoryClicked: () -> Unit,
     onAmountClicked: () -> Unit,
     onDateClicked: () -> Unit,
@@ -167,46 +183,45 @@ fun TransactionScreenContent(
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         ListItemComponent(
-            title = "Счет",
-            trailingText = uiState.account?.name,
+            title = stringResource(R.string.list_item_text_account),
+            trailingText = accountName,
             trailingIcon = { TrailingIcon() },
         )
         Divider()
         ListItemComponent(
-            title = "Статья",
-            trailingText = uiState.selectedCategory?.name,
+            title = stringResource(R.string.list_item_text_category),
+            trailingText = selectedCategory,
             trailingIcon = { TrailingIcon() },
             onClick = onCategoryClicked
         )
         Divider()
         ListItemComponent(
-            title = "Cумма",
-            trailingText = uiState.account?.let { "${uiState.amount} ${it.currency.toSymbol()}" }
-                ?: uiState.amount,
+            title = stringResource(R.string.list_item_text_sum),
+            trailingText = "$amount ${currency?.toSymbol()}" ,
             onClick = onAmountClicked
         )
         Divider()
         ListItemComponent(
-            title = "Дата",
-            trailingText = uiState.date,
+            title = stringResource(R.string.list_item_text_date),
+            trailingText = date,
             onClick = onDateClicked
         )
         Divider()
         ListItemComponent(
-            title = "Время",
-            trailingText = uiState.time,
+            title = stringResource(R.string.list_item_text_time),
+            trailingText = time,
             onClick = onTimeClicked
         )
         Divider()
         TextField(
             modifier = Modifier.fillMaxWidth(),
-            value = uiState.comment ?: "",
+            value = comment ?: "",
             onValueChange = {
                 onValueChange(it)
             },
             placeholder = {
                 Text(
-                    text = "Комментарий",
+                    text = stringResource(R.string.comment_placeholder),
                     style = MaterialTheme.typography.bodyLarge
                 )
             },

@@ -47,23 +47,11 @@ class EditTransactionViewModel @AssistedInject constructor(
 
     override fun handleEvent(event: EditTransactionEvent) {
         when (event) {
-            is EditTransactionEvent.ShowAmountDialog -> {
-                _uiState.update { it.copy(showAmountDialog = true) }
-            }
-            is EditTransactionEvent.DismissAmountDialog -> {
-                _uiState.update { it.copy(showAmountDialog = false) }
-            }
             is EditTransactionEvent.OnAmountChanged -> {
                 _uiState.update { it.copy(amount = event.amount) }
             }
             is EditTransactionEvent.CancelChanges -> {
                 emitEffect(EditTransactionSideEffect.NavigateBack)
-            }
-            is EditTransactionEvent.ShowCategorySheet -> {
-                _uiState.update { it.copy(showCategorySheet = true) }
-            }
-            is EditTransactionEvent.DismissCategorySheet -> {
-                _uiState.update { it.copy(showCategorySheet = false) }
             }
             is EditTransactionEvent.OnCategorySelected -> {
                 _uiState.update {
@@ -73,20 +61,8 @@ class EditTransactionViewModel @AssistedInject constructor(
             is EditTransactionEvent.OnCommentChanged -> {
                 _uiState.update { it.copy(comment = event.comment) }
             }
-            is EditTransactionEvent.ShowDatePicker -> {
-                _uiState.update { it.copy(showDatePicker = true) }
-            }
-            is EditTransactionEvent.DismissDatePicker -> {
-                _uiState.update { it.copy(showDatePicker = false) }
-            }
             is EditTransactionEvent.OnDateSelected -> {
                 _uiState.update { it.copy(date = event.date) }
-            }
-            is EditTransactionEvent.ShowTimePicker -> {
-                _uiState.update { it.copy(showTimePicker = true) }
-            }
-            is EditTransactionEvent.DismissTimePicker -> {
-                _uiState.update { it.copy(showTimePicker = false) }
             }
             is EditTransactionEvent.OnTimeSelected -> {
                 _uiState.update { it.copy(time = event.time) }

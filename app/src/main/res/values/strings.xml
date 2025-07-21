@@ -21,8 +21,13 @@
     <string name="list_item_text_period_end">Период: конец</string>
     <string name="list_item_text_end">Конец</string>
     <string name="list_item_text_sum">Сумма</string>
+    <string name="list_item_text_account">Счет</string>
+    <string name="list_item_text_category">Статья</string>
+    <string name="list_item_text_date">Дата</string>
+    <string name="list_item_text_time">Время</string>
 
     <string name="search_field_placeholder">Найти статью</string>
+    <string name="comment_placeholder">Комментарий</string>
     <string name="search_field_icon_description">Поиск</string>
 
     <string name="settings_item_night_theme">Тёмная тема</string>
