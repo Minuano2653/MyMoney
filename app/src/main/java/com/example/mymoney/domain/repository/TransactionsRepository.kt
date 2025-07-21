@@ -53,4 +53,7 @@ interface TransactionsRepository {
         startDate: String,
         endDate: String
     ): Flow<Resource<Pair<BigDecimal, List<CategoryAnalysis>>>>
+
+    fun observeTransaction(transactionId: Int): Flow<Resource<Transaction?>>
+
 }

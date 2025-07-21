@@ -39,13 +39,15 @@ data class TransactionDto(
     }
     fun toLocal(): LocalTransaction {
         return LocalTransaction(
-            id = id,
+            localId = id,
+            serverId = id,
             categoryId = category.id,
             amount = amount,
             transactionDate = transactionDate,
             comment = comment,
             createdAt = createdAt,
-            updatedAt = updatedAt
+            updatedAt = updatedAt,
+            isSynced = true
         )
     }
 }

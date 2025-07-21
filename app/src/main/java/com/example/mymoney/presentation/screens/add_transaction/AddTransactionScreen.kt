@@ -181,7 +181,7 @@ fun TransactionScreenContent(
     onTimeClicked: () -> Unit,
     onValueChange: (String) -> Unit,
 ) {
-    Column(modifier = modifier.fillMaxSize()) {
+    Column(modifier = modifier) {
         ListItemComponent(
             title = stringResource(R.string.list_item_text_account),
             trailingText = accountName,

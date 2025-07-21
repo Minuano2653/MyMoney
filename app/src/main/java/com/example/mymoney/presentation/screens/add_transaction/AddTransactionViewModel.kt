@@ -164,7 +164,7 @@ class AddTransactionViewModel @AssistedInject constructor(
                     }
                 },
                 onFailure = { error ->
-                    val message =mapErrorToMessage(error)
+                    val message = mapErrorToMessage(error)
                     _uiState.update { it.copy(isLoadingCategories = false) }
                     emitEffect(AddTransactionSideEffect.ShowSnackbar(message))
                 }

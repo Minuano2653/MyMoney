@@ -23,5 +23,4 @@ data class EditTransactionUiState(
     val showTimePicker: Boolean = false,
     val error: String? = null,
     val isIncome: Boolean = false,
-    val transactionId: Int = -1,
 ): BaseUiState

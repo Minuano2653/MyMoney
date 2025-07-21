@@ -1,5 +1,6 @@
 package com.example.mymoney.presentation.screens.history
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute

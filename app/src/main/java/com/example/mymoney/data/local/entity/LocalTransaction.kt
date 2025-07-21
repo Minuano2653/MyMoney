@@ -19,18 +19,19 @@ import java.math.BigDecimal
     ]
 )
 data class LocalTransaction(
-    @PrimaryKey val id: Int,
+    @PrimaryKey(autoGenerate = true) val localId: Int = 0,
+    val serverId: Int? = null,
     val categoryId: Int,
     val amount: String,
     val transactionDate: String,
     val comment: String?,
     val createdAt: String,
     val updatedAt: String,
-    val isSynced: Boolean = true
+    val isSynced: Boolean = false,
 ) {
     fun toDomain(category: Category): Transaction {
         return Transaction(
-            id = id,
+            id = localId,
             category = category,
             comment = comment,
             amount = BigDecimal(amount),

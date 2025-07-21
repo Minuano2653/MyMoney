@@ -1,13 +1,21 @@
 package com.example.mymoney.presentation.screens.edit_transaction
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -15,6 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mymoney.R
@@ -60,7 +69,7 @@ fun EditTransactionScreen(
     ) { paddingValues ->
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        TransactionScreenContent(
+        EditTransactionScreenContent(
             modifier = modifier.padding(paddingValues),
             onCategoryClicked = { showCategorySheet = true },
             onAmountClicked = { showAmountDialog = true },
@@ -75,7 +84,9 @@ fun EditTransactionScreen(
             currency = uiState.account?.currency,
             date = uiState.date,
             time = uiState.time,
-            comment = uiState.comment
+            comment = uiState.comment,
+            isIncome = uiState.isIncome,
+            onDeleteClicked = { viewModel.handleEvent(EditTransactionEvent.DeleteTransaction) }
         )
 
         if (showCategorySheet) {
@@ -140,10 +151,64 @@ fun EditTransactionScreen(
                 is EditTransactionSideEffect.NavigateBack -> {
                     onNavigateBack()
                 }
+
                 is EditTransactionSideEffect.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(effect.message)
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun EditTransactionScreenContent(
+    modifier: Modifier = Modifier,
+    date: String,
+    time: String,
+    accountName: String? = null,
+    selectedCategory: String? = null,
+    amount: String,
+    currency: String? = null,
+    comment: String? = null,
+    onCategoryClicked: () -> Unit,
+    onAmountClicked: () -> Unit,
+    onDateClicked: () -> Unit,
+    onTimeClicked: () -> Unit,
+    onValueChange: (String) -> Unit,
+    isIncome: Boolean,
+    onDeleteClicked: () -> Unit
+) {
+    Column(modifier = modifier) {
+        TransactionScreenContent(
+            onCategoryClicked = onCategoryClicked,
+            onAmountClicked = onAmountClicked,
+            onDateClicked = onDateClicked,
+            onTimeClicked = onTimeClicked,
+            onValueChange = onValueChange,
+            accountName = accountName,
+            selectedCategory = selectedCategory,
+            amount = amount,
+            currency = currency,
+            date = date,
+            time = time,
+            comment = comment
+        )
+        Spacer(modifier = Modifier.height(32.dp))
+        Button(
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .fillMaxWidth(),
+            onClick = onDeleteClicked,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.error
+            )
+        ) {
+            Text(
+                text = if (isIncome) {
+                    stringResource(R.string.button_delete_income)
+                } else stringResource(R.string.button_delete_expense),
+                color = MaterialTheme.colorScheme.onError
+            )
         }
     }
 }

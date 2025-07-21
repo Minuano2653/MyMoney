@@ -128,10 +128,14 @@ object DateUtils {
     }
 
     fun formatDateWithMonthInGenitive(dateString: String): String {
-
         val outputFormat = SimpleDateFormat("d MMMM yyyy", Locale("ru", "RU"))
 
         val date = yearMonthDayFormatter.parse(dateString) ?: return ""
         return outputFormat.format(date)
+    }
+
+    fun getCurrentIso(): String {
+        val currentTime = Calendar.getInstance().time
+        return isoFormatter.format(currentTime)
     }
 }

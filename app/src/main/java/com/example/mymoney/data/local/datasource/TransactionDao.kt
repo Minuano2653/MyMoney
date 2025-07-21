@@ -27,13 +27,22 @@ interface TransactionDao {
     ): Flow<List<TransactionWithCategory>>
 
     @Query("""
+        SELECT t.*, c.name as categoryName, c.emoji as categoryEmoji, c.isIncome as categoryIsIncome 
+        FROM `transaction` as t 
+        INNER JOIN category as c ON t.categoryId = c.id 
+        WHERE t.localId = :localId
+    """)
+    fun observeTransactionById(localId: Int): Flow<TransactionWithCategory?>
+
+
+    @Query("""
         SELECT 
             c.id as categoryId,
             c.name as categoryName,
             c.emoji as categoryEmoji,
             c.isIncome as isIncome,
             SUM(t.amount) as totalAmount,
-            COUNT(t.id) as transactionCount
+            COUNT(t.localId) as transactionCount
         FROM `transaction` t
         INNER JOIN category c ON t.categoryId = c.id
         WHERE isIncome = :isIncome
@@ -60,15 +69,23 @@ interface TransactionDao {
         endDate: String
     ): Flow<BigDecimal>
 
+    @Query("""
+        SELECT * FROM `transaction` 
+        WHERE isSynced = 0
+    """)
+    suspend fun getUnsyncedTransactions(): List<LocalTransaction>
+
     @Upsert
     suspend fun upsert(task: LocalTransaction)
 
     @Upsert
     suspend fun upsertAll(tasks: List<LocalTransaction>)
+
 }
 
 data class TransactionWithCategory(
-    val id: Int,
+    val localId: Int,
+    val serverId: Int?,
     val categoryId: Int,
     val amount: String,
     val transactionDate: String,
@@ -80,7 +97,7 @@ data class TransactionWithCategory(
     val categoryIsIncome: Boolean
 ) {
     fun toDomain() = Transaction(
-        id = id,
+        id = localId,
         category = Category(
             id = categoryId,
             name = categoryName,

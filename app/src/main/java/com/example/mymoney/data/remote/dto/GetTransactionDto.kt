@@ -25,7 +25,7 @@ data class GetTransactionDto(
     )
 
     fun toLocal() = LocalTransaction(
-        id = id,
+        serverId = id,
         comment = comment,
         amount = amount,
         transactionDate = transactionDate,

@@ -1,6 +1,7 @@
 package com.example.mymoney.data.repository
 
 import com.example.mymoney.data.local.datasource.TransactionDao
+import com.example.mymoney.data.local.entity.LocalTransaction
 import com.example.mymoney.data.remote.datasource.TransactionsRemoteDataSource
 import com.example.mymoney.data.remote.dto.TransactionRequest
 import com.example.mymoney.data.repository.base.BaseRepository
@@ -10,6 +11,7 @@ import com.example.mymoney.domain.entity.SavedTransaction
 import com.example.mymoney.domain.entity.Transaction
 import com.example.mymoney.domain.repository.TransactionsRepository
 import com.example.mymoney.presentation.screens.analysis.model.CategoryAnalysis
+import com.example.mymoney.utils.DateUtils
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -43,16 +45,66 @@ class TransactionsRepositoryImpl @Inject constructor(
         transactionDate: String,
         comment: String?
     ): Result<SavedTransaction> {
-        return callWithRetry {
-            val request = TransactionRequest(
-                accountId = accountId,
+        val request = TransactionRequest(
+            accountId = accountId,
+            categoryId = categoryId,
+            amount = amount,
+            transactionDate = transactionDate,
+            comment = comment
+        )
+
+        return try {
+            val savedTransaction = callWithRetry {
+                remoteDataSource.createTransaction(request)
+            }.getOrThrow()
+
+            val localTransaction = LocalTransaction(
+                localId = savedTransaction.id,
+                serverId = savedTransaction.id,
                 categoryId = categoryId,
                 amount = amount,
                 transactionDate = transactionDate,
-                comment = comment
+                comment = comment,
+                createdAt = savedTransaction.createdAt,
+                updatedAt = savedTransaction.updatedAt,
+                isSynced = true
             )
-            remoteDataSource.createTransaction(request).toDomain()
+            localDataSource.upsert(localTransaction)
+            Result.success(savedTransaction.toDomain())
+
+        } catch (e: Throwable) {
+            saveTransactionLocally(
+                categoryId = categoryId,
+                amount = amount,
+                transactionDate = transactionDate,
+                comment = comment,
+                isSynced = false
+            )
+            Result.failure(e)
         }
+    }
+
+    private suspend fun saveTransactionLocally(
+        categoryId: Int,
+        amount: String,
+        transactionDate: String,
+        comment: String?,
+        isSynced: Boolean
+    ): LocalTransaction {
+        val currentTime = DateUtils.getCurrentIso()
+
+        val localTransaction = LocalTransaction(
+            categoryId = categoryId,
+            amount = amount,
+            transactionDate = transactionDate,
+            comment = comment,
+            createdAt = currentTime,
+            updatedAt = currentTime,
+            isSynced = isSynced
+        )
+
+        localDataSource.upsert(localTransaction)
+        return localTransaction
     }
 
     override suspend fun updateTransaction(
@@ -159,6 +211,23 @@ class TransactionsRepositoryImpl @Inject constructor(
                 localDataSource.upsertAll(remote.map { it.toLocal() })
             },
             shouldFetch = { true },
+            onFetchFailed = { e -> e }
+        )
+    }
+
+    override fun observeTransaction(transactionId: Int): Flow<Resource<Transaction?>> {
+        return networkBoundResource(
+            query = {
+                localDataSource.observeTransactionById(transactionId)
+                    .map { it?.toDomain() }
+            },
+            fetch = {
+                remoteDataSource.getTransaction(transactionId)
+            },
+            saveFetchResult = { remote ->
+                localDataSource.upsert(remote.toLocal())
+            },
+            shouldFetch = { false },
             onFetchFailed = { e -> e }
         )
     }
