@@ -1,24 +1,36 @@
 package com.example.mymoney.presentation.navigation
 
-import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
+import com.example.mymoney.presentation.screens.account.AccountScreen
+import com.example.mymoney.presentation.screens.edit_account.EditAccountScreen
 
+/**
+ * Добавляет вложенный граф навигации для раздела "Счёт" в основной [NavGraphBuilder].
+ */
 fun NavGraphBuilder.accountNavGraph(
-    accountInfoScreenContent: @Composable () -> Unit,
-    editAccountScreenContent: @Composable (Int) -> Unit,
+    onNavigateToEditAccount: (Int) -> Unit,
+    onNavigateBack: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     navigation<Account>(
         startDestination = AccountInfo
     ) {
         composable<AccountInfo> {
-            accountInfoScreenContent()
+            AccountScreen(
+                onNavigateToEditAccount = onNavigateToEditAccount,
+                modifier = modifier
+            )
         }
+
         composable<EditAccount> { backStackEntry ->
-            val args = backStackEntry.toRoute<EditAccount>()
-            editAccountScreenContent(args.accountId)
+            EditAccountScreen(
+                onNavigateBack = onNavigateBack,
+                modifier = modifier
+            )
         }
     }
 }

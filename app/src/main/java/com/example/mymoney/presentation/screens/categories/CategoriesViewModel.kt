@@ -89,11 +89,6 @@ class CategoriesViewModel @Inject constructor(
             is CategoriesEvent.LoadCategories -> {
                 loadCategories()
             }
-            is CategoriesEvent.OnCategoryClicked -> {
-                viewModelScope.launch {
-                    emitEffect(CategoriesSideEffect.NavigateToCategoryDetails)
-                }
-            }
             is CategoriesEvent.OnSearchQueryChanged -> {
                 _uiState.update { it.copy(searchQuery = event.query) }
             }

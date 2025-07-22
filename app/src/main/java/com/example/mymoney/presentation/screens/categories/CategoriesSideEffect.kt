@@ -8,5 +8,4 @@ import com.example.mymoney.presentation.base.contract.BaseSideEffect
  */
 sealed class CategoriesSideEffect: BaseSideEffect {
     data class ShowError(val message: String) : CategoriesSideEffect()
-    data object NavigateToCategoryDetails : CategoriesSideEffect()
 }

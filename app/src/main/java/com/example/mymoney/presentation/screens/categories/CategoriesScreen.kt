@@ -34,7 +34,6 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun CategoriesScreen(
     modifier: Modifier = Modifier,
-    onNavigateToCategoriesDetail: () -> Unit,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     viewModel: CategoriesViewModel = daggerViewModel()
 ) {
@@ -59,9 +58,6 @@ fun CategoriesScreen(
             when (effect) {
                 is CategoriesSideEffect.ShowError -> {
                     snackbarHostState.showSnackbar(effect.message)
-                }
-                is CategoriesSideEffect.NavigateToCategoryDetails -> {
-                    /*onNavigateToCategoriesDetail()*/
                 }
             }
         }
@@ -96,7 +92,7 @@ fun CategoriesScreenContent(
                         leadingIcon = {
                             EmojiIcon(emoji = category.emoji)
                         },
-                        onClick = {onEvent(CategoriesEvent.OnCategoryClicked)}
+                        onClick = {}
                     )
                     Divider()
                 }

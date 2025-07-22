@@ -8,6 +8,5 @@ import com.example.mymoney.presentation.base.contract.BaseEvent
  */
 sealed class CategoriesEvent: BaseEvent {
     object LoadCategories : CategoriesEvent()
-    object OnCategoryClicked: CategoriesEvent()
     data class OnSearchQueryChanged(val query: String): CategoriesEvent()
 }
