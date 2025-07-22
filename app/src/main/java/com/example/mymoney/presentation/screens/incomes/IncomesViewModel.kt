@@ -2,12 +2,11 @@ package com.example.mymoney.presentation.screens.incomes
 
 import androidx.lifecycle.viewModelScope
 import com.example.mymoney.data.utils.Resource
-import com.example.mymoney.domain.usecase.ObserveAccountUseCase
 import com.example.mymoney.domain.usecase.GetTransactionsByTypeAndPeriodUseCase
+import com.example.mymoney.domain.usecase.ObserveAccountUseCase
 import com.example.mymoney.domain.usecase.ObserveTransactionsByTypeAndPeriodUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
 import com.example.mymoney.utils.DateUtils
-import com.example.mymoney.utils.NetworkMonitor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -25,9 +24,7 @@ class IncomesViewModel @Inject constructor(
     private val getTransactionsByTypeAndPeriodUseCase: GetTransactionsByTypeAndPeriodUseCase,
     observeTransactionsByTypeAndPeriodUseCase: ObserveTransactionsByTypeAndPeriodUseCase,
     observeAccountUseCase: ObserveAccountUseCase,
-    networkMonitor: NetworkMonitor
 ): BaseViewModel<IncomesUiState, IncomesEvent, IncomesSideEffect>(
-    networkMonitor,
     IncomesUiState()
 ) {
     override val uiState: StateFlow<IncomesUiState> =
@@ -132,13 +129,6 @@ class IncomesViewModel @Inject constructor(
             else -> {
                 "Не удалось загрузить данные"
             }
-        }
-    }
-
-    override fun onNetworkStateChanged(isConnected: Boolean) {
-        _uiState.update { it.copy(isNetworkAvailable = isConnected) }
-        if (!isConnected) {
-            emitEffect(IncomesSideEffect.ShowError("Нет подключения к интернету"))
         }
     }
 }

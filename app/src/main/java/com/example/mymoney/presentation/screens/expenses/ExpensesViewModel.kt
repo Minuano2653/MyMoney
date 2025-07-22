@@ -7,7 +7,6 @@ import com.example.mymoney.domain.usecase.ObserveAccountUseCase
 import com.example.mymoney.domain.usecase.ObserveTransactionsByTypeAndPeriodUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
 import com.example.mymoney.utils.DateUtils
-import com.example.mymoney.utils.NetworkMonitor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -25,9 +24,7 @@ class ExpensesViewModel @Inject constructor(
     private val getTransactionsByTypeAndPeriodUseCase: GetTransactionsByTypeAndPeriodUseCase,
     observeTransactionsByTypeAndPeriodUseCase: ObserveTransactionsByTypeAndPeriodUseCase,
     observeAccountUseCase: ObserveAccountUseCase,
-    networkMonitor: NetworkMonitor
 ): BaseViewModel<ExpensesUiState, ExpensesEvent, ExpensesSideEffect>(
-    networkMonitor,
     ExpensesUiState()
 ) {
     override val uiState: StateFlow<ExpensesUiState> =
@@ -116,13 +113,6 @@ class ExpensesViewModel @Inject constructor(
                     val message = mapErrorToMessage(error)
                     emitEffect(ExpensesSideEffect.ShowError(message))
                 }
-        }
-    }
-
-    override fun onNetworkStateChanged(isConnected: Boolean) {
-        _uiState.update { it.copy(isNetworkAvailable = isConnected) }
-        if (!isConnected) {
-            emitEffect(ExpensesSideEffect.ShowError("Нет подключения к интернету"))
         }
     }
 

@@ -5,12 +5,10 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.mymoney.di.viewmodel.factories.ViewModelFactory
 import com.example.mymoney.di.viewmodel.keys.ViewModelKey
 import com.example.mymoney.presentation.screens.account.AccountViewModel
-import com.example.mymoney.presentation.screens.add_transaction.AddTransactionViewModel
 import com.example.mymoney.presentation.screens.categories.CategoriesViewModel
-import com.example.mymoney.presentation.screens.edit_transaction.EditTransactionViewModel
 import com.example.mymoney.presentation.screens.expenses.ExpensesViewModel
-import com.example.mymoney.presentation.screens.history.HistoryViewModel
 import com.example.mymoney.presentation.screens.incomes.IncomesViewModel
+import com.example.mymoney.presentation.screens.main.MainViewModel
 import com.example.mymoney.presentation.screens.splash.SplashViewModel
 import dagger.Binds
 import dagger.Module
@@ -20,6 +18,11 @@ import dagger.multibindings.IntoMap
 abstract class ViewModelModule {
     @Binds
     abstract fun bindViewModelFactory(factory: ViewModelFactory): ViewModelProvider.Factory
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(MainViewModel::class)
+    abstract fun bindMainViewModel(viewModel: MainViewModel): ViewModel
 
     @Binds
     @IntoMap

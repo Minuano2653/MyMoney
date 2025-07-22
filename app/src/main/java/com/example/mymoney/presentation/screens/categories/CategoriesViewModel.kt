@@ -6,7 +6,6 @@ import com.example.mymoney.domain.entity.Category
 import com.example.mymoney.domain.usecase.GetCategoriesUseCase
 import com.example.mymoney.domain.usecase.ObserveCategoriesUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
-import com.example.mymoney.utils.NetworkMonitor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -25,9 +24,7 @@ import javax.inject.Inject
 class CategoriesViewModel @Inject constructor(
     private val getCategoriesUseCase: GetCategoriesUseCase,
     observeCategoriesUseCase: ObserveCategoriesUseCase,
-    networkMonitor: NetworkMonitor
 ): BaseViewModel<CategoriesUiState, CategoriesEvent, CategoriesSideEffect>(
-    networkMonitor,
     CategoriesUiState()
 ) {
 
@@ -115,13 +112,6 @@ class CategoriesViewModel @Inject constructor(
                     _uiState.update { it.copy(isLoading = false, error = message) }
                     emitEffect(CategoriesSideEffect.ShowError(message))
                 }
-        }
-    }
-
-    override fun onNetworkStateChanged(isConnected: Boolean) {
-        _uiState.update { it.copy(isNetworkAvailable = isConnected) }
-        if (!isConnected) {
-            emitEffect(CategoriesSideEffect.ShowError("Нет подключения к интернету"))
         }
     }
 

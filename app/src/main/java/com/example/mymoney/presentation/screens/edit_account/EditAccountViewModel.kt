@@ -1,4 +1,5 @@
 package com.example.mymoney.presentation.screens.edit_account
+
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
@@ -7,7 +8,6 @@ import com.example.mymoney.domain.usecase.ObserveAccountUseCase
 import com.example.mymoney.domain.usecase.UpdateAccountUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
 import com.example.mymoney.presentation.navigation.EditAccount
-import com.example.mymoney.utils.NetworkMonitor
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
@@ -24,10 +24,8 @@ class EditAccountViewModel @AssistedInject constructor(
     private val updateAccountUseCase: UpdateAccountUseCase,
     private val observeAccountUseCase: ObserveAccountUseCase,
     @Assisted private val savedStateHandle: SavedStateHandle,
-    networkMonitor: NetworkMonitor,
-): BaseViewModel<EditAccountUiState, EditAccountEvent, EditAccountSideEffect>(
-        networkMonitor,
-        EditAccountUiState()
+) : BaseViewModel<EditAccountUiState, EditAccountEvent, EditAccountSideEffect>(
+    EditAccountUiState()
 ) {
     private var loadAccountJob: Job? = null
     private var saveChangesJob: Job? = null
@@ -47,12 +45,15 @@ class EditAccountViewModel @AssistedInject constructor(
             is EditAccountEvent.LoadAccount -> {
                 loadAccount()
             }
+
             is EditAccountEvent.OnCancelChangesClicked -> {
                 emitEffect(EditAccountSideEffect.NavigateBack)
             }
+
             is EditAccountEvent.OnSaveChangesClicked -> {
                 saveChanges()
             }
+
             is EditAccountEvent.OnNameChanged -> {
                 _uiState.update {
                     it.copy(
@@ -61,6 +62,7 @@ class EditAccountViewModel @AssistedInject constructor(
                     )
                 }
             }
+
             is EditAccountEvent.OnBalanceChanged -> {
                 _uiState.update {
                     it.copy(
@@ -69,6 +71,7 @@ class EditAccountViewModel @AssistedInject constructor(
                     )
                 }
             }
+
             is EditAccountEvent.OnCurrencyChanged -> {
                 _uiState.update {
                     it.copy(
@@ -78,9 +81,11 @@ class EditAccountViewModel @AssistedInject constructor(
                     )
                 }
             }
+
             is EditAccountEvent.OnCurrencyClicked -> {
                 _uiState.update { it.copy(showBottomSheet = true) }
             }
+
             is EditAccountEvent.OnBottomSheetDismissed -> {
                 _uiState.update { it.copy(showBottomSheet = false) }
             }
@@ -109,7 +114,11 @@ class EditAccountViewModel @AssistedInject constructor(
                     _uiState.update {
                         it.copy(isLoading = false, error = e.message)
                     }
-                    _sideEffect.emit(EditAccountSideEffect.ShowError(e.message ?: "Неизвестная ошибка"))
+                    _sideEffect.emit(
+                        EditAccountSideEffect.ShowError(
+                            e.message ?: "Неизвестная ошибка"
+                        )
+                    )
                 }
         }
     }
@@ -193,10 +202,14 @@ class EditAccountViewModel @AssistedInject constructor(
                                     hasChanges = false
                                 )
                             } else {
-                                    currentState.copy(
+                                currentState.copy(
                                     isLoading = false,
                                     error = null,
-                                    hasChanges = checkHasChanges(currentState.name, currentState.balance, currentState.currency)
+                                    hasChanges = checkHasChanges(
+                                        currentState.name,
+                                        currentState.balance,
+                                        currentState.currency
+                                    )
                                 )
                             }
                         }
@@ -223,6 +236,7 @@ class EditAccountViewModel @AssistedInject constructor(
                 500 -> "Внутренняя ошибка сервера"
                 else -> "Ошибка сервера (${error.code()})"
             }
+
             else -> {
                 "Не удалось загрузить данные"
             }

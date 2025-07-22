@@ -9,7 +9,6 @@ import com.example.mymoney.domain.usecase.ObserveAccountUseCase
 import com.example.mymoney.domain.usecase.ObserveAnalysisUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
 import com.example.mymoney.presentation.navigation.Analysis
-import com.example.mymoney.utils.NetworkMonitor
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
@@ -34,9 +33,7 @@ class AnalysisViewModel @AssistedInject constructor(
     @Assisted savedStateHandle: SavedStateHandle,
     observeCategoryAnalysisUseCase: ObserveAnalysisUseCase,
     observeAccountUseCase: ObserveAccountUseCase,
-    networkMonitor: NetworkMonitor
 ) : BaseViewModel<AnalysisUiState, AnalysisEvent, AnalysisSideEffect>(
-    networkMonitor,
     AnalysisUiState()
 ) {
     private val isIncome: Boolean = savedStateHandle.toRoute<Analysis>().isIncome

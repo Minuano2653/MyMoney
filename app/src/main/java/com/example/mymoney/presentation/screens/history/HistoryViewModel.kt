@@ -1,6 +1,5 @@
 package com.example.mymoney.presentation.screens.history
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
@@ -11,7 +10,6 @@ import com.example.mymoney.domain.usecase.ObserveTransactionsByTypeAndPeriodUseC
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
 import com.example.mymoney.presentation.navigation.TransactionsHistory
 import com.example.mymoney.utils.DateUtils
-import com.example.mymoney.utils.NetworkMonitor
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
@@ -38,9 +36,7 @@ class HistoryViewModel @AssistedInject constructor(
     @Assisted private val savedStateHandle: SavedStateHandle,
     observeTransactionsByTypeAndPeriodUseCase: ObserveTransactionsByTypeAndPeriodUseCase,
     observeAccountUseCase: ObserveAccountUseCase,
-    networkMonitor: NetworkMonitor
 ): BaseViewModel<HistoryUiState, HistoryEvent, HistorySideEffect>(
-    networkMonitor,
     HistoryUiState()
 ) {
     private var loadTransactionsJob: Job? = null

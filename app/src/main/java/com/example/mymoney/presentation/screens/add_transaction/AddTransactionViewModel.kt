@@ -11,7 +11,6 @@ import com.example.mymoney.domain.usecase.ObserveCategoriesByTypeUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
 import com.example.mymoney.presentation.navigation.TransactionDetail
 import com.example.mymoney.utils.DateUtils.combineDateAndTimeToIso
-import com.example.mymoney.utils.NetworkMonitor
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
@@ -31,9 +30,7 @@ class AddTransactionViewModel @AssistedInject constructor(
     @Assisted private val savedStateHandle: SavedStateHandle,
     observeAccountUseCase: ObserveAccountUseCase,
     observeCategoriesByTypeUseCase: ObserveCategoriesByTypeUseCase,
-    networkMonitor: NetworkMonitor,
 ) : BaseViewModel<AddTransactionUiState, AddTransactionEvent, AddTransactionSideEffect>(
-    networkMonitor,
     AddTransactionUiState()
 ) {
     private val isIncome: Boolean = savedStateHandle.toRoute<TransactionDetail>().isIncome

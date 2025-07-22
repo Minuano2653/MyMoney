@@ -15,9 +15,7 @@ import javax.inject.Inject
 class AccountViewModel @Inject constructor(
     private val getAccountUseCase: GetAccountUseCase,
     private val observeAccountUseCase: ObserveAccountUseCase,
-    networkMonitor: NetworkMonitor
 ): BaseViewModel<AccountUiState, AccountEvent, AccountSideEffect>(
-    networkMonitor,
     AccountUiState()
 ){
     init {
@@ -77,17 +75,6 @@ class AccountViewModel @Inject constructor(
                     }
                 }
             }
-        }
-    }
-
-    override fun onNetworkStateChanged(isConnected: Boolean) {
-        val wasDisconnected = !_uiState.value.isNetworkAvailable
-        _uiState.update { it.copy(isNetworkAvailable = isConnected) }
-
-        if (!isConnected) {
-            emitEffect(AccountSideEffect.ShowError("Нет подключения к интернету"))
-        } else if (wasDisconnected && (_uiState.value.name.isBlank() || _uiState.value.error != null)) {
-            handleEvent(AccountEvent.LoadAccount)
         }
     }
 }

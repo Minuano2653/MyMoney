@@ -6,25 +6,18 @@ import androidx.navigation.toRoute
 import com.example.mymoney.data.utils.Resource
 import com.example.mymoney.domain.usecase.DeleteTransactionUseCase
 import com.example.mymoney.domain.usecase.GetCategoriesByTypeUseCase
-import com.example.mymoney.domain.usecase.ObserveAccountUseCase
 import com.example.mymoney.domain.usecase.GetTransactionUseCase
+import com.example.mymoney.domain.usecase.ObserveAccountUseCase
 import com.example.mymoney.domain.usecase.ObserveCategoriesByTypeUseCase
 import com.example.mymoney.domain.usecase.ObserveTransactionUseCase
 import com.example.mymoney.domain.usecase.UpdateTransactionUseCase
 import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
 import com.example.mymoney.presentation.navigation.EditTransaction
-import com.example.mymoney.presentation.screens.add_transaction.AddTransactionUiState
 import com.example.mymoney.utils.DateUtils
-import com.example.mymoney.utils.NetworkMonitor
 import com.example.mymoney.utils.formatAmount
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -40,9 +33,7 @@ class EditTransactionViewModel @AssistedInject constructor(
     private val observeAccountUseCase: ObserveAccountUseCase,
     private val observeCategoriesByTypeUseCase: ObserveCategoriesByTypeUseCase,
     @Assisted private val savedStateHandle: SavedStateHandle,
-    networkMonitor: NetworkMonitor,
 ) : BaseViewModel<EditTransactionUiState, EditTransactionEvent, EditTransactionSideEffect>(
-    networkMonitor,
     EditTransactionUiState()
 ) {
     private val isIncome: Boolean = savedStateHandle.toRoute<EditTransaction>().isIncome
