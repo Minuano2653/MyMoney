@@ -3,9 +3,9 @@ package com.example.mymoney.data.local.datasource
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
+import com.example.core.domain.entity.Category
+import com.example.core.domain.entity.Transaction
 import com.example.mymoney.data.local.entity.LocalTransaction
-import com.example.mymoney.domain.entity.Category
-import com.example.mymoney.domain.entity.Transaction
 import kotlinx.coroutines.flow.Flow
 import java.math.BigDecimal
 
@@ -20,8 +20,20 @@ interface TransactionDao {
     AND DATE(t.transactionDate) BETWEEN DATE(:startDate) AND DATE(:endDate)
     ORDER BY t.transactionDate DESC, t.createdAt DESC
 """)
-    fun observeTransactionsByPeriod(
+    fun observeTransactionsByTypeAndPeriod(
         isIncome: Boolean,
+        startDate: String,
+        endDate: String
+    ): Flow<List<TransactionWithCategory>>
+
+    @Query("""
+    SELECT t.*, c.name as categoryName, c.emoji as categoryEmoji, c.isIncome as categoryIsIncome 
+    FROM `transaction` as t 
+    INNER JOIN category as c ON t.categoryId = c.id 
+    AND DATE(t.transactionDate) BETWEEN DATE(:startDate) AND DATE(:endDate)
+    ORDER BY t.transactionDate DESC, t.createdAt DESC
+""")
+    fun observeTransactionsByPeriod(
         startDate: String,
         endDate: String
     ): Flow<List<TransactionWithCategory>>

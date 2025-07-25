@@ -3,7 +3,10 @@ package com.example.mymoney.presentation.components
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
-import com.example.mymoney.domain.entity.Category
+import com.example.core.domain.entity.Category
+import com.example.core.ui.components.Divider
+import com.example.core.ui.components.EmojiIcon
+import com.example.core.ui.components.ListItemComponent
 
 @Composable
 fun CategoriesBottomSheetContent(

@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.compose.compiler)
-    /*alias(libs.plugins.dagger.hilt)*/
     alias(libs.plugins.kotlin.serialization)
     kotlin("kapt")
 }
@@ -67,6 +66,11 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:common"))
+    implementation(project(":core:domain"))
+    implementation(project(":core:network"))
+    implementation(project(":core:ui"))
+    implementation(project(":core:ui:charts"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -85,10 +89,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.lottie.compose)
-
-    /*kapt(libs.hilt.compiler)
-    implementation(libs.hilt.android)
-    implementation(libs.hilt.navigation.compose)*/
 
     implementation(libs.dagger)
     kapt(libs.dagger.compiler)

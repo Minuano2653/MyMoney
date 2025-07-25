@@ -5,7 +5,7 @@ import com.example.mymoney.di.AppComponent
 import com.example.mymoney.di.DaggerAppComponent
 
 /**
- * Класс приложения, точка входа для Hilt Dependency Injection.
+ * Класс приложения, точка входа для Dependency Injection.
  */
 class MyMoneyApp : Application() {
     lateinit var appComponent: AppComponent

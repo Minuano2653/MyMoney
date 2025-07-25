@@ -1,6 +1,6 @@
 package com.example.mymoney.presentation.screens.edit_account
 
-import com.example.mymoney.presentation.base.contract.BaseEvent
+import com.example.core.ui.contract.BaseEvent
 
 sealed class EditAccountEvent: BaseEvent {
     object LoadAccount: EditAccountEvent()

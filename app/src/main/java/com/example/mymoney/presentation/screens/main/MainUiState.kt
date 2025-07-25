@@ -1,8 +1,8 @@
 package com.example.mymoney.presentation.screens.main
 
-import com.example.mymoney.presentation.base.contract.BaseUiState
+import com.example.core.ui.contract.BaseUiState
 
 data class MainUiState(
     val isNetworkAvailable: Boolean = true,
-    val hasShownNetworkError: Boolean = false
+    val wasNetworkLost: Boolean = false
 ): BaseUiState

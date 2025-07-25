@@ -1,13 +1,15 @@
 package com.example.mymoney.di
 
+import com.example.core.domain.repository.SettingsRepository
+import com.example.core.domain.repository.AccountsRepository
+import com.example.core.domain.repository.CategoriesRepository
+import com.example.core.domain.repository.NetworkRepository
+import com.example.core.domain.repository.TransactionsRepository
 import com.example.mymoney.data.repository.AccountsRepositoryImpl
+import com.example.mymoney.data.repository.SettingsRepositoryImpl
 import com.example.mymoney.data.repository.CategoriesRepositoryImpl
 import com.example.mymoney.data.repository.NetworkRepositoryImpl
 import com.example.mymoney.data.repository.TransactionsRepositoryImpl
-import com.example.mymoney.domain.repository.AccountsRepository
-import com.example.mymoney.domain.repository.CategoriesRepository
-import com.example.mymoney.domain.repository.NetworkRepository
-import com.example.mymoney.domain.repository.TransactionsRepository
 import dagger.Binds
 import dagger.Module
 import javax.inject.Singleton
@@ -38,4 +40,10 @@ abstract class RepositoryModule {
     abstract fun bindNetworkRepository(
         impl: NetworkRepositoryImpl
     ): NetworkRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSettingsRepository(
+        impl: SettingsRepositoryImpl
+    ): SettingsRepository
 }

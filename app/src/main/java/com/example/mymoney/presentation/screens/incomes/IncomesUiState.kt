@@ -1,7 +1,7 @@
 package com.example.mymoney.presentation.screens.incomes
 
-import com.example.mymoney.domain.entity.Transaction
-import com.example.mymoney.presentation.base.contract.BaseUiState
+import com.example.core.domain.entity.Transaction
+import com.example.core.ui.contract.BaseUiState
 import java.math.BigDecimal
 
 /**
@@ -18,6 +18,5 @@ data class IncomesUiState(
     val incomes: List<Transaction> = emptyList(),
     val total: BigDecimal = BigDecimal(0),
     val currency: String = "",
-    val error: String? = null,
     val isNetworkAvailable: Boolean = true
 ): BaseUiState

@@ -3,8 +3,8 @@ package com.example.mymoney.data.local.entity
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.example.mymoney.domain.entity.Category
-import com.example.mymoney.domain.entity.Transaction
+import com.example.core.domain.entity.Category
+import com.example.core.domain.entity.Transaction
 import java.math.BigDecimal
 
 @Entity(

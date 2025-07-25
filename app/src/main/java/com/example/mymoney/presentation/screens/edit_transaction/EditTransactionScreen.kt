@@ -3,7 +3,6 @@ package com.example.mymoney.presentation.screens.edit_transaction
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -23,18 +22,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.core.common.utils.DateUtils
+import com.example.core.ui.components.CustomTopAppBar
+import com.example.core.ui.components.DatePickerModal
+import com.example.core.ui.components.TimeInputDialog
 import com.example.mymoney.R
-import com.example.mymoney.presentation.base.viewmodel.daggerViewModel
 import com.example.mymoney.presentation.components.AmountInputDialog
 import com.example.mymoney.presentation.components.CategoriesBottomSheetContent
-import com.example.mymoney.presentation.components.CustomTopAppBar
-import com.example.mymoney.presentation.components.DatePickerModal
-import com.example.mymoney.presentation.components.TimeInputDialog
+import com.example.mymoney.presentation.daggerViewModel
 import com.example.mymoney.presentation.screens.add_transaction.TransactionScreenContent
-import com.example.mymoney.utils.DateUtils
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -145,15 +145,15 @@ fun EditTransactionScreen(
         }
     }
 
+    val context = LocalContext.current
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collectLatest { effect ->
             when (effect) {
                 is EditTransactionSideEffect.NavigateBack -> {
                     onNavigateBack()
                 }
-
                 is EditTransactionSideEffect.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(effect.message)
+                    snackbarHostState.showSnackbar(context.getString(effect.message))
                 }
             }
         }

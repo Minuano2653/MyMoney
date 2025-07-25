@@ -1,11 +1,13 @@
 package com.example.mymoney.presentation.screens.analysis
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -16,26 +18,30 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.core.common.utils.DateUtils
+import com.example.core.common.utils.DateUtils.formatDateWithMonthInGenitive
+import com.example.core.common.utils.formatAmount
+import com.example.core.common.utils.toSymbol
+import com.example.core.domain.entity.CategoryAnalysis
+import com.example.core.ui.charts.pie.PieChart
+import com.example.core.ui.charts.pie.PieChartItem
+import com.example.core.ui.components.CustomTopAppBar
+import com.example.core.ui.components.DateChip
+import com.example.core.ui.components.DatePickerModal
+import com.example.core.ui.components.Divider
+import com.example.core.ui.components.EmojiIcon
+import com.example.core.ui.components.EmptyContent
+import com.example.core.ui.components.ListItemComponent
+import com.example.core.ui.components.LoadingCircularIndicator
+import com.example.core.ui.components.TrailingIcon
 import com.example.mymoney.R
-import com.example.mymoney.presentation.base.viewmodel.daggerViewModel
-import com.example.mymoney.presentation.components.CustomTopAppBar
-import com.example.mymoney.presentation.components.DateChip
-import com.example.mymoney.presentation.components.DatePickerModal
-import com.example.mymoney.presentation.components.Divider
-import com.example.mymoney.presentation.components.EmojiIcon
-import com.example.mymoney.presentation.components.EmptyContent
-import com.example.mymoney.presentation.components.ListItemComponent
-import com.example.mymoney.presentation.components.LoadingCircularIndicator
-import com.example.mymoney.presentation.components.TrailingIcon
-import com.example.mymoney.presentation.screens.analysis.model.CategoryAnalysis
-import com.example.mymoney.utils.DateUtils
-import com.example.mymoney.utils.DateUtils.formatDateWithMonthInGenitive
-import com.example.mymoney.utils.formatAmount
-import com.example.mymoney.utils.toSymbol
+import com.example.mymoney.presentation.daggerViewModel
 import kotlinx.coroutines.flow.collectLatest
 import java.math.BigDecimal
 
@@ -108,11 +114,12 @@ fun AnalysisScreen(
         }
     }
 
+    val context = LocalContext.current
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collectLatest { effect ->
             when (effect) {
                 is AnalysisSideEffect.ShowError -> {
-                    snackbarHostState.showSnackbar(effect.message)
+                    snackbarHostState.showSnackbar(context.getString(effect.message))
                 }
                 is AnalysisSideEffect.NavigateBack -> {
                     onNavigateBack()
@@ -209,19 +216,38 @@ fun AnalysisContent(
     currency: String,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(modifier = modifier) {
-        itemsIndexed(
-            items = categoryAnalysisList,
-            key = { _, categoryAnalysis -> categoryAnalysis.categoryId }
-        ) { _, categoryAnalysis ->
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(top = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        PieChart(
+            items = categoryAnalysisList.map {
+                PieChartItem(
+                    label = it.categoryName,
+                    value = it.totalAmount.toFloat()
+                )
+            },
+            size = 250.dp,
+            showInnerLegend = true
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        categoryAnalysisList.forEachIndexed { index, categoryAnalysis ->
+            Divider()
             ListItemComponent(
                 leadingIcon = { EmojiIcon(emoji = categoryAnalysis.categoryEmoji) },
-                trailingIcon = { TrailingIcon() },
+                trailingIcon = { TrailingIcon(R.drawable.ic_more_vert) },
                 title = categoryAnalysis.categoryName,
-                trailingText = categoryAnalysis.percentage,
-                trailingSubText = "${categoryAnalysis.totalAmount} ${currency.toSymbol()}",
+                trailingText = "${categoryAnalysis.percentage}%",
+                trailingSubText = "${categoryAnalysis.totalAmount.formatAmount()} ${currency.toSymbol()}",
             )
-            Divider()
+            if (index == categoryAnalysisList.size - 1) {
+                Divider()
+            }
         }
     }
 }

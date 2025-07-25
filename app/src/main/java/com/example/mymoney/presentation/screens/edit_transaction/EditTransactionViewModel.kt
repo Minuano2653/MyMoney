@@ -3,18 +3,19 @@ package com.example.mymoney.presentation.screens.edit_transaction
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.example.mymoney.data.utils.Resource
-import com.example.mymoney.domain.usecase.DeleteTransactionUseCase
-import com.example.mymoney.domain.usecase.GetCategoriesByTypeUseCase
-import com.example.mymoney.domain.usecase.GetTransactionUseCase
-import com.example.mymoney.domain.usecase.ObserveAccountUseCase
-import com.example.mymoney.domain.usecase.ObserveCategoriesByTypeUseCase
-import com.example.mymoney.domain.usecase.ObserveTransactionUseCase
-import com.example.mymoney.domain.usecase.UpdateTransactionUseCase
-import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
+import com.example.core.common.utils.DateUtils
+import com.example.core.common.utils.formatAmount
+import com.example.core.domain.entity.Resource
+import com.example.core.domain.usecase.DeleteTransactionUseCase
+import com.example.core.domain.usecase.GetCategoriesByTypeUseCase
+import com.example.core.domain.usecase.GetTransactionUseCase
+import com.example.core.domain.usecase.ObserveAccountUseCase
+import com.example.core.domain.usecase.ObserveCategoriesByTypeUseCase
+import com.example.core.domain.usecase.ObserveTransactionUseCase
+import com.example.core.domain.usecase.UpdateTransactionUseCase
+import com.example.core.ui.viewmodel.BaseViewModel
+import com.example.mymoney.R
 import com.example.mymoney.presentation.navigation.EditTransaction
-import com.example.mymoney.utils.DateUtils
-import com.example.mymoney.utils.formatAmount
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
@@ -48,36 +49,16 @@ class EditTransactionViewModel @AssistedInject constructor(
 
     override fun handleEvent(event: EditTransactionEvent) {
         when (event) {
-            is EditTransactionEvent.OnAmountChanged -> {
-                _uiState.update { it.copy(amount = event.amount) }
-            }
-            is EditTransactionEvent.CancelChanges -> {
-                emitEffect(EditTransactionSideEffect.NavigateBack)
-            }
-            is EditTransactionEvent.OnCategorySelected -> {
-                _uiState.update { it.copy(selectedCategory = event.selectedCategory) }
-            }
-            is EditTransactionEvent.OnCommentChanged -> {
-                _uiState.update { it.copy(comment = event.comment) }
-            }
-            is EditTransactionEvent.OnDateSelected -> {
-                _uiState.update { it.copy(date = event.date) }
-            }
-            is EditTransactionEvent.OnTimeSelected -> {
-                _uiState.update { it.copy(time = event.time) }
-            }
-            is EditTransactionEvent.LoadCategories -> {
-                loadCategories()
-            }
-            is EditTransactionEvent.LoadTransaction -> {
-                loadTransaction()
-            }
-            is EditTransactionEvent.DeleteTransaction -> {
-                deleteTransaction()
-            }
-            is EditTransactionEvent.UpdateTransaction -> {
-                updateTransaction()
-            }
+            is EditTransactionEvent.OnAmountChanged -> _uiState.update { it.copy(amount = event.amount) }
+            is EditTransactionEvent.CancelChanges -> emitEffect(EditTransactionSideEffect.NavigateBack)
+            is EditTransactionEvent.OnCategorySelected -> _uiState.update { it.copy(selectedCategory = event.selectedCategory) }
+            is EditTransactionEvent.OnCommentChanged -> _uiState.update { it.copy(comment = event.comment) }
+            is EditTransactionEvent.OnDateSelected -> _uiState.update { it.copy(date = event.date) }
+            is EditTransactionEvent.OnTimeSelected -> _uiState.update { it.copy(time = event.time) }
+            is EditTransactionEvent.LoadCategories -> loadCategories()
+            is EditTransactionEvent.LoadTransaction -> loadTransaction()
+            is EditTransactionEvent.DeleteTransaction -> deleteTransaction()
+            is EditTransactionEvent.UpdateTransaction -> updateTransaction()
         }
     }
 
@@ -85,16 +66,17 @@ class EditTransactionViewModel @AssistedInject constructor(
         val currentState = _uiState.value
 
         if (currentState.selectedCategory == null) {
-            emitEffect(EditTransactionSideEffect.ShowSnackbar("Выберите категорию"))
+            emitEffect(EditTransactionSideEffect.ShowSnackbar(R.string.choose_category_error))
             return
         }
+
         if (currentState.amount.replace(" ", "").toBigDecimalOrNull() == null) {
-            emitEffect(EditTransactionSideEffect.ShowSnackbar("Неверный формат суммы"))
+            emitEffect(EditTransactionSideEffect.ShowSnackbar(R.string.invalid_sum_format))
             return
         }
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isSaving = true, error = null) }
+            _uiState.update { it.copy(isSaving = true) }
 
             val account = currentState.account
             val category = currentState.selectedCategory
@@ -112,26 +94,14 @@ class EditTransactionViewModel @AssistedInject constructor(
                     comment = currentState.comment,
                     transactionId = transactionId
                 ).fold(
-                    onSuccess = { createdTransaction ->
+                    onSuccess = {
                         _uiState.update { it.copy(isSaving = false) }
                         emitEffect(EditTransactionSideEffect.NavigateBack)
                     },
                     onFailure = { error ->
                         _uiState.update { it.copy(isSaving = false) }
-                        val message = when (error) {
-                            is UnknownHostException -> "Нет подключения к интернету"
-                            is SocketTimeoutException -> "Превышено время ожидания ответа"
-                            is HttpException -> when (error.code()) {
-                                400 -> "Некорректные данные"
-                                401 -> "Неавторизованный доступ"
-                                404 -> "Счет или категория не найдены"
-                                500 -> "Внутренняя ошибка сервера"
-                                else -> "Ошибка сервера (${error.code()})"
-                            }
-
-                            else -> "Не удалось сохранить транзакцию"
-                        }
-                        emitEffect(EditTransactionSideEffect.ShowSnackbar(message))
+                        val msgRes = mapErrorToStringRes(error, ErrorContext.UPDATE_TRANSACTION)
+                        emitEffect(EditTransactionSideEffect.ShowSnackbar(msgRes))
                     }
                 )
             }
@@ -147,6 +117,7 @@ class EditTransactionViewModel @AssistedInject constructor(
                     val (date, time) = DateUtils
                         .splitIsoToDateAndTime(transaction.transactionDate)
                         ?: (DateUtils.getTodayDayMonthYearFormatted() to DateUtils.getCurrentTime())
+
                     _uiState.update {
                         it.copy(
                             amount = transaction.amount.formatAmount(),
@@ -161,20 +132,8 @@ class EditTransactionViewModel @AssistedInject constructor(
                 },
                 onFailure = { error ->
                     _uiState.update { it.copy(isSaving = false) }
-                    val message = when (error) {
-                        is UnknownHostException -> "Нет подключения к интернету"
-                        is SocketTimeoutException -> "Превышено время ожидания ответа"
-                        is HttpException -> when (error.code()) {
-                            400 -> "Неверный формат ID"
-                            401 -> "Неавторизованный доступ"
-                            404 -> "Транзакция не найдена"
-                            500 -> "Внутренняя ошибка сервера"
-                            else -> "Ошибка сервера (${error.code()})"
-                        }
-
-                        else -> "Не удалось сохранить транзакцию"
-                    }
-                    emitEffect(EditTransactionSideEffect.ShowSnackbar(message))
+                    val msgRes = mapErrorToStringRes(error, ErrorContext.LOAD_TRANSACTION)
+                    emitEffect(EditTransactionSideEffect.ShowSnackbar(msgRes))
                 }
             )
         }
@@ -191,21 +150,8 @@ class EditTransactionViewModel @AssistedInject constructor(
                 },
                 onFailure = { error ->
                     _uiState.update { it.copy(isDeleting = false) }
-                    val message = when (error) {
-                        is UnknownHostException -> "Нет подключения к интернету"
-                        is SocketTimeoutException -> "Превышено время ожидания ответа"
-                        is HttpException -> when (error.code()) {
-                            204 -> "Транзакция удалена"
-                            400 -> "Неверный формат ID"
-                            401 -> "Неавторизованный доступ"
-                            404 -> "Транзакция не найдена"
-                            500 -> "Внутренняя ошибка сервера"
-                            else -> "Ошибка сервера (${error.code()})"
-                        }
-
-                        else -> "Не удалось удалить транзакцию"
-                    }
-                    emitEffect(EditTransactionSideEffect.ShowSnackbar(message))
+                    val msgRes = mapErrorToStringRes(error, ErrorContext.DELETE_TRANSACTION)
+                    emitEffect(EditTransactionSideEffect.ShowSnackbar(msgRes))
                 }
             )
         }
@@ -214,23 +160,17 @@ class EditTransactionViewModel @AssistedInject constructor(
     private fun loadCategories() {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update { it.copy(isLoadingCategories = true) }
+
             getCategoriesByTypeUseCase(isIncome).fold(
                 onSuccess = { categories ->
                     _uiState.update {
-                        it.copy(
-                            categories = categories,
-                            isLoadingCategories = false
-                        )
+                        it.copy(categories = categories, isLoadingCategories = false)
                     }
                 },
                 onFailure = { error ->
                     _uiState.update { it.copy(isLoadingCategories = false) }
-                    val message = when (error) {
-                        is UnknownHostException -> "Нет подключения к интернету"
-                        is SocketTimeoutException -> "Превышено время ожидания ответа"
-                        else -> "Ошибка загрузки категорий"
-                    }
-                    emitEffect(EditTransactionSideEffect.ShowSnackbar(message))
+                    val msgRes = mapErrorToStringRes(error, ErrorContext.LOAD_CATEGORIES)
+                    emitEffect(EditTransactionSideEffect.ShowSnackbar(msgRes))
                 }
             )
         }
@@ -240,13 +180,11 @@ class EditTransactionViewModel @AssistedInject constructor(
         viewModelScope.launch {
             observeTransactionUseCase(transactionId).collect { resource ->
                 when (resource) {
-                    is Resource.Loading -> {
-                        _uiState.update { it.copy(isLoadingTransaction = true) }
-                    }
+                    is Resource.Loading -> _uiState.update { it.copy(isLoadingTransaction = true) }
                     is Resource.Success -> {
-                        val transaction = resource.data
-                        if (transaction != null) {
-                            val (date, time) = DateUtils.splitIsoToDateAndTime(transaction.transactionDate)
+                        resource.data?.let { transaction ->
+                            val (date, time) = DateUtils
+                                .splitIsoToDateAndTime(transaction.transactionDate)
                                 ?: (DateUtils.getTodayDayMonthYearFormatted() to DateUtils.getCurrentTime())
 
                             _uiState.update {
@@ -265,7 +203,6 @@ class EditTransactionViewModel @AssistedInject constructor(
                         _uiState.update {
                             it.copy(
                                 isLoadingTransaction = false,
-                                error = mapErrorToMessage(resource.error)
                             )
                         }
                     }
@@ -286,51 +223,74 @@ class EditTransactionViewModel @AssistedInject constructor(
         viewModelScope.launch {
             observeCategoriesByTypeUseCase(isIncome).collect { resource ->
                 when (resource) {
-                    is Resource.Loading -> {
-                        _uiState.update {
-                            it.copy(
-                                isLoadingCategories = true,
-                                categories = resource.data ?: emptyList(),
-                                error = null
-                            )
-                        }
+                    is Resource.Loading -> _uiState.update {
+                        it.copy(
+                            isLoadingCategories = true,
+                            categories = resource.data ?: emptyList(),
+                        )
                     }
-                    is Resource.Success -> {
-                        _uiState.update {
-                            it.copy(
-                                isLoadingCategories = false,
-                                categories = resource.data ?: emptyList(),
-                                error = null
-                            )
-                        }
+                    is Resource.Success -> _uiState.update {
+                        it.copy(
+                            isLoadingCategories = false,
+                            categories = resource.data ?: emptyList(),
+                        )
                     }
-                    is Resource.Error -> {
-                        _uiState.update {
-                            it.copy(
-                                isLoadingCategories = false,
-                                categories = resource.data ?: emptyList(),
-                                error = mapErrorToMessage(resource.error)
-                            )
-                        }
+                    is Resource.Error -> _uiState.update {
+                        it.copy(
+                            isLoadingCategories = false,
+                            categories = resource.data ?: emptyList(),
+                        )
                     }
                 }
             }
         }
     }
 
-    private fun mapErrorToMessage(error: Throwable?): String {
+    fun mapErrorToStringRes(error: Throwable?, context: ErrorContext): Int {
         return when (error) {
-            is UnknownHostException -> "Нет подключения к интернету"
-            is SocketTimeoutException -> "Превышено время ожидания ответа"
-            is HttpException -> when (error.code()) {
-                400 -> "Некорректные данные"
-                401 -> "Неавторизованный доступ"
-                404 -> "Счет или категория не найдены"
-                500 -> "Внутренняя ошибка сервера"
-                else -> "Ошибка сервера (${error.code()})"
+            is UnknownHostException -> R.string.no_network_connection
+            is SocketTimeoutException -> R.string.response_timeout
+            is HttpException -> when (context) {
+                ErrorContext.UPDATE_TRANSACTION -> when (error.code()) {
+                    400 -> R.string.incorrect_data_or_id
+                    401 -> R.string.unauthorised_access
+                    404 -> R.string.trs_account_ctg_not_found
+                    500 -> R.string.internal_server_error
+                    else -> R.string.unknown_error
+                }
+                ErrorContext.DELETE_TRANSACTION -> when (error.code()) {
+                    400 -> R.string.incorrect_data_or_id
+                    401 -> R.string.unauthorised_access
+                    404 -> R.string.transaction_not_found
+                    500 -> R.string.internal_server_error
+                    else -> R.string.unknown_error
+                }
+                ErrorContext.LOAD_TRANSACTION -> when (error.code()) {
+                    400 -> R.string.incorrect_id
+                    401 -> R.string.unauthorised_access
+                    404 -> R.string.transaction_not_found
+                    500 -> R.string.internal_server_error
+                    else -> R.string.unknown_error
+                }
+                ErrorContext.LOAD_CATEGORIES -> when (error.code()) {
+                    401 -> R.string.unauthorised_access
+                    500 -> R.string.internal_server_error
+                    else -> R.string.failed_to_load_categories
+                }
             }
-
-            else -> "Не удалось сохранить транзакцию"
+            else -> when (context) {
+                ErrorContext.UPDATE_TRANSACTION -> R.string.failed_to_save_transaction
+                ErrorContext.DELETE_TRANSACTION -> R.string.unknown_error
+                ErrorContext.LOAD_TRANSACTION -> R.string.failed_to_load_data
+                ErrorContext.LOAD_CATEGORIES -> R.string.failed_to_load_categories
+            }
         }
     }
+}
+
+enum class ErrorContext {
+    UPDATE_TRANSACTION,
+    DELETE_TRANSACTION,
+    LOAD_TRANSACTION,
+    LOAD_CATEGORIES
 }

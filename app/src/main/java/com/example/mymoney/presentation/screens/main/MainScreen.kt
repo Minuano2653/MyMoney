@@ -28,8 +28,8 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.mymoney.presentation.daggerViewModel
 import com.example.mymoney.R
-import com.example.mymoney.presentation.base.viewmodel.daggerViewModel
 import com.example.mymoney.presentation.navigation.Account
 import com.example.mymoney.presentation.navigation.AppNavGraph
 import com.example.mymoney.presentation.navigation.BottomNavItem

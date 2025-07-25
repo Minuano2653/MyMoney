@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="date_time_picker_clear_button">Очистить</string>
+    <string name="date_time_picker_dismiss_button">Отмена</string>
+    <string name="date_time_picker_ok_button">Ок</string>
+</resources>

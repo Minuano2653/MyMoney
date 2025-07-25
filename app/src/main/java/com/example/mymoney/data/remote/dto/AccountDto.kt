@@ -1,6 +1,6 @@
 package com.example.mymoney.data.remote.dto
 
-import com.example.mymoney.domain.entity.Account
+import com.example.core.domain.entity.Account
 import java.math.BigDecimal
 
 data class AccountDto(

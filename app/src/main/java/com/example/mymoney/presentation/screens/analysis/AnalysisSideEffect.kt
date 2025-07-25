@@ -1,8 +1,8 @@
 package com.example.mymoney.presentation.screens.analysis
 
-import com.example.mymoney.presentation.base.contract.BaseSideEffect
+import com.example.core.ui.contract.BaseSideEffect
 
 sealed class AnalysisSideEffect: BaseSideEffect {
-    data class ShowError(val message: String) : AnalysisSideEffect()
+    data class ShowError(val message: Int) : AnalysisSideEffect()
     object NavigateBack : AnalysisSideEffect()
 }

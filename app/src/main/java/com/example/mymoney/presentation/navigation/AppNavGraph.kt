@@ -77,8 +77,22 @@ fun AppNavGraph(
             CategoriesScreen()
         }
 
-        composable<Settings> {
-            SettingsScreen()
-        }
+        settingsNavGraph(
+            onNavigateToAboutApp = {
+                navHostController.navigate(AboutApp)
+            },
+            onNavigateToLanguage = {
+                navHostController.navigate(Language)
+            },
+            onNavigateToPassword = {
+                navHostController.navigate(Password)
+            },
+            onNavigateToHaptics = {
+                navHostController.navigate(Haptics)
+            },
+            onNavigateBack = {
+                navHostController.popBackStack()
+            },
+        )
     }
 }

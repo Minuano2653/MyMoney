@@ -18,10 +18,9 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.mymoney.R
-import com.example.mymoney.presentation.base.viewmodel.daggerViewModel
+import com.example.mymoney.presentation.daggerViewModel
 import com.example.mymoney.presentation.navigation.Main
 import com.example.mymoney.presentation.navigation.Splash
-
 
 @Composable
 fun SplashScreen(

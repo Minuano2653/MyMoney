@@ -1,11 +1,11 @@
 package com.example.mymoney.data.repository
 
+import com.example.core.domain.repository.AccountsRepository
 import com.example.mymoney.data.local.datasource.AccountDao
 import com.example.mymoney.data.remote.datasource.AccountsRemoteDataSource
 import com.example.mymoney.data.remote.dto.UpdateAccountRequest
 import com.example.mymoney.data.repository.base.BaseRepository
-import com.example.mymoney.domain.entity.Account
-import com.example.mymoney.domain.repository.AccountsRepository
+import com.example.core.domain.entity.Account
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject

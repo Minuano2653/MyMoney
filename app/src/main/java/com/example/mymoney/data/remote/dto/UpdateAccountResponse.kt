@@ -1,7 +1,7 @@
 package com.example.mymoney.data.remote.dto
 
+import com.example.core.domain.entity.Account
 import com.example.mymoney.data.local.entity.LocalAccount
-import com.example.mymoney.domain.entity.Account
 import java.math.BigDecimal
 
 data class UpdateAccountResponse(

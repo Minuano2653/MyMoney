@@ -1,8 +1,10 @@
 package com.example.mymoney.presentation.screens.account
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -13,20 +15,22 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.core.common.utils.formatAmount
+import com.example.core.common.utils.toSymbol
+import com.example.core.ui.charts.bar.BarChart
+import com.example.core.ui.components.CustomTopAppBar
+import com.example.core.ui.components.Divider
+import com.example.core.ui.components.EmojiIcon
+import com.example.core.ui.components.ListItemComponent
+import com.example.core.ui.components.TrailingIcon
 import com.example.mymoney.R
-import com.example.mymoney.presentation.base.viewmodel.daggerViewModel
-import com.example.mymoney.presentation.components.CustomTopAppBar
-import com.example.mymoney.presentation.components.Divider
-import com.example.mymoney.presentation.components.EmojiIcon
-import com.example.mymoney.presentation.components.ListItemComponent
-import com.example.mymoney.presentation.components.TrailingIcon
+import com.example.mymoney.presentation.daggerViewModel
 import com.example.mymoney.presentation.theme.MyMoneyTheme
-import com.example.mymoney.utils.formatAmount
-import com.example.mymoney.utils.toSymbol
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -57,11 +61,12 @@ fun AccountScreen(
         )
     }
 
+    val context = LocalContext.current
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collectLatest { effect ->
             when (effect) {
                 is AccountSideEffect.ShowError -> {
-                    snackbarHostState.showSnackbar(effect.message)
+                    snackbarHostState.showSnackbar(context.getString(effect.message))
                 }
                 is AccountSideEffect.NavigateToEditAccount -> {
                     onNavigateToEditAccount(effect.accountId)
@@ -87,7 +92,7 @@ fun AccountScreenContent(
                 )
             },
             trailingIcon = {
-                TrailingIcon()
+                TrailingIcon(R.drawable.ic_more_vert)
             },
             itemHeight = 56.dp,
             backgroundColor = MaterialTheme.colorScheme.secondary,
@@ -97,11 +102,18 @@ fun AccountScreenContent(
             title = stringResource(R.string.list_item_text_currency),
             trailingText = uiState.currency.toSymbol(),
             trailingIcon = {
-                TrailingIcon()
+                TrailingIcon(R.drawable.ic_more_vert)
             },
             itemHeight = 56.dp,
             backgroundColor = MaterialTheme.colorScheme.secondary,
         )
+        Spacer(modifier = Modifier.height(16.dp))
+        if (uiState.chartItems.isNotEmpty()) {
+            BarChart(
+                modifier = Modifier.padding(8.dp),
+                data = uiState.chartItems
+            )
+        }
     }
 }
 

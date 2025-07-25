@@ -1,6 +1,6 @@
 package com.example.mymoney.presentation.screens.account
 
-import com.example.mymoney.presentation.base.contract.BaseEvent
+import com.example.core.ui.contract.BaseEvent
 
 /**
  * События, связанные с экраном аккаунта.

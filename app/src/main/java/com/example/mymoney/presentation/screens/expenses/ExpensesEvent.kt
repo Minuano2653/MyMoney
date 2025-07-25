@@ -1,7 +1,7 @@
 package com.example.mymoney.presentation.screens.expenses
 
-import com.example.mymoney.domain.entity.Transaction
-import com.example.mymoney.presentation.base.contract.BaseEvent
+import com.example.core.domain.entity.Transaction
+import com.example.core.ui.contract.BaseEvent
 
 /**
  * События, связанные с экраном расходов.

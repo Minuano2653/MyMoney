@@ -4,11 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.mymoney.di.viewmodel.factories.ViewModelFactory
 import com.example.mymoney.di.viewmodel.keys.ViewModelKey
+import com.example.mymoney.presentation.screens.settings.about.AboutViewModel
 import com.example.mymoney.presentation.screens.account.AccountViewModel
 import com.example.mymoney.presentation.screens.categories.CategoriesViewModel
 import com.example.mymoney.presentation.screens.expenses.ExpensesViewModel
 import com.example.mymoney.presentation.screens.incomes.IncomesViewModel
 import com.example.mymoney.presentation.screens.main.MainViewModel
+import com.example.mymoney.presentation.screens.settings.language.LanguageViewModel
+import com.example.mymoney.presentation.screens.settings.theme.ThemeViewModel
 import com.example.mymoney.presentation.screens.splash.SplashViewModel
 import dagger.Binds
 import dagger.Module
@@ -48,4 +51,19 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(SplashViewModel::class)
     abstract fun bindSplashViewModel(viewModel: SplashViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(AboutViewModel::class)
+    abstract fun bindAboutViewModel(viewModel: AboutViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(LanguageViewModel::class)
+    abstract fun bindLanguageViewModel(viewModel: LanguageViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(ThemeViewModel::class)
+    abstract fun bindThemeViewModel(viewModel: ThemeViewModel): ViewModel
 }

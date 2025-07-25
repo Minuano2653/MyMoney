@@ -9,9 +9,40 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = Color(0xFF2AE881),              // светло-зелёный как в светлой теме
+    onPrimary = Color.Black,                  // хороший контраст в тёмной теме
+    primaryContainer = Color(0xFF006D3A),     // более тёмный вариант зелёного
+    onPrimaryContainer = Color(0xFF95F7BA),   // светлый текст на контейнере
+
+    secondary = Color(0xFF42A685),            // адаптация светлой secondary
+    onSecondary = Color.Black,
+    secondaryContainer = Color(0xFF005234),
+    onSecondaryContainer = Color(0xFFA2F6D5),
+
+    tertiary = Pink40,                        // можно оставить как есть
+    onTertiary = Color.Black,
+    tertiaryContainer = Color(0xFF5A003E),
+    onTertiaryContainer = Color(0xFFFFD8EC),
+
+    background = Color(0xFF1C1B1F),
+    onBackground = Color(0xFFE6E1E5),
+    surface = Color(0xFF1D1B20),
+    onSurface = Color(0xFFE6E1E5),
+
+    surfaceContainer = Color(0xFF2A282F),
+    surfaceContainerHigh = Color(0xFF36343B),
+    surfaceContainerHighest = Color(0xFF3E3C42),
+
+    surfaceVariant = Color(0xFF49454F),
+    onSurfaceVariant = Color(0xFFCAC4D0),
+
+    outline = Color(0xFF938F99),
+    outlineVariant = Color(0xFF49454F),
+
+    error = Color(0xFFE46962),
+    onError = Color.Black,
+    errorContainer = Color(0xFF8C1D18),
+    onErrorContainer = Color(0xFFFFDAD6)
 )
 
 private val LightColorScheme = lightColorScheme(

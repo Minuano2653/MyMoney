@@ -1,10 +1,11 @@
 package com.example.mymoney.presentation.screens.main
 
 import androidx.lifecycle.viewModelScope
+import com.example.core.domain.usecase.ObserveNetworkUseCase
 import com.example.mymoney.R
-import com.example.mymoney.domain.usecase.ObserveNetworkUseCase
-import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
+import com.example.core.ui.viewmodel.BaseViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,6 +23,7 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             observeNetworkUseCase()
                 .distinctUntilChanged()
+                .drop(1)
                 .collect { isConnected ->
                     _uiState.update { it.copy(isNetworkAvailable = isConnected) }
 

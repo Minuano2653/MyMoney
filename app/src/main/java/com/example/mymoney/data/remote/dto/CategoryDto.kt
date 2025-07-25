@@ -1,7 +1,7 @@
 package com.example.mymoney.data.remote.dto
 
+import com.example.core.domain.entity.Category
 import com.example.mymoney.data.local.entity.LocalCategory
-import com.example.mymoney.domain.entity.Category
 
 /**
  * DTO-модель статьи, получаемая с сервера.

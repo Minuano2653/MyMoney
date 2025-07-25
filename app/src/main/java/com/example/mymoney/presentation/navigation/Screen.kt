@@ -18,6 +18,21 @@ object Categories
 object Settings
 
 @Serializable
+object SettingsScreen
+
+@Serializable
+object AboutApp
+
+@Serializable
+object Language
+
+@Serializable
+object Password
+
+@Serializable
+object Haptics
+
+@Serializable
 object ExpensesToday
 
 @Serializable

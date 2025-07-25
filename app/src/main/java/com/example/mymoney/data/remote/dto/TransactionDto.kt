@@ -1,7 +1,7 @@
 package com.example.mymoney.data.remote.dto
 
+import com.example.core.domain.entity.Transaction
 import com.example.mymoney.data.local.entity.LocalTransaction
-import com.example.mymoney.domain.entity.Transaction
 import java.math.BigDecimal
 
 /**

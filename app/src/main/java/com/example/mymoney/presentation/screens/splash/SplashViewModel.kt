@@ -1,8 +1,8 @@
 package com.example.mymoney.presentation.screens.splash
 
 import androidx.lifecycle.viewModelScope
-import com.example.mymoney.domain.usecase.InitializeAppDataUseCase
-import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
+import com.example.core.domain.usecase.InitializeAppDataUseCase
+import com.example.core.ui.viewmodel.BaseViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch

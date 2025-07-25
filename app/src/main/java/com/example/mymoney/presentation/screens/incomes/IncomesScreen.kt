@@ -12,17 +12,18 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mymoney.R
-import com.example.mymoney.presentation.base.viewmodel.daggerViewModel
-import com.example.mymoney.presentation.components.CustomFloatingActionButton
-import com.example.mymoney.presentation.components.CustomTopAppBar
+import com.example.core.ui.components.CustomFloatingActionButton
+import com.example.core.ui.components.CustomTopAppBar
+import com.example.mymoney.presentation.daggerViewModel
 import com.example.mymoney.presentation.screens.expenses.TransactionsScreenContent
 import com.example.mymoney.presentation.theme.MyMoneyTheme
-import com.example.mymoney.utils.formatAmount
-import com.example.mymoney.utils.toSymbol
+import com.example.core.common.utils.formatAmount
+import com.example.core.common.utils.toSymbol
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -51,7 +52,8 @@ fun IncomesScreen(
             CustomFloatingActionButton(
                 onClick = {
                     viewModel.handleEvent(IncomesEvent.OnAddClicked)
-                }
+                },
+                iconRes = R.drawable.ic_add
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -70,11 +72,13 @@ fun IncomesScreen(
         )
     }
 
+    val context = LocalContext.current
+
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collectLatest { effect ->
             when (effect) {
                 is IncomesSideEffect.ShowError -> {
-                    snackbarHostState.showSnackbar(effect.message)
+                    snackbarHostState.showSnackbar(context.getString(effect.message))
                 }
                 is IncomesSideEffect.NavigateToHistory -> {
                     onNavigateToHistory()

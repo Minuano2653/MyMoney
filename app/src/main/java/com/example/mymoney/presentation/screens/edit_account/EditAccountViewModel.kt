@@ -3,10 +3,11 @@ package com.example.mymoney.presentation.screens.edit_account
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.example.mymoney.domain.usecase.GetAccountUseCase
-import com.example.mymoney.domain.usecase.ObserveAccountUseCase
-import com.example.mymoney.domain.usecase.UpdateAccountUseCase
-import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
+import com.example.core.domain.usecase.GetAccountUseCase
+import com.example.core.domain.usecase.ObserveAccountUseCase
+import com.example.core.domain.usecase.UpdateAccountUseCase
+import com.example.core.ui.viewmodel.BaseViewModel
+import com.example.mymoney.R
 import com.example.mymoney.presentation.navigation.EditAccount
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -95,7 +96,7 @@ class EditAccountViewModel @AssistedInject constructor(
     private fun loadAccount() {
         loadAccountJob?.cancel()
         loadAccountJob = viewModelScope.launch(Dispatchers.IO) {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+            _uiState.update { it.copy(isLoading = true) }
 
             val result = getAccountUseCase()
             result
@@ -106,17 +107,16 @@ class EditAccountViewModel @AssistedInject constructor(
                             balance = account.balance.toString(),
                             currency = account.currency,
                             isLoading = false,
-                            error = null
                         )
                     }
                 }
                 .onFailure { e ->
                     _uiState.update {
-                        it.copy(isLoading = false, error = e.message)
+                        it.copy(isLoading = false)
                     }
                     _sideEffect.emit(
                         EditAccountSideEffect.ShowError(
-                            e.message ?: "Неизвестная ошибка"
+                            R.string.unknown_error
                         )
                     )
                 }
@@ -129,17 +129,17 @@ class EditAccountViewModel @AssistedInject constructor(
         val currentState = _uiState.value
 
         if (currentState.name.isBlank()) {
-            emitEffect(EditAccountSideEffect.ShowError("Название счёта не может быть пустым"))
+            emitEffect(EditAccountSideEffect.ShowError(R.string.empty_account_error))
             return
         }
 
         if (currentState.balance.toBigDecimalOrNull() == null) {
-            emitEffect(EditAccountSideEffect.ShowError("Неверный формат баланса"))
+            emitEffect(EditAccountSideEffect.ShowError(R.string.invalid_balance_format))
             return
         }
 
         saveChangesJob = viewModelScope.launch(Dispatchers.IO) {
-            _uiState.update { it.copy(isSaving = true, error = null) }
+            _uiState.update { it.copy(isSaving = true) }
 
             val result = updateAccountUseCase(
                 accountId = accountId,
@@ -154,7 +154,6 @@ class EditAccountViewModel @AssistedInject constructor(
                         it.copy(
                             isSaving = false,
                             hasChanges = false,
-                            error = null
                         )
                     }
                     _sideEffect.emit(EditAccountSideEffect.NavigateBack)
@@ -162,7 +161,7 @@ class EditAccountViewModel @AssistedInject constructor(
                 .onFailure { e ->
                     val errorMessage = mapErrorToMessage(e)
                     _uiState.update {
-                        it.copy(isSaving = false, error = errorMessage)
+                        it.copy(isSaving = false)
                     }
                     _sideEffect.emit(EditAccountSideEffect.ShowError(errorMessage))
                 }
@@ -172,12 +171,12 @@ class EditAccountViewModel @AssistedInject constructor(
     private fun startObservingAccount() {
         observeAccountJob?.cancel()
         observeAccountJob = viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+            _uiState.update { it.copy(isLoading = true) }
 
             observeAccountUseCase()
                 .catch { e ->
                     val errorMessage = mapErrorToMessage(e)
-                    _uiState.update { it.copy(isLoading = false, error = errorMessage) }
+                    _uiState.update { it.copy(isLoading = false) }
                     _sideEffect.emit(EditAccountSideEffect.ShowError(errorMessage))
                 }
                 .collect { account ->
@@ -198,13 +197,11 @@ class EditAccountViewModel @AssistedInject constructor(
                                     balance = account.balance.toString(),
                                     currency = account.currency,
                                     isLoading = false,
-                                    error = null,
                                     hasChanges = false
                                 )
                             } else {
                                 currentState.copy(
                                     isLoading = false,
-                                    error = null,
                                     hasChanges = checkHasChanges(
                                         currentState.name,
                                         currentState.balance,
@@ -215,30 +212,27 @@ class EditAccountViewModel @AssistedInject constructor(
                         }
                     } else {
                         _uiState.update {
-                            it.copy(
-                                isLoading = false,
-                                error = "Аккаунт не найден"
-                            )
+                            it.copy(isLoading = false)
                         }
                     }
                 }
         }
     }
 
-    private fun mapErrorToMessage(error: Throwable?): String {
+    private fun mapErrorToMessage(error: Throwable?): Int {
         return when (error) {
-            is UnknownHostException -> "Нет подключения к интернету"
-            is SocketTimeoutException -> "Превышено время ожидания ответа"
+            is UnknownHostException -> R.string.no_network_connection
+            is SocketTimeoutException -> R.string.response_timeout
             is HttpException -> when (error.code()) {
-                400 -> "Некорректные данные или неверный формат ID"
-                401 -> "Неавторизованный доступ"
-                404 -> "Счет не найден"
-                500 -> "Внутренняя ошибка сервера"
-                else -> "Ошибка сервера (${error.code()})"
+                400 -> R.string.incorrect_data_or_id
+                401 -> R.string.unauthorised_access
+                404 -> R.string.account_not_found
+                500 -> R.string.internal_server_error
+                else -> R.string.unknown_error
             }
 
             else -> {
-                "Не удалось загрузить данные"
+                R.string.failed_to_load_data
             }
         }
     }

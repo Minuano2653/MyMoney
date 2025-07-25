@@ -16,23 +16,24 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mymoney.R
-import com.example.mymoney.domain.entity.Transaction
-import com.example.mymoney.presentation.base.viewmodel.daggerViewModel
-import com.example.mymoney.presentation.components.CustomFloatingActionButton
-import com.example.mymoney.presentation.components.CustomTopAppBar
-import com.example.mymoney.presentation.components.Divider
-import com.example.mymoney.presentation.components.EmojiIcon
-import com.example.mymoney.presentation.components.ListItemComponent
-import com.example.mymoney.presentation.components.LoadingCircularIndicator
-import com.example.mymoney.presentation.components.TrailingIcon
+import com.example.core.ui.components.CustomFloatingActionButton
+import com.example.core.ui.components.CustomTopAppBar
+import com.example.core.ui.components.Divider
+import com.example.core.ui.components.EmojiIcon
+import com.example.core.ui.components.ListItemComponent
+import com.example.core.ui.components.LoadingCircularIndicator
+import com.example.core.ui.components.TrailingIcon
+import com.example.mymoney.presentation.daggerViewModel
 import com.example.mymoney.presentation.theme.MyMoneyTheme
-import com.example.mymoney.utils.formatAmount
-import com.example.mymoney.utils.toSymbol
+import com.example.core.common.utils.formatAmount
+import com.example.core.common.utils.toSymbol
+import com.example.core.domain.entity.Transaction
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -61,7 +62,8 @@ fun ExpensesScreen(
             CustomFloatingActionButton(
                 onClick = {
                     viewModel.handleEvent(ExpensesEvent.OnAddClicked)
-                }
+                },
+                iconRes = R.drawable.ic_add,
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -80,21 +82,19 @@ fun ExpensesScreen(
         )
     }
 
+    val context = LocalContext.current
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collectLatest { effect ->
             when (effect) {
                 is ExpensesSideEffect.ShowError -> {
-                    snackbarHostState.showSnackbar(effect.message)
+                    snackbarHostState.showSnackbar(context.getString(effect.message))
                 }
-
                 is ExpensesSideEffect.NavigateToHistory -> {
                     onNavigateToHistory()
                 }
-
                 is ExpensesSideEffect.NavigateToAddExpense -> {
                     onNavigateToAddExpense()
                 }
-
                 is ExpensesSideEffect.NavigateToTransactionDetail -> {
                     onNavigateToTransactionDetail(effect.transactionId)
                 }
@@ -135,7 +135,7 @@ fun TransactionsScreenContent(
                         subtitle = expense.comment,
                         trailingText = "${expense.amount.formatAmount()} $currency",
                         leadingIcon = { EmojiIcon(emoji = expense.category.emoji) },
-                        trailingIcon = { TrailingIcon() },
+                        trailingIcon = { TrailingIcon(R.drawable.ic_more_vert) },
                         onClick = { onExpenseClick(expense) }
                     )
                     Divider()

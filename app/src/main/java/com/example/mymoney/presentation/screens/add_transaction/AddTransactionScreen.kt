@@ -2,7 +2,6 @@ package com.example.mymoney.presentation.screens.add_transaction
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,23 +22,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.core.common.utils.DateUtils
+import com.example.core.common.utils.toSymbol
+import com.example.core.ui.components.CustomTopAppBar
+import com.example.core.ui.components.DatePickerModal
+import com.example.core.ui.components.Divider
+import com.example.core.ui.components.ListItemComponent
+import com.example.core.ui.components.TimeInputDialog
+import com.example.core.ui.components.TrailingIcon
 import com.example.mymoney.R
-import com.example.mymoney.presentation.base.viewmodel.daggerViewModel
 import com.example.mymoney.presentation.components.AmountInputDialog
 import com.example.mymoney.presentation.components.CategoriesBottomSheetContent
-import com.example.mymoney.presentation.components.CustomTopAppBar
-import com.example.mymoney.presentation.components.DatePickerModal
-import com.example.mymoney.presentation.components.Divider
-import com.example.mymoney.presentation.components.ListItemComponent
-import com.example.mymoney.presentation.components.TimeInputDialog
-import com.example.mymoney.presentation.components.TrailingIcon
-import com.example.mymoney.presentation.theme.MyMoneyTheme
-import com.example.mymoney.utils.DateUtils
-import com.example.mymoney.utils.toSymbol
+import com.example.mymoney.presentation.daggerViewModel
 import kotlinx.coroutines.flow.collectLatest
 
 
@@ -150,15 +148,15 @@ fun AddTransactionScreen(
         }
     }
 
+    val context = LocalContext.current
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collectLatest { effect ->
             when (effect) {
                 is AddTransactionSideEffect.NavigateBack -> {
                     onNavigateBack()
                 }
-
                 is AddTransactionSideEffect.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(effect.message)
+                    snackbarHostState.showSnackbar(context.getString(effect.message))
                 }
             }
         }
@@ -185,13 +183,13 @@ fun TransactionScreenContent(
         ListItemComponent(
             title = stringResource(R.string.list_item_text_account),
             trailingText = accountName,
-            trailingIcon = { TrailingIcon() },
+            trailingIcon = { TrailingIcon(R.drawable.ic_more_vert) },
         )
         Divider()
         ListItemComponent(
             title = stringResource(R.string.list_item_text_category),
             trailingText = selectedCategory,
-            trailingIcon = { TrailingIcon() },
+            trailingIcon = { TrailingIcon(R.drawable.ic_more_vert) },
             onClick = onCategoryClicked
         )
         Divider()

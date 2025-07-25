@@ -1,17 +1,17 @@
 package com.example.mymoney.data.repository
 
+import com.example.core.common.utils.DateUtils
+import com.example.core.domain.entity.CategoryAnalysis
+import com.example.core.domain.entity.Resource
+import com.example.core.domain.entity.SavedTransaction
+import com.example.core.domain.entity.Transaction
+import com.example.core.domain.repository.TransactionsRepository
 import com.example.mymoney.data.local.datasource.TransactionDao
 import com.example.mymoney.data.local.entity.LocalTransaction
 import com.example.mymoney.data.remote.datasource.TransactionsRemoteDataSource
 import com.example.mymoney.data.remote.dto.TransactionRequest
 import com.example.mymoney.data.repository.base.BaseRepository
-import com.example.mymoney.data.utils.Resource
 import com.example.mymoney.data.utils.networkBoundResource
-import com.example.mymoney.domain.entity.SavedTransaction
-import com.example.mymoney.domain.entity.Transaction
-import com.example.mymoney.domain.repository.TransactionsRepository
-import com.example.mymoney.presentation.screens.analysis.model.CategoryAnalysis
-import com.example.mymoney.utils.DateUtils
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -45,42 +45,15 @@ class TransactionsRepositoryImpl @Inject constructor(
         transactionDate: String,
         comment: String?
     ): Result<SavedTransaction> {
-        val request = TransactionRequest(
-            accountId = accountId,
-            categoryId = categoryId,
-            amount = amount,
-            transactionDate = transactionDate,
-            comment = comment
-        )
-
-        return try {
-            val savedTransaction = callWithRetry {
-                remoteDataSource.createTransaction(request)
-            }.getOrThrow()
-
-            val localTransaction = LocalTransaction(
-                localId = savedTransaction.id,
-                serverId = savedTransaction.id,
+        return callWithRetry {
+            val request = TransactionRequest(
+                accountId = accountId,
                 categoryId = categoryId,
                 amount = amount,
                 transactionDate = transactionDate,
-                comment = comment,
-                createdAt = savedTransaction.createdAt,
-                updatedAt = savedTransaction.updatedAt,
-                isSynced = true
+                comment = comment
             )
-            localDataSource.upsert(localTransaction)
-            Result.success(savedTransaction.toDomain())
-
-        } catch (e: Throwable) {
-            saveTransactionLocally(
-                categoryId = categoryId,
-                amount = amount,
-                transactionDate = transactionDate,
-                comment = comment,
-                isSynced = false
-            )
-            Result.failure(e)
+            remoteDataSource.createTransaction(request).toDomain()
         }
     }
 
@@ -153,7 +126,30 @@ class TransactionsRepositoryImpl @Inject constructor(
         return networkBoundResource(
             query = {
                 localDataSource
-                    .observeTransactionsByPeriod(isIncome, startDate, endDate)
+                    .observeTransactionsByTypeAndPeriod(isIncome, startDate, endDate)
+                    .map { list -> list.map { it.toDomain() } }
+            },
+            fetch = {
+                remoteDataSource
+                    .getTransactionsByPeriod(accountId, startDate, endDate)
+            },
+            saveFetchResult = { remote ->
+                localDataSource.upsertAll(remote.map { it.toLocal() })
+            },
+            shouldFetch = { true },
+            onFetchFailed = { e -> e }
+        )
+    }
+
+    override fun observeTransactionsByPeriod(
+        accountId: Int,
+        startDate: String,
+        endDate: String
+    ): Flow<Resource<List<Transaction>>> {
+        return networkBoundResource(
+            query = {
+                localDataSource
+                    .observeTransactionsByPeriod(startDate, endDate)
                     .map { list -> list.map { it.toDomain() } }
             },
             fetch = {
@@ -193,8 +189,8 @@ class TransactionsRepositoryImpl @Inject constructor(
                             categoryName = localAnalysis.categoryName,
                             categoryEmoji = localAnalysis.categoryEmoji,
                             isIncome = localAnalysis.isIncome,
-                            percentage = "${percentage}%",
-                            totalAmount = localAnalysis.totalAmount.toString()
+                            percentage = percentage,
+                            totalAmount = localAnalysis.totalAmount
                         )
                     }
                     Pair(total, categoryAnalysisList)

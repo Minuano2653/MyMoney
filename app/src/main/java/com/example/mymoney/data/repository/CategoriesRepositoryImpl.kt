@@ -3,10 +3,10 @@ package com.example.mymoney.data.repository
 import com.example.mymoney.data.local.datasource.CategoryDao
 import com.example.mymoney.data.remote.datasource.CategoriesRemoteDataSource
 import com.example.mymoney.data.repository.base.BaseRepository
-import com.example.mymoney.data.utils.Resource
 import com.example.mymoney.data.utils.networkBoundResource
-import com.example.mymoney.domain.entity.Category
-import com.example.mymoney.domain.repository.CategoriesRepository
+import com.example.core.domain.entity.Category
+import com.example.core.domain.repository.CategoriesRepository
+import com.example.core.domain.entity.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject

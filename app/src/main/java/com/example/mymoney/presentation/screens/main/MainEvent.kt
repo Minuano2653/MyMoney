@@ -1,5 +1,5 @@
 package com.example.mymoney.presentation.screens.main
 
-import com.example.mymoney.presentation.base.contract.BaseEvent
+import com.example.core.ui.contract.BaseEvent
 
 sealed class MainEvent: BaseEvent

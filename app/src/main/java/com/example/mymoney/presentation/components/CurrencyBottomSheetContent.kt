@@ -8,9 +8,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.core.ui.components.Divider
+import com.example.core.ui.components.ListItemComponent
 import com.example.mymoney.R
 import com.example.mymoney.presentation.theme.MyMoneyTheme
 
@@ -19,6 +23,7 @@ fun CurrencyBottomSheetContent(
     onCurrencyClick: (String) -> Unit,
     onCancelClick: () -> Unit
 ) {
+    val context = LocalContext.current
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -31,8 +36,8 @@ fun CurrencyBottomSheetContent(
                     contentDescription = null
                 )
             },
-            title = "Российский рубль ₽",
-            onClick = { onCurrencyClick("RUB") }
+            title = stringResource(R.string.ruble_lable),
+            onClick = { onCurrencyClick(context.getString(R.string.ruble_code)) }
         )
         Divider()
         ListItemComponent(
@@ -44,8 +49,8 @@ fun CurrencyBottomSheetContent(
                     contentDescription = null
                 )
             },
-            title = "Американский доллар $",
-            onClick = { onCurrencyClick("USD") }
+            title = stringResource(R.string.dollar_lable),
+            onClick = { onCurrencyClick(context.getString(R.string.dollar_code)) }
         )
         Divider()
         ListItemComponent(
@@ -57,8 +62,8 @@ fun CurrencyBottomSheetContent(
                     contentDescription = null
                 )
             },
-            title = "Евро €",
-            onClick = { onCurrencyClick("EUR") }
+            title = stringResource(R.string.euro_lable),
+            onClick = { onCurrencyClick(context.getString(R.string.euro_code)) }
         )
         Divider()
         ListItemComponent(
