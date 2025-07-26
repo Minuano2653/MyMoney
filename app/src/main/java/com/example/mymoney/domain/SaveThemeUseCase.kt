@@ -1,6 +1,6 @@
 package com.example.mymoney.domain
 
-import com.example.mymoney.domain.SettingsRepository
+import com.example.mymoney.domain.repository.SettingsRepository
 import com.example.mymoney.presentation.theme.AppTheme
 import javax.inject.Inject
 

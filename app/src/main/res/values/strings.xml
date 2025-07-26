@@ -112,4 +112,13 @@
     <string name="dark_mode_description">Включить темный режим для выбранной цветовой темы</string>
     <string name="color_themes">Цветовые темы</string>
 
+    <string name="create_password_title">Создание пароля</string>
+    <string name="enter_password_title">Введите пароль</string>
+    <string name="confirm_password_title">Подтверждение пароля</string>
+
+    <string name="create_password_label">Введите 4-значный пароль</string>
+    <string name="confirm_password_label">Пожалуйста, подвердите пароль</string>
+    <string name="pin_dont_match_error">Пароль не совпадает</string>
+    <string name="create_pin_error">Ошибка создания пароля</string>
+
 </resources>

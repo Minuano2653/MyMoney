@@ -8,6 +8,7 @@ import com.example.mymoney.presentation.screens.settings.about.AboutScreen
 import com.example.mymoney.presentation.screens.settings.SettingsScreen
 import com.example.mymoney.presentation.screens.settings.language.LanguageScreen
 import com.example.mymoney.presentation.screens.settings.main_color.MainColorScreen
+import com.example.mymoney.presentation.screens.settings.pincode.create.CreatePinScreen
 
 fun NavGraphBuilder.settingsNavGraph(
     onNavigateBack: () -> Unit,
@@ -47,6 +48,12 @@ fun NavGraphBuilder.settingsNavGraph(
             MainColorScreen(
                 onNavigateBack = onNavigateBack,
                 modifier = modifier
+            )
+        }
+        composable<Password> {
+            CreatePinScreen(
+                modifier = modifier,
+                onNavigateBack = onNavigateBack,
             )
         }
     }

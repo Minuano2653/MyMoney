@@ -11,6 +11,8 @@ import com.example.mymoney.presentation.screens.expenses.ExpensesViewModel
 import com.example.mymoney.presentation.screens.incomes.IncomesViewModel
 import com.example.mymoney.presentation.screens.main.MainViewModel
 import com.example.mymoney.presentation.screens.settings.language.LanguageViewModel
+import com.example.mymoney.presentation.screens.settings.pincode.create.CreatePinViewModel
+import com.example.mymoney.presentation.screens.settings.pincode.enter.EnterPinViewModel
 import com.example.mymoney.presentation.screens.settings.theme.ThemeViewModel
 import com.example.mymoney.presentation.screens.splash.SplashViewModel
 import dagger.Binds
@@ -66,4 +68,14 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(ThemeViewModel::class)
     abstract fun bindThemeViewModel(viewModel: ThemeViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(CreatePinViewModel::class)
+    abstract fun bindCreatePinViewModel(viewModel: CreatePinViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(EnterPinViewModel::class)
+    abstract fun bindEnterPinViewModel(viewModel: EnterPinViewModel): ViewModel
 }

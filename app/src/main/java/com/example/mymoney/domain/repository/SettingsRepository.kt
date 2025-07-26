@@ -1,4 +1,4 @@
-package com.example.mymoney.domain
+package com.example.mymoney.domain.repository
 
 import com.example.core.domain.entity.AppInfo
 import com.example.core.domain.entity.AppLanguage
@@ -12,4 +12,9 @@ interface SettingsRepository {
     suspend fun initDefaultLanguageIfNeeded()
     suspend fun saveTheme(theme: AppTheme)
     fun getTheme(): Flow<AppTheme>
+
+    suspend fun savePinCode(pinCode: String): Result<Unit>
+    suspend fun verifyPinCode(pinCode: String): Result<Boolean>
+    suspend fun isPinCodeSet(): Result<Boolean>
+    suspend fun clearPinCode(): Result<Unit>
 }

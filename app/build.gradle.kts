@@ -105,4 +105,6 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     kapt(libs.androidx.room.compiler)
 
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
+
 }

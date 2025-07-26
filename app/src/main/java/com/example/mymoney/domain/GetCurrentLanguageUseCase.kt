@@ -1,6 +1,7 @@
 package com.example.mymoney.domain
 
 import com.example.core.domain.entity.AppLanguage
+import com.example.mymoney.domain.repository.SettingsRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

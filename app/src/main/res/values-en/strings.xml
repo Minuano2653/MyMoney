@@ -114,4 +114,15 @@
     <string name="dark_mode_description">Enable dark mode for the selected colour theme</string>
     <string name="color_themes">Color themes</string>
 
+    <string name="create_password_label">Create PIN</string>
+    <string name="enter_password_title">Enter password</string>
+
+    <string name="confirm_password_label">Confirm PIN</string>
+
+    <string name="create_password_title">Create a 4-digit PIN</string>
+    <string name="confirm_password_title">Please, confirm your PIN code</string>
+    <string name="pin_dont_match_error">PIN codes don\'t match</string>
+    <string name="create_pin_error">PIN creation error</string>
+
+
 </resources>

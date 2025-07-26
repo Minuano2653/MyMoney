@@ -1,6 +1,6 @@
 package com.example.mymoney.di
 
-import com.example.mymoney.domain.SettingsRepository
+import com.example.mymoney.domain.repository.SettingsRepository
 import com.example.core.domain.repository.AccountsRepository
 import com.example.core.domain.repository.CategoriesRepository
 import com.example.core.domain.repository.NetworkRepository

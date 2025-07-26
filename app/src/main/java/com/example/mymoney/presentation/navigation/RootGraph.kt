@@ -6,11 +6,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.mymoney.presentation.screens.main.MainScreen
+import com.example.mymoney.presentation.screens.settings.pincode.enter.EnterPinScreen
 import com.example.mymoney.presentation.screens.splash.SplashScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
 object Splash
+
+@Serializable
+object EnterPin
 
 @Serializable
 object Main
@@ -26,6 +30,15 @@ fun RootGraph(navController: NavHostController = rememberNavController()) {
         }
         composable<Main> {
             MainScreen()
+        }
+        composable<EnterPin>{
+            EnterPinScreen(
+                onPinVerified = {
+                    navController.navigate(Main) {
+                        popUpTo(Splash) { inclusive = true }
+                    }
+                }
+            )
         }
     }
 }
