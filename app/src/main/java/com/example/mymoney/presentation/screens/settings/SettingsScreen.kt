@@ -18,9 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -46,6 +44,7 @@ fun SettingsScreen(
     onNavigateToLanguage: () -> Unit,
     onNavigateToPassword: () -> Unit,
     onNavigateToHaptics: () -> Unit,
+    onNavigateToPrimaryColor: () -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     themeViewModel: ThemeViewModel = daggerViewModel()
@@ -55,8 +54,7 @@ fun SettingsScreen(
         contentWindowInsets = WindowInsets(bottom = 0.dp),
         topBar = {
             CustomTopAppBar(
-                titleRes = R.string.top_bar_title_settings,
-                onTrailingClick = { }
+                titleRes = R.string.top_bar_title_settings
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -68,8 +66,9 @@ fun SettingsScreen(
             navigateToLanguage = onNavigateToLanguage,
             navigateToPassword = onNavigateToPassword,
             navigateToHaptics = onNavigateToHaptics,
+            navigateToPrimaryColor = onNavigateToPrimaryColor,
             onThemeToggle = { isDarkMode ->
-                themeViewModel.handleEvent(ThemeEvent.ToggleTheme(isDarkMode))
+                themeViewModel.handleEvent(ThemeEvent.ToggleDarkMode(isDarkMode))
             },
             modifier = modifier.padding(paddingValues),
             themeUiState = uiState
@@ -91,6 +90,7 @@ fun SettingsScreen(
 fun SettingsScreenContent(
     navigateToLanguage: () -> Unit,
     navigateToAboutApp: () -> Unit,
+    navigateToPrimaryColor: () -> Unit,
     navigateToPassword: () -> Unit,
     navigateToHaptics: () -> Unit,
     themeUiState: ThemeUiState,
@@ -103,7 +103,7 @@ fun SettingsScreenContent(
             headlineContent = { Text(stringResource(R.string.settings_item_night_theme)) },
             trailingContent = {
                 Switch(
-                    checked = themeUiState.isDarkMode,
+                    checked = themeUiState.currentTheme.isDarkMode,
                     onCheckedChange = onThemeToggle,
                     enabled = !themeUiState.isLoading,
                     colors = SwitchDefaults.colors(
@@ -121,7 +121,7 @@ fun SettingsScreenContent(
         ListItem(
             modifier = Modifier
                 .height(56.dp)
-                .clickable { },
+                .clickable { navigateToPrimaryColor() },
             headlineContent = { Text(stringResource(R.string.settings_item_primary_color)) },
             trailingContent = {
                 Icon(
@@ -230,6 +230,7 @@ fun SettingsScreenPreview() {
             navigateToHaptics = {},
             onThemeToggle = {},
             themeUiState = ThemeUiState(),
+            navigateToPrimaryColor = {}
         )
     }
 }

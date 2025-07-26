@@ -7,11 +7,13 @@ import androidx.navigation.navigation
 import com.example.mymoney.presentation.screens.settings.about.AboutScreen
 import com.example.mymoney.presentation.screens.settings.SettingsScreen
 import com.example.mymoney.presentation.screens.settings.language.LanguageScreen
+import com.example.mymoney.presentation.screens.settings.main_color.MainColorScreen
 
 fun NavGraphBuilder.settingsNavGraph(
     onNavigateBack: () -> Unit,
     onNavigateToAboutApp: () -> Unit,
     onNavigateToLanguage: () -> Unit,
+    onNavigateToPrimaryColor: () -> Unit,
     onNavigateToPassword: () -> Unit,
     onNavigateToHaptics: () -> Unit,
     modifier: Modifier = Modifier
@@ -25,6 +27,7 @@ fun NavGraphBuilder.settingsNavGraph(
                 onNavigateToLanguage = onNavigateToLanguage,
                 onNavigateToPassword = onNavigateToPassword,
                 onNavigateToHaptics = onNavigateToHaptics,
+                onNavigateToPrimaryColor = onNavigateToPrimaryColor,
                 modifier = modifier
             )
         }
@@ -36,6 +39,12 @@ fun NavGraphBuilder.settingsNavGraph(
         }
         composable<Language> {
             LanguageScreen(
+                onNavigateBack = onNavigateBack,
+                modifier = modifier
+            )
+        }
+        composable<PrimaryColors> {
+            MainColorScreen(
                 onNavigateBack = onNavigateBack,
                 modifier = modifier
             )

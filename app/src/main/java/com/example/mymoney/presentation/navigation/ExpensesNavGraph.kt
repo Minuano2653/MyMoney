@@ -4,6 +4,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import androidx.navigation.toRoute
 import com.example.mymoney.presentation.screens.add_transaction.AddTransactionScreen
 import com.example.mymoney.presentation.screens.analysis.AnalysisScreen
 import com.example.mymoney.presentation.screens.edit_transaction.EditTransactionScreen
@@ -43,14 +44,18 @@ fun NavGraphBuilder.expensesNavGraph(
         }
 
         composable<TransactionDetail> { backStackEntry ->
+            val args = backStackEntry.toRoute<TransactionDetail>()
             AddTransactionScreen(
+                isIncome = args.isIncome,
                 onNavigateBack = onNavigateBack,
                 modifier = modifier
             )
         }
 
         composable<EditTransaction> { backStackEntry ->
+            val args = backStackEntry.toRoute<EditTransaction>()
             EditTransactionScreen(
+                isIncome = args.isIncome,
                 onNavigateBack = onNavigateBack,
                 modifier = modifier
             )

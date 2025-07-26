@@ -2,9 +2,8 @@ package com.example.mymoney.presentation.screens.settings.language
 
 import androidx.lifecycle.viewModelScope
 import com.example.core.domain.entity.AppLanguage
-import com.example.core.domain.repository.SettingsRepository
-import com.example.core.domain.usecase.GetCurrentLanguageUseCase
-import com.example.core.domain.usecase.SaveLanguageUseCase
+import com.example.mymoney.domain.GetCurrentLanguageUseCase
+import com.example.mymoney.domain.SaveLanguageUseCase
 import com.example.core.ui.viewmodel.BaseViewModel
 import com.example.mymoney.R
 import kotlinx.coroutines.flow.catch

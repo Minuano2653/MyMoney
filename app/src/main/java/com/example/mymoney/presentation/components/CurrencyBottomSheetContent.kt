@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -30,10 +31,12 @@ fun CurrencyBottomSheetContent(
         ListItemComponent(
             itemHeight = 72.dp,
             leadingIcon = {
-                Image(
+                Icon(
                     modifier = Modifier.size(24.dp),
                     painter = painterResource(R.drawable.ic_ruble),
-                    contentDescription = null
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    contentDescription = null,
+
                 )
             },
             title = stringResource(R.string.ruble_lable),
@@ -43,9 +46,10 @@ fun CurrencyBottomSheetContent(
         ListItemComponent(
             itemHeight = 72.dp,
             leadingIcon = {
-                Image(
+                Icon(
                     modifier = Modifier.size(24.dp),
                     painter = painterResource(R.drawable.ic_dollar),
+                    tint = MaterialTheme.colorScheme.onSurface,
                     contentDescription = null
                 )
             },
@@ -56,9 +60,10 @@ fun CurrencyBottomSheetContent(
         ListItemComponent(
             itemHeight = 72.dp,
             leadingIcon = {
-                Image(
+                Icon(
                     modifier = Modifier.size(24.dp),
                     painter = painterResource(R.drawable.ic_euro),
+                    tint = MaterialTheme.colorScheme.onSurface,
                     contentDescription = null
                 )
             },
@@ -75,7 +80,7 @@ fun CurrencyBottomSheetContent(
                     contentDescription = null
                 )
             },
-            title = "Отмена",
+            title = stringResource(R.string.dialog_negative_button),
             onClick = onCancelClick,
             contentColor = Color.White,
             backgroundColor = MaterialTheme.colorScheme.error

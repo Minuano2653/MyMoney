@@ -1,7 +1,6 @@
-package com.example.core.domain.usecase
+package com.example.mymoney.domain
 
 import com.example.core.domain.entity.AppLanguage
-import com.example.core.domain.repository.SettingsRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

@@ -1,6 +1,5 @@
-package com.example.core.domain.usecase
+package com.example.mymoney.domain
 
-import com.example.core.domain.repository.SettingsRepository
 import javax.inject.Inject
 
 class InitDefaultLanguageIfNeeded @Inject constructor(

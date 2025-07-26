@@ -1,4 +1,4 @@
-package com.example.mymoney.presentation.screens.settings.language
+package com.example.mymoney.presentation.screens.settings.haptics
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -27,10 +27,15 @@ import com.example.core.ui.components.CustomTopAppBar
 import com.example.core.ui.components.Divider
 import com.example.mymoney.R
 import com.example.mymoney.presentation.daggerViewModel
+import com.example.mymoney.presentation.screens.settings.language.LanguageEvent
+import com.example.mymoney.presentation.screens.settings.language.LanguageScreenContent
+import com.example.mymoney.presentation.screens.settings.language.LanguageSideEffect
+import com.example.mymoney.presentation.screens.settings.language.LanguageUiState
+import com.example.mymoney.presentation.screens.settings.language.LanguageViewModel
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun LanguageScreen(
+fun HapticsScreen(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
@@ -41,7 +46,7 @@ fun LanguageScreen(
         contentWindowInsets = WindowInsets(bottom = 0.dp),
         topBar = {
             CustomTopAppBar(
-                titleRes = R.string.settings_item_lang,
+                titleRes = R.string.settings_item_haptic,
                 leadingIconRes = R.drawable.ic_arrow_back,
                 onLeadingClick = onNavigateBack
             )
@@ -72,7 +77,7 @@ fun LanguageScreen(
 }
 
 @Composable
-fun LanguageScreenContent(
+fun HapticsScreenContent(
     uiState: LanguageUiState,
     onLanguageSelected: (AppLanguage) -> Unit,
     modifier: Modifier = Modifier
@@ -101,4 +106,3 @@ fun LanguageScreenContent(
         }
     }
 }
-

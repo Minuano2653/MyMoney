@@ -3,6 +3,8 @@
     <string name="top_bar_title_expenses">Расходы сегодня</string>
     <string name="top_bar_title_incomes">Доходы сегодня</string>
     <string name="top_bar_title_account">Мой счет</string>
+    <string name="top_bar_title_my_expenses">Мои расходы</string>
+    <string name="top_bar_title_my_incomes">Мои доходы</string>
     <string name="top_bar_title_categories">Мои статьи</string>
     <string name="top_bar_title_settings">Настройки</string>
     <string name="top_bar_title_history">Моя история</string>
@@ -100,6 +102,14 @@
     <string name="error_load_theme">Ошибка загрузки темы</string>
     <string name="error_save_theme">Ошибка сохранения темы</string>
 
-
+    <string name="theme_default">Стандартная</string>
+    <string name="theme_blue">Синяя</string>
+    <string name="theme_green">Зеленая</string>
+    <string name="theme_orange">Оранжевая</string>
+    <string name="theme_purple">Фиолетовая</string>
+    <string name="choose_theme">Выбор темы</string>
+    <string name="dark_mode">Темный режим</string>
+    <string name="dark_mode_description">Включить темный режим для выбранной цветовой темы</string>
+    <string name="color_themes">Цветовые темы</string>
 
 </resources>

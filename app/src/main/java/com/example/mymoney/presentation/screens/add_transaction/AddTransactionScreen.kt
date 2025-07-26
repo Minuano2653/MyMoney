@@ -44,6 +44,7 @@ import kotlinx.coroutines.flow.collectLatest
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTransactionScreen(
+    isIncome: Boolean,
     modifier: Modifier = Modifier,
     onNavigateBack: () -> Unit,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
@@ -59,7 +60,7 @@ fun AddTransactionScreen(
         contentWindowInsets = WindowInsets(bottom = 0.dp),
         topBar = {
             CustomTopAppBar(
-                titleRes = R.string.top_bar_title_account,
+                titleRes = if (isIncome) R.string.top_bar_title_my_incomes else R.string.top_bar_title_my_expenses ,
                 leadingIconRes = R.drawable.ic_cancel,
                 trailingIconRes = R.drawable.ic_check,
                 onLeadingClick = {

@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val themeUiState by themeViewModel.uiState.collectAsStateWithLifecycle()
 
-            MyMoneyTheme(darkTheme = themeUiState.isDarkMode) {
+            MyMoneyTheme(appTheme = themeUiState.currentTheme) {
                 RootGraph()
             }
         }

@@ -27,6 +27,9 @@ object AboutApp
 object Language
 
 @Serializable
+object PrimaryColors
+
+@Serializable
 object Password
 
 @Serializable

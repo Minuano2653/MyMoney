@@ -4,9 +4,10 @@ import android.content.Context
 import com.example.core.common.utils.DateUtils
 import com.example.core.domain.entity.AppInfo
 import com.example.core.domain.entity.AppLanguage
-import com.example.core.domain.repository.SettingsRepository
+import com.example.mymoney.domain.SettingsRepository
 import com.example.mymoney.BuildConfig
 import com.example.mymoney.data.local.datasource.AppDataStore
+import com.example.mymoney.presentation.theme.AppTheme
 import kotlinx.coroutines.flow.Flow
 import java.util.Date
 import javax.inject.Inject
@@ -41,11 +42,11 @@ class SettingsRepositoryImpl @Inject constructor(
         appDataStore.initDefaultLanguageIfNeeded()
     }
 
-    override suspend fun saveTheme(isDarkMode: Boolean) {
-        appDataStore.saveTheme(isDarkMode)
+    override suspend fun saveTheme(theme: AppTheme) {
+        appDataStore.saveTheme(theme)
     }
 
-    override fun getTheme(): Flow<Boolean> {
+    override fun getTheme(): Flow<AppTheme> {
         return appDataStore.getTheme()
     }
 

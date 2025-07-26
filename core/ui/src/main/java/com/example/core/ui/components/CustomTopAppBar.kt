@@ -29,7 +29,7 @@ fun CustomTopAppBar(
             Text(
                 text = stringResource(titleRes),
                 style = MaterialTheme.typography.titleLarge,
-                color = Color(0xFF1D1B20)
+                color = MaterialTheme.colorScheme.onSurface
             )
         },
         navigationIcon = {
@@ -55,8 +55,8 @@ fun CustomTopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = containerColor,
             titleContentColor = MaterialTheme.colorScheme.onSurface,
-            actionIconContentColor = Color(0xFF1D1B20),
-            navigationIconContentColor = Color(0xFF1D1B20)
+            actionIconContentColor = MaterialTheme.colorScheme.onSurface,
+            navigationIconContentColor = MaterialTheme.colorScheme.onSurface
         )
     )
 }

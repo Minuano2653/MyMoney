@@ -90,6 +90,9 @@ fun AppNavGraph(
             onNavigateToHaptics = {
                 navHostController.navigate(Haptics)
             },
+            onNavigateToPrimaryColor = {
+                navHostController.navigate(PrimaryColors)
+            },
             onNavigateBack = {
                 navHostController.popBackStack()
             },

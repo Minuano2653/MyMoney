@@ -1,9 +1,7 @@
-package com.example.core.domain.usecase
+package com.example.mymoney.domain
 
 import com.example.core.domain.entity.AppLanguage
-import com.example.core.domain.repository.SettingsRepository
 import javax.inject.Inject
-
 
 class SaveLanguageUseCase @Inject constructor(
     private val settingsRepository: SettingsRepository

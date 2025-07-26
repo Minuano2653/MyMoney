@@ -4,6 +4,8 @@
     <string name="top_bar_title_expenses">Expenses today</string>
     <string name="top_bar_title_incomes">Income today</string>
     <string name="top_bar_title_account">My account</string>
+    <string name="top_bar_title_my_expenses">My expenses</string>
+    <string name="top_bar_title_my_incomes">My incomes</string>
     <string name="top_bar_title_categories">My categories</string>
     <string name="top_bar_title_settings">Settings</string>
     <string name="top_bar_title_history">My history</string>
@@ -101,5 +103,15 @@
 
     <string name="error_load_theme">Error loading the theme</string>
     <string name="error_save_theme">Error saving the theme</string>
+
+    <string name="theme_default">Standard</string>
+    <string name="theme_blue">Blue</string>
+    <string name="theme_green">Green</string>
+    <string name="theme_orange">Orange</string>
+    <string name="theme_purple">Purple</string>
+    <string name="choose_theme">Choose theme</string>
+    <string name="dark_mode">Dark mode</string>
+    <string name="dark_mode_description">Enable dark mode for the selected colour theme</string>
+    <string name="color_themes">Color themes</string>
 
 </resources>

@@ -1,6 +1,6 @@
 package com.example.mymoney.presentation.screens.settings.about
 
-import com.example.core.domain.usecase.GetAppInfoUseCase
+import com.example.mymoney.domain.GetAppInfoUseCase
 import com.example.core.ui.viewmodel.BaseViewModel
 import com.example.mymoney.R
 import kotlinx.coroutines.flow.update

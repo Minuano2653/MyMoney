@@ -13,6 +13,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.core.domain.entity.AppLanguage
+import com.example.mymoney.presentation.theme.AppTheme
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
@@ -28,10 +29,6 @@ class AppDataStore @Inject constructor(
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "app_settings")
 
     private val dataStore get() = context.dataStore
-
-    private val prefs by lazy {
-        context.getSharedPreferences("legacy_prefs", Context.MODE_PRIVATE)
-    }
 
     suspend fun initDefaultLanguageIfNeeded() {
         val isSet = isLanguageSet().first()
@@ -50,7 +47,6 @@ class AppDataStore @Inject constructor(
             preferences[LANGUAGE_KEY] = language.code
         }
         applyLanguage(language)
-        prefs.edit().putString("app_language", language.code).apply()
 
         applyLanguage(language)
     }
@@ -80,7 +76,22 @@ class AppDataStore @Inject constructor(
             .catch { emit(AppLanguage.ENGLISH) }
     }
 
-    suspend fun saveTheme(isDarkMode: Boolean) {
+    suspend fun saveTheme(theme: AppTheme) {
+        dataStore.edit { preferences ->
+            preferences[THEME_KEY] = theme.toId()
+        }
+    }
+
+    fun getTheme(): Flow<AppTheme> {
+        return dataStore.data
+            .map { preferences ->
+                val themeId = preferences[THEME_KEY] ?: AppTheme().toId()
+                AppTheme.fromId(themeId)
+            }
+            .catch { emit(AppTheme()) }
+    }
+
+    /*suspend fun saveTheme(isDarkMode: Boolean) {
         dataStore.edit { preferences ->
             preferences[THEME_KEY] = isDarkMode
         }
@@ -89,13 +100,13 @@ class AppDataStore @Inject constructor(
     fun getTheme(): Flow<Boolean> {
         return dataStore.data
             .map { preferences ->
-                preferences[THEME_KEY] ?: false // по умолчанию светлая тема
+                preferences[THEME_KEY] == true // по умолчанию светлая тема
             }
             .catch { emit(false) }
-    }
+    }*/
 
     companion object {
         private val LANGUAGE_KEY = stringPreferencesKey("app_language")
-        private val THEME_KEY = booleanPreferencesKey("is_dark_mode")
+        private val THEME_KEY = stringPreferencesKey("app_theme")
     }
 }
