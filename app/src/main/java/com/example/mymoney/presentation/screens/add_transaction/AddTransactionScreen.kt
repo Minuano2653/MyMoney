@@ -2,7 +2,6 @@ package com.example.mymoney.presentation.screens.add_transaction
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,28 +22,29 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.core.common.utils.DateUtils
+import com.example.core.common.utils.toSymbol
+import com.example.core.ui.components.CustomTopAppBar
+import com.example.core.ui.components.DatePickerModal
+import com.example.core.ui.components.Divider
+import com.example.core.ui.components.ListItemComponent
+import com.example.core.ui.components.TimeInputDialog
+import com.example.core.ui.components.TrailingIcon
 import com.example.mymoney.R
-import com.example.mymoney.presentation.base.viewmodel.daggerViewModel
 import com.example.mymoney.presentation.components.AmountInputDialog
 import com.example.mymoney.presentation.components.CategoriesBottomSheetContent
-import com.example.mymoney.presentation.components.CustomTopAppBar
-import com.example.mymoney.presentation.components.DatePickerModal
-import com.example.mymoney.presentation.components.Divider
-import com.example.mymoney.presentation.components.ListItemComponent
-import com.example.mymoney.presentation.components.TimeInputDialog
-import com.example.mymoney.presentation.components.TrailingIcon
-import com.example.mymoney.presentation.theme.MyMoneyTheme
-import com.example.mymoney.utils.DateUtils
-import com.example.mymoney.utils.toSymbol
+import com.example.mymoney.presentation.daggerViewModel
 import kotlinx.coroutines.flow.collectLatest
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTransactionScreen(
+    isIncome: Boolean,
     modifier: Modifier = Modifier,
     onNavigateBack: () -> Unit,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
@@ -60,7 +60,7 @@ fun AddTransactionScreen(
         contentWindowInsets = WindowInsets(bottom = 0.dp),
         topBar = {
             CustomTopAppBar(
-                titleRes = R.string.top_bar_title_account,
+                titleRes = if (isIncome) R.string.top_bar_title_my_incomes else R.string.top_bar_title_my_expenses ,
                 leadingIconRes = R.drawable.ic_cancel,
                 trailingIconRes = R.drawable.ic_check,
                 onLeadingClick = {
@@ -74,14 +74,23 @@ fun AddTransactionScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
         TransactionScreenContent(
-            uiState = uiState,
             modifier = modifier.padding(paddingValues),
             onCategoryClicked = { showCategorySheet = true },
             onAmountClicked = { showAmountDialog = true },
             onDateClicked = { showDatePicker = true },
             onTimeClicked = { showTimePicker = true },
-            onValueChange = { comment -> viewModel.handleEvent(AddTransactionEvent.OnCommentChanged(comment)) }
+            onValueChange = { comment ->
+                viewModel.handleEvent(AddTransactionEvent.OnCommentChanged(comment))
+            },
+            accountName = uiState.account?.name,
+            selectedCategory = uiState.selectedCategory?.name,
+            amount = uiState.amount,
+            currency = uiState.account?.currency,
+            date = uiState.date,
+            time = uiState.time,
+            comment = uiState.comment
         )
 
         if (showCategorySheet) {
@@ -140,15 +149,15 @@ fun AddTransactionScreen(
         }
     }
 
+    val context = LocalContext.current
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collectLatest { effect ->
             when (effect) {
                 is AddTransactionSideEffect.NavigateBack -> {
                     onNavigateBack()
                 }
-
                 is AddTransactionSideEffect.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(effect.message)
+                    snackbarHostState.showSnackbar(context.getString(effect.message))
                 }
             }
         }
@@ -158,55 +167,60 @@ fun AddTransactionScreen(
 @Composable
 fun TransactionScreenContent(
     modifier: Modifier = Modifier,
-    uiState: AddTransactionUiState,
+    date: String,
+    time: String,
+    accountName: String? = null,
+    selectedCategory: String? = null,
+    amount: String,
+    currency: String? = null,
+    comment: String? = null,
     onCategoryClicked: () -> Unit,
     onAmountClicked: () -> Unit,
     onDateClicked: () -> Unit,
     onTimeClicked: () -> Unit,
     onValueChange: (String) -> Unit,
 ) {
-    Column(modifier = modifier.fillMaxSize()) {
+    Column(modifier = modifier) {
         ListItemComponent(
-            title = "Счет",
-            trailingText = uiState.account?.name,
-            trailingIcon = { TrailingIcon() },
+            title = stringResource(R.string.list_item_text_account),
+            trailingText = accountName,
+            trailingIcon = { TrailingIcon(R.drawable.ic_more_vert) },
         )
         Divider()
         ListItemComponent(
-            title = "Статья",
-            trailingText = uiState.selectedCategory?.name,
-            trailingIcon = { TrailingIcon() },
+            title = stringResource(R.string.list_item_text_category),
+            trailingText = selectedCategory,
+            trailingIcon = { TrailingIcon(R.drawable.ic_more_vert) },
             onClick = onCategoryClicked
         )
         Divider()
         ListItemComponent(
-            title = "Cумма",
-            trailingText = uiState.account?.let { "${uiState.amount} ${it.currency.toSymbol()}" }
-                ?: uiState.amount,
+            title = stringResource(R.string.list_item_text_sum),
+            trailingText = "$amount ${currency?.toSymbol()}" ,
             onClick = onAmountClicked
         )
         Divider()
         ListItemComponent(
-            title = "Дата",
-            trailingText = uiState.date,
+            title = stringResource(R.string.list_item_text_date),
+            trailingText = date,
             onClick = onDateClicked
         )
         Divider()
         ListItemComponent(
-            title = "Время",
-            trailingText = uiState.time,
+            title = stringResource(R.string.list_item_text_time),
+            trailingText = time,
             onClick = onTimeClicked
         )
         Divider()
         TextField(
             modifier = Modifier.fillMaxWidth(),
-            value = uiState.comment ?: "",
+            value = comment ?: "",
             onValueChange = {
                 onValueChange(it)
             },
             placeholder = {
                 Text(
-                    text = "Комментарий",
+                    text = stringResource(R.string.comment_placeholder),
                     style = MaterialTheme.typography.bodyLarge
                 )
             },

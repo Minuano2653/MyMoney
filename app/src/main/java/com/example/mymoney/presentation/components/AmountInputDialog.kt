@@ -13,8 +13,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import com.example.mymoney.R
 
 @Composable
 fun AmountInputDialog(
@@ -28,7 +30,7 @@ fun AmountInputDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = "Введите сумму",
+                text = stringResource(R.string.amount_placeholder),
                 style = MaterialTheme.typography.titleLarge
             )
         },
@@ -52,14 +54,14 @@ fun AmountInputDialog(
                     onConfirm(text.trim())
                 }
             ) {
-                Text(text = "ОК", color = MaterialTheme.colorScheme.onSurface)
+                Text(text = stringResource(R.string.dialog_positive_button), color = MaterialTheme.colorScheme.onSurface)
             }
         },
         dismissButton = {
             TextButton(
                 onClick = onDismiss
             ) {
-                Text(text = "Отмена", color = MaterialTheme.colorScheme.onSurface)
+                Text(text = stringResource(R.string.dialog_negative_button), color = MaterialTheme.colorScheme.onSurface)
             }
         }
     )

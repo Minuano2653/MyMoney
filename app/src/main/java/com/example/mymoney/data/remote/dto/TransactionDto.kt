@@ -1,7 +1,7 @@
 package com.example.mymoney.data.remote.dto
 
+import com.example.core.domain.entity.Transaction
 import com.example.mymoney.data.local.entity.LocalTransaction
-import com.example.mymoney.domain.entity.Transaction
 import java.math.BigDecimal
 
 /**
@@ -39,13 +39,15 @@ data class TransactionDto(
     }
     fun toLocal(): LocalTransaction {
         return LocalTransaction(
-            id = id,
+            localId = id,
+            serverId = id,
             categoryId = category.id,
             amount = amount,
             transactionDate = transactionDate,
             comment = comment,
             createdAt = createdAt,
-            updatedAt = updatedAt
+            updatedAt = updatedAt,
+            isSynced = true
         )
     }
 }

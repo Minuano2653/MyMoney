@@ -7,38 +7,19 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.mymoney.presentation.screens.categories.CategoriesScreen
+import com.example.mymoney.presentation.screens.settings.SettingsScreen
 
 /**
  * Навигационный граф приложения, объединяющий навигацию по основным экранам.
  *
  * @param navHostController Контроллер навигации.
  * @param modifier Модификатор для NavHost.
- * @param expensesTodayScreenContent composable контент для экрана "Расходы сегодня".
- * @param expensesHistoryScreenContent composable контент для экрана "История расходов".
- * @param incomesTodayScreenContent composable контент для экрана "Доходы сегодня".
- * @param incomesHistoryScreenContent composable контент для экрана "История доходов".
- * @param accountInfoScreenContent composable контент для экрана "Аккаунт".
- * @param categoriesScreenContent composable контент для экрана "Категории".
- * @param settingsScreenContent composable контент для экрана "Настройки".
  */
 @Composable
 fun AppNavGraph(
     navHostController: NavHostController,
     modifier: Modifier = Modifier,
-    expensesTodayScreenContent: @Composable () -> Unit,
-    expensesHistoryScreenContent: @Composable (Boolean) -> Unit,
-    incomesTodayScreenContent: @Composable () -> Unit,
-    incomesHistoryScreenContent: @Composable (Boolean) -> Unit,
-    accountInfoScreenContent: @Composable () -> Unit,
-    editAccountScreenContent: @Composable (Int) -> Unit,
-    categoriesScreenContent: @Composable () -> Unit,
-    settingsScreenContent: @Composable () -> Unit,
-    addExpenseScreenContent: @Composable (Boolean) -> Unit,
-    addIncomeScreenContent: @Composable (Boolean) -> Unit,
-    editExpenseScreenContent: @Composable (Boolean, Int) -> Unit,
-    editIncomeScreenContent: @Composable (Boolean, Int) -> Unit,
-    expensesAnalysisScreenContent: @Composable (Boolean) -> Unit,
-    incomesAnalysisScreenContent: @Composable (Boolean) -> Unit,
     ) {
     NavHost(
         navController = navHostController,
@@ -48,32 +29,73 @@ fun AppNavGraph(
         modifier = modifier
     ) {
         expensesNavGraph(
-            expensesTodayScreenContent = expensesTodayScreenContent,
-            expensesHistoryScreenContent = expensesHistoryScreenContent,
-            addExpenseScreenContent = addExpenseScreenContent,
-            editExpenseScreenContent = editExpenseScreenContent,
-            expensesAnalysisScreenContent = expensesAnalysisScreenContent
+            onNavigateToHistory = {
+                navHostController.navigate(TransactionsHistory(isIncome = false))
+            },
+            onNavigateToAddExpense = {
+                navHostController.navigate(TransactionDetail(isIncome = false))
+            },
+            onNavigateToTransactionDetail = { transactionId ->
+                navHostController.navigate(EditTransaction(isIncome = false, transactionId))
+            },
+            onNavigateToAnalysis = { isIncome ->
+                navHostController.navigate(Analysis(isIncome))
+            },
+            onNavigateBack = {
+                navHostController.popBackStack()
+            }
         )
 
         incomesNavGraph(
-            incomesTodayScreenContent = incomesTodayScreenContent,
-            incomesHistoryScreenContent = incomesHistoryScreenContent,
-            addIncomeScreenContent = addIncomeScreenContent,
-            editIncomeScreenContent = editIncomeScreenContent,
-            incomesAnalysisScreenContent = incomesAnalysisScreenContent
+            onNavigateToHistory = {
+                navHostController.navigate(TransactionsHistory(isIncome = true))
+            },
+            onNavigateToAddIncome = {
+                navHostController.navigate(TransactionDetail(isIncome = true))
+            },
+            onNavigateToTransactionDetail = { transactionId ->
+                navHostController.navigate(EditTransaction(isIncome = true, transactionId))
+            },
+            onNavigateToAnalysis = { isIncome ->
+                navHostController.navigate(Analysis(isIncome))
+            },
+            onNavigateBack = {
+                navHostController.popBackStack()
+            }
         )
 
         accountNavGraph(
-            accountInfoScreenContent = accountInfoScreenContent,
-            editAccountScreenContent = editAccountScreenContent
+            onNavigateToEditAccount = { accountId ->
+                navHostController.navigate(EditAccount(accountId))
+            },
+            onNavigateBack = {
+                navHostController.popBackStack()
+            }
         )
 
         composable<Categories> {
-            categoriesScreenContent()
+            CategoriesScreen()
         }
 
-        composable<Settings> {
-            settingsScreenContent()
-        }
+        settingsNavGraph(
+            onNavigateToAboutApp = {
+                navHostController.navigate(AboutApp)
+            },
+            onNavigateToLanguage = {
+                navHostController.navigate(Language)
+            },
+            onNavigateToPassword = {
+                navHostController.navigate(Password)
+            },
+            onNavigateToHaptics = {
+                navHostController.navigate(Haptics)
+            },
+            onNavigateToPrimaryColor = {
+                navHostController.navigate(PrimaryColors)
+            },
+            onNavigateBack = {
+                navHostController.popBackStack()
+            },
+        )
     }
 }

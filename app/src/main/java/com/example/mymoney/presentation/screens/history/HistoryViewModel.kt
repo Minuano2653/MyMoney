@@ -3,14 +3,14 @@ package com.example.mymoney.presentation.screens.history
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.example.mymoney.data.utils.Resource
-import com.example.mymoney.domain.usecase.GetTransactionsByTypeAndPeriodUseCase
-import com.example.mymoney.domain.usecase.ObserveAccountUseCase
-import com.example.mymoney.domain.usecase.ObserveTransactionsByTypeAndPeriodUseCase
-import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
+import com.example.core.domain.entity.Resource
+import com.example.core.domain.usecase.GetTransactionsByTypeAndPeriodUseCase
+import com.example.core.domain.usecase.ObserveAccountUseCase
+import com.example.core.domain.usecase.ObserveTransactionsByTypeAndPeriodUseCase
+import com.example.core.ui.viewmodel.BaseViewModel
+import com.example.core.common.utils.DateUtils
+import com.example.mymoney.R
 import com.example.mymoney.presentation.navigation.TransactionsHistory
-import com.example.mymoney.utils.DateUtils
-import com.example.mymoney.utils.NetworkMonitor
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
@@ -37,9 +37,7 @@ class HistoryViewModel @AssistedInject constructor(
     @Assisted private val savedStateHandle: SavedStateHandle,
     observeTransactionsByTypeAndPeriodUseCase: ObserveTransactionsByTypeAndPeriodUseCase,
     observeAccountUseCase: ObserveAccountUseCase,
-    networkMonitor: NetworkMonitor
 ): BaseViewModel<HistoryUiState, HistoryEvent, HistorySideEffect>(
-    networkMonitor,
     HistoryUiState()
 ) {
     private var loadTransactionsJob: Job? = null
@@ -82,7 +80,6 @@ class HistoryViewModel @AssistedInject constructor(
                         transactions = sortedTransactions,
                         total = sortedTransactions.sumOf { it.amount },
                         currency = account?.currency ?: currentState.currency,
-                        error = null
                     )
                 }
 
@@ -95,7 +92,6 @@ class HistoryViewModel @AssistedInject constructor(
                         transactions = transactions,
                         total = transactions.sumOf { it.amount },
                         currency = account?.currency ?: currentState.currency,
-                        error = message
                     )
                 }
             }
@@ -133,7 +129,7 @@ class HistoryViewModel @AssistedInject constructor(
     private fun loadTransactions() {
         loadTransactionsJob?.job?.cancel()
         loadTransactionsJob = viewModelScope.launch(Dispatchers.IO) {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+            _uiState.update { it.copy(isLoading = true) }
 
             val currentState = _uiState.value
             val result = getTransactionsByTypeAndPeriodUseCase(
@@ -153,7 +149,6 @@ class HistoryViewModel @AssistedInject constructor(
                                 transactions = sortedTransactions,
                                 total = sortedTransactions.sumOf {trs -> trs.amount},
                                 isLoading = false,
-                                error = null
                             )
                         }
                     }
@@ -166,18 +161,18 @@ class HistoryViewModel @AssistedInject constructor(
         }
     }
 
-    private fun mapErrorToMessage(error: Throwable?): String {
+    private fun mapErrorToMessage(error: Throwable?): Int {
         return when (error) {
-            is UnknownHostException -> "Нет подключения к интернету"
-            is SocketTimeoutException -> "Превышено время ожидания ответа"
+            is UnknownHostException ->  R.string.no_network_connection
+            is SocketTimeoutException -> R.string.response_timeout
             is HttpException -> when (error.code()) {
-                400 -> "Неверный формат ID счета или некорректный формат дат"
-                401 -> "Неавторизованный доступ"
-                500 -> "Внутренняя ошибка сервера"
-                else -> "Ошибка сервера (${error.code()})"
+                400 -> R.string.incorrect_id_or_date
+                401 -> R.string.unauthorised_access
+                500 -> R.string.internal_server_error
+                else -> R.string.unknown_error
             }
             else -> {
-                "Не удалось загрузить данные"
+                R.string.failed_to_load_data
             }
         }
     }

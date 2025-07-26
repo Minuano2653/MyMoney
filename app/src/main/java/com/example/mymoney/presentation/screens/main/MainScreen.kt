@@ -12,9 +12,11 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -22,44 +24,35 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.example.mymoney.presentation.daggerViewModel
 import com.example.mymoney.R
 import com.example.mymoney.presentation.navigation.Account
-import com.example.mymoney.presentation.navigation.Analysis
-import com.example.mymoney.presentation.navigation.TransactionDetail
 import com.example.mymoney.presentation.navigation.AppNavGraph
 import com.example.mymoney.presentation.navigation.BottomNavItem
 import com.example.mymoney.presentation.navigation.Categories
-import com.example.mymoney.presentation.navigation.EditTransaction
 import com.example.mymoney.presentation.navigation.Expenses
 import com.example.mymoney.presentation.navigation.Incomes
-import com.example.mymoney.presentation.navigation.NavigationState
 import com.example.mymoney.presentation.navigation.Settings
-import com.example.mymoney.presentation.navigation.TransactionsHistory
-import com.example.mymoney.presentation.navigation.rememberNavigationState
-import com.example.mymoney.presentation.screens.account.AccountScreen
-import com.example.mymoney.presentation.screens.categories.CategoriesScreen
-import com.example.mymoney.presentation.screens.edit_account.EditAccountScreen
-import com.example.mymoney.presentation.screens.expenses.ExpensesScreen
-import com.example.mymoney.presentation.screens.history.HistoryScreen
-import com.example.mymoney.presentation.screens.incomes.IncomesScreen
-import com.example.mymoney.presentation.screens.settings.SettingsScreen
-import com.example.mymoney.presentation.screens.add_transaction.AddTransactionScreen
-import com.example.mymoney.presentation.screens.analysis.AnalysisScreen
-import com.example.mymoney.presentation.screens.edit_transaction.EditTransactionScreen
 import com.example.mymoney.presentation.theme.MyMoneyTheme
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    navigationState: NavigationState = rememberNavigationState()
+    navHostController: NavHostController = rememberNavController(),
+    viewModel: MainViewModel = daggerViewModel()
 ) {
+    val context = LocalContext.current
     Scaffold(
         contentWindowInsets = WindowInsets(0.dp),
         containerColor = MaterialTheme.colorScheme.surface,
         bottomBar = {
-            val navBackStackEntry by navigationState.navHostController.currentBackStackEntryAsState()
+            val navBackStackEntry by navHostController.currentBackStackEntryAsState()
             val currentDestination = navBackStackEntry?.destination
 
             val navigationList = listOf(
@@ -81,7 +74,13 @@ fun MainScreen(
                     NavigationBarItem(
                         selected = selected,
                         onClick = {
-                            navigationState.navigateTo(item.route)
+                            navHostController.navigate(item.route) {
+                                popUpTo(navHostController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
                         },
                         icon = {
                             Icon(
@@ -112,139 +111,17 @@ fun MainScreen(
     ) { paddingValues ->
         AppNavGraph(
             modifier = modifier.padding(paddingValues),
-            navHostController = navigationState.navHostController,
-            expensesTodayScreenContent = {
-                ExpensesScreen(
-                    onNavigateToHistory = {
-                        navigationState.navHostController.navigate(TransactionsHistory(false))
-                    },
-                    onNavigateToAddExpense = {
-                        navigationState.navHostController.navigate(
-                            TransactionDetail(false)
-                        )
-                    },
-                    onNavigateToTransactionDetail = { transactionId ->
-                        navigationState.navHostController.navigate(
-                            EditTransaction(false, transactionId)
-                        )
-                    },
-                    modifier = modifier
-                )
-            },
-            incomesTodayScreenContent = {
-                IncomesScreen(
-                    onNavigateToHistory = {
-                        navigationState.navHostController.navigate(TransactionsHistory(true))
-                    },
-                    onNavigateToAddIncome = {
-                        navigationState.navHostController.navigate(
-                            TransactionDetail(true)
-                        )
-                    },
-                    onNavigateToTransactionDetail = { transactionId ->
-                        navigationState.navHostController.navigate(
-                            EditTransaction(true, transactionId)
-                        )
-                    },
-                    modifier = modifier
-                )
-            },
-            accountInfoScreenContent = {
-                AccountScreen(
-                    onNavigateToEditAccount = { accountId ->
-                        navigationState.navigateToEditAccount(accountId = accountId)
-                    },
-                    modifier = modifier
-                )
-            },
-            categoriesScreenContent = {
-                CategoriesScreen(
-                    onNavigateToCategoriesDetail = { /*navigationState.navigateTo("Навигация на категорию")*/ },
-                    modifier = modifier
-                )
-            },
-            settingsScreenContent = {
-                SettingsScreen(
-                    modifier = modifier
-                )
-            },
-            expensesHistoryScreenContent = {
-                HistoryScreen(
-                    onNavigateBack = { navigationState.navigateBack() },
-                    onNavigateToEditTransaction = { transactionId ->
-                        navigationState.navHostController.navigate(
-                            EditTransaction(
-                                false,
-                                transactionId
-                            )
-                        )
-                    },
-                    onNavigateToAnalysis = { isIncome ->
-                        navigationState.navHostController.navigate(Analysis(isIncome))
-                    },
-                    modifier = modifier
-                )
-            },
-            incomesHistoryScreenContent = {
-                HistoryScreen(
-                    onNavigateBack = { navigationState.navigateBack() },
-                    onNavigateToEditTransaction = { transactionId ->
-                        navigationState.navHostController.navigate(
-                            EditTransaction(
-                                true,
-                                transactionId
-                            )
-                        )
-                    },
-                    onNavigateToAnalysis = { isIncome ->
-                        navigationState.navHostController.navigate(Analysis(isIncome))
-                    },
-                    modifier = modifier
-                )
-            },
-            editAccountScreenContent = { accountId ->
-                EditAccountScreen(
-                    onNavigateBack = { navigationState.navigateBack() },
-                    modifier = modifier,
-                )
-            },
-            addExpenseScreenContent = { isIncome ->
-                AddTransactionScreen(
-                    onNavigateBack = { navigationState.navigateBack() },
-                    modifier = modifier
-                )
-            },
-            addIncomeScreenContent = { isIncome ->
-                AddTransactionScreen(
-                    onNavigateBack = { navigationState.navigateBack() },
-                    modifier = modifier
-                )
-            },
-            editExpenseScreenContent = { isIncome, transactionId ->
-                EditTransactionScreen(
-                    onNavigateBack = { navigationState.navigateBack() },
-                    modifier = modifier
-                )
-            },
-            editIncomeScreenContent = { isIncome, transactionId ->
-                EditTransactionScreen(
-                    onNavigateBack = { navigationState.navigateBack() },
-                    modifier = modifier
-                )
-            },
-            expensesAnalysisScreenContent = {
-                AnalysisScreen(
-                    onNavigateBack = { navigationState.navigateBack() },
-                    modifier = modifier
-                )
-            },
-            incomesAnalysisScreenContent = {
-                AnalysisScreen(
-                    onNavigateBack = { navigationState.navigateBack() },
-                    modifier = modifier
-                )
-            }
+            navHostController = navHostController
         )
+    }
+    LaunchedEffect(Unit) {
+        viewModel.sideEffect.collectLatest { effect ->
+            when (effect) {
+                is MainSideEffect.ShowNetworkStatus -> {
+                    snackbarHostState.showSnackbar(context.getString(effect.messageRes))
+                }
+            }
+        }
     }
 }
 

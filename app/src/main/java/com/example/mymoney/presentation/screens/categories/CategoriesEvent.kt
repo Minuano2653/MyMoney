@@ -1,6 +1,6 @@
 package com.example.mymoney.presentation.screens.categories
 
-import com.example.mymoney.presentation.base.contract.BaseEvent
+import com.example.core.ui.contract.BaseEvent
 
 /**
  * События, связанные с экраном статей.
@@ -8,6 +8,5 @@ import com.example.mymoney.presentation.base.contract.BaseEvent
  */
 sealed class CategoriesEvent: BaseEvent {
     object LoadCategories : CategoriesEvent()
-    object OnCategoryClicked: CategoriesEvent()
     data class OnSearchQueryChanged(val query: String): CategoriesEvent()
 }

@@ -18,10 +18,10 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.mymoney.R
-import com.example.mymoney.presentation.base.viewmodel.daggerViewModel
+import com.example.mymoney.presentation.daggerViewModel
+import com.example.mymoney.presentation.navigation.EnterPin
 import com.example.mymoney.presentation.navigation.Main
 import com.example.mymoney.presentation.navigation.Splash
-
 
 @Composable
 fun SplashScreen(
@@ -43,6 +43,11 @@ fun SplashScreen(
             when (effect) {
                 SplashSideEffect.NavigateToMain -> {
                     navController.navigate(Main) {
+                        popUpTo(Splash) { inclusive = true }
+                    }
+                }
+                SplashSideEffect.NavigateToEnterPin -> {
+                    navController.navigate(EnterPin) {
                         popUpTo(Splash) { inclusive = true }
                     }
                 }

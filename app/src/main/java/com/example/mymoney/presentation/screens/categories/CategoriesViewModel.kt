@@ -1,12 +1,12 @@
 package com.example.mymoney.presentation.screens.categories
 
 import androidx.lifecycle.viewModelScope
-import com.example.mymoney.data.utils.Resource
-import com.example.mymoney.domain.entity.Category
-import com.example.mymoney.domain.usecase.GetCategoriesUseCase
-import com.example.mymoney.domain.usecase.ObserveCategoriesUseCase
-import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
-import com.example.mymoney.utils.NetworkMonitor
+import com.example.core.domain.entity.Category
+import com.example.core.domain.entity.Resource
+import com.example.core.domain.usecase.GetCategoriesUseCase
+import com.example.core.domain.usecase.ObserveCategoriesUseCase
+import com.example.core.ui.viewmodel.BaseViewModel
+import com.example.mymoney.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -25,9 +25,7 @@ import javax.inject.Inject
 class CategoriesViewModel @Inject constructor(
     private val getCategoriesUseCase: GetCategoriesUseCase,
     observeCategoriesUseCase: ObserveCategoriesUseCase,
-    networkMonitor: NetworkMonitor
 ): BaseViewModel<CategoriesUiState, CategoriesEvent, CategoriesSideEffect>(
-    networkMonitor,
     CategoriesUiState()
 ) {
 
@@ -89,11 +87,6 @@ class CategoriesViewModel @Inject constructor(
             is CategoriesEvent.LoadCategories -> {
                 loadCategories()
             }
-            is CategoriesEvent.OnCategoryClicked -> {
-                viewModelScope.launch {
-                    emitEffect(CategoriesSideEffect.NavigateToCategoryDetails)
-                }
-            }
             is CategoriesEvent.OnSearchQueryChanged -> {
                 _uiState.update { it.copy(searchQuery = event.query) }
             }
@@ -123,23 +116,18 @@ class CategoriesViewModel @Inject constructor(
         }
     }
 
-    override fun onNetworkStateChanged(isConnected: Boolean) {
-        _uiState.update { it.copy(isNetworkAvailable = isConnected) }
-        if (!isConnected) {
-            emitEffect(CategoriesSideEffect.ShowError("Нет подключения к интернету"))
-        }
-    }
-
-    private fun mapErrorToMessage(error: Throwable?): String {
+    private fun mapErrorToMessage(error: Throwable?): Int {
         return when (error) {
-            is UnknownHostException -> "Нет подключения к интернету"
-            is SocketTimeoutException -> "Превышено время ожидания ответа"
+            is UnknownHostException ->  R.string.no_network_connection
+            is SocketTimeoutException -> R.string.response_timeout
             is HttpException -> when (error.code()) {
-                401 -> "Неавторизованный доступ"
-                500 -> "Внутренняя ошибка сервера"
-                else -> "Ошибка сервера (${error.code()})"
+                401 -> R.string.unauthorised_access
+                500 -> R.string.internal_server_error
+                else -> R.string.unknown_error
             }
-            else -> "Не удалось загрузить категории"
+            else -> {
+                R.string.failed_to_load_categories
+            }
         }
     }
 }

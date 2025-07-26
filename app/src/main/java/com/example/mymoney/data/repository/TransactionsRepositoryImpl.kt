@@ -1,15 +1,17 @@
 package com.example.mymoney.data.repository
 
+import com.example.core.common.utils.DateUtils
+import com.example.core.domain.entity.CategoryAnalysis
+import com.example.core.domain.entity.Resource
+import com.example.core.domain.entity.SavedTransaction
+import com.example.core.domain.entity.Transaction
+import com.example.core.domain.repository.TransactionsRepository
 import com.example.mymoney.data.local.datasource.TransactionDao
+import com.example.mymoney.data.local.entity.LocalTransaction
 import com.example.mymoney.data.remote.datasource.TransactionsRemoteDataSource
 import com.example.mymoney.data.remote.dto.TransactionRequest
 import com.example.mymoney.data.repository.base.BaseRepository
-import com.example.mymoney.data.utils.Resource
 import com.example.mymoney.data.utils.networkBoundResource
-import com.example.mymoney.domain.entity.SavedTransaction
-import com.example.mymoney.domain.entity.Transaction
-import com.example.mymoney.domain.repository.TransactionsRepository
-import com.example.mymoney.presentation.screens.analysis.model.CategoryAnalysis
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -53,6 +55,29 @@ class TransactionsRepositoryImpl @Inject constructor(
             )
             remoteDataSource.createTransaction(request).toDomain()
         }
+    }
+
+    private suspend fun saveTransactionLocally(
+        categoryId: Int,
+        amount: String,
+        transactionDate: String,
+        comment: String?,
+        isSynced: Boolean
+    ): LocalTransaction {
+        val currentTime = DateUtils.getCurrentIso()
+
+        val localTransaction = LocalTransaction(
+            categoryId = categoryId,
+            amount = amount,
+            transactionDate = transactionDate,
+            comment = comment,
+            createdAt = currentTime,
+            updatedAt = currentTime,
+            isSynced = isSynced
+        )
+
+        localDataSource.upsert(localTransaction)
+        return localTransaction
     }
 
     override suspend fun updateTransaction(
@@ -101,7 +126,30 @@ class TransactionsRepositoryImpl @Inject constructor(
         return networkBoundResource(
             query = {
                 localDataSource
-                    .observeTransactionsByPeriod(isIncome, startDate, endDate)
+                    .observeTransactionsByTypeAndPeriod(isIncome, startDate, endDate)
+                    .map { list -> list.map { it.toDomain() } }
+            },
+            fetch = {
+                remoteDataSource
+                    .getTransactionsByPeriod(accountId, startDate, endDate)
+            },
+            saveFetchResult = { remote ->
+                localDataSource.upsertAll(remote.map { it.toLocal() })
+            },
+            shouldFetch = { true },
+            onFetchFailed = { e -> e }
+        )
+    }
+
+    override fun observeTransactionsByPeriod(
+        accountId: Int,
+        startDate: String,
+        endDate: String
+    ): Flow<Resource<List<Transaction>>> {
+        return networkBoundResource(
+            query = {
+                localDataSource
+                    .observeTransactionsByPeriod(startDate, endDate)
                     .map { list -> list.map { it.toDomain() } }
             },
             fetch = {
@@ -141,8 +189,8 @@ class TransactionsRepositoryImpl @Inject constructor(
                             categoryName = localAnalysis.categoryName,
                             categoryEmoji = localAnalysis.categoryEmoji,
                             isIncome = localAnalysis.isIncome,
-                            percentage = "${percentage}%",
-                            totalAmount = localAnalysis.totalAmount.toString()
+                            percentage = percentage,
+                            totalAmount = localAnalysis.totalAmount
                         )
                     }
                     Pair(total, categoryAnalysisList)
@@ -159,6 +207,23 @@ class TransactionsRepositoryImpl @Inject constructor(
                 localDataSource.upsertAll(remote.map { it.toLocal() })
             },
             shouldFetch = { true },
+            onFetchFailed = { e -> e }
+        )
+    }
+
+    override fun observeTransaction(transactionId: Int): Flow<Resource<Transaction?>> {
+        return networkBoundResource(
+            query = {
+                localDataSource.observeTransactionById(transactionId)
+                    .map { it?.toDomain() }
+            },
+            fetch = {
+                remoteDataSource.getTransaction(transactionId)
+            },
+            saveFetchResult = { remote ->
+                localDataSource.upsert(remote.toLocal())
+            },
+            shouldFetch = { false },
             onFetchFailed = { e -> e }
         )
     }

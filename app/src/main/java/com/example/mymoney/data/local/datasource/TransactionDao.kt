@@ -3,9 +3,9 @@ package com.example.mymoney.data.local.datasource
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
+import com.example.core.domain.entity.Category
+import com.example.core.domain.entity.Transaction
 import com.example.mymoney.data.local.entity.LocalTransaction
-import com.example.mymoney.domain.entity.Category
-import com.example.mymoney.domain.entity.Transaction
 import kotlinx.coroutines.flow.Flow
 import java.math.BigDecimal
 
@@ -20,11 +20,32 @@ interface TransactionDao {
     AND DATE(t.transactionDate) BETWEEN DATE(:startDate) AND DATE(:endDate)
     ORDER BY t.transactionDate DESC, t.createdAt DESC
 """)
-    fun observeTransactionsByPeriod(
+    fun observeTransactionsByTypeAndPeriod(
         isIncome: Boolean,
         startDate: String,
         endDate: String
     ): Flow<List<TransactionWithCategory>>
+
+    @Query("""
+    SELECT t.*, c.name as categoryName, c.emoji as categoryEmoji, c.isIncome as categoryIsIncome 
+    FROM `transaction` as t 
+    INNER JOIN category as c ON t.categoryId = c.id 
+    AND DATE(t.transactionDate) BETWEEN DATE(:startDate) AND DATE(:endDate)
+    ORDER BY t.transactionDate DESC, t.createdAt DESC
+""")
+    fun observeTransactionsByPeriod(
+        startDate: String,
+        endDate: String
+    ): Flow<List<TransactionWithCategory>>
+
+    @Query("""
+        SELECT t.*, c.name as categoryName, c.emoji as categoryEmoji, c.isIncome as categoryIsIncome 
+        FROM `transaction` as t 
+        INNER JOIN category as c ON t.categoryId = c.id 
+        WHERE t.localId = :localId
+    """)
+    fun observeTransactionById(localId: Int): Flow<TransactionWithCategory?>
+
 
     @Query("""
         SELECT 
@@ -33,7 +54,7 @@ interface TransactionDao {
             c.emoji as categoryEmoji,
             c.isIncome as isIncome,
             SUM(t.amount) as totalAmount,
-            COUNT(t.id) as transactionCount
+            COUNT(t.localId) as transactionCount
         FROM `transaction` t
         INNER JOIN category c ON t.categoryId = c.id
         WHERE isIncome = :isIncome
@@ -60,15 +81,23 @@ interface TransactionDao {
         endDate: String
     ): Flow<BigDecimal>
 
+    @Query("""
+        SELECT * FROM `transaction` 
+        WHERE isSynced = 0
+    """)
+    suspend fun getUnsyncedTransactions(): List<LocalTransaction>
+
     @Upsert
     suspend fun upsert(task: LocalTransaction)
 
     @Upsert
     suspend fun upsertAll(tasks: List<LocalTransaction>)
+
 }
 
 data class TransactionWithCategory(
-    val id: Int,
+    val localId: Int,
+    val serverId: Int?,
     val categoryId: Int,
     val amount: String,
     val transactionDate: String,
@@ -80,7 +109,7 @@ data class TransactionWithCategory(
     val categoryIsIncome: Boolean
 ) {
     fun toDomain() = Transaction(
-        id = id,
+        id = localId,
         category = Category(
             id = categoryId,
             name = categoryName,

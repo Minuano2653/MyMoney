@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">My money</string>
+    <string name="top_bar_title_expenses">Expenses today</string>
+    <string name="top_bar_title_incomes">Income today</string>
+    <string name="top_bar_title_account">My account</string>
+    <string name="top_bar_title_my_expenses">My expenses</string>
+    <string name="top_bar_title_my_incomes">My incomes</string>
+    <string name="top_bar_title_categories">My categories</string>
+    <string name="top_bar_title_settings">Settings</string>
+    <string name="top_bar_title_history">My history</string>
+    <string name="top_bar_title_analysis">Analysis</string>
+
+    <string name="dialog_clear_button">Clear</string>
+    <string name="dialog_negative_button">Cancel</string>
+    <string name="dialog_positive_button">Ok</string>
+
+    <string name="fab_description">Add</string>
+
+    <string name="list_item_text_currency">Currency</string>
+    <string name="list_item_text_total">Total</string>
+    <string name="list_item_text_start">Start</string>
+    <string name="list_item_text_period_start">Period: start</string>
+    <string name="list_item_text_period_end">Period: end</string>
+    <string name="list_item_text_end">End</string>
+    <string name="list_item_text_sum">Amount</string>
+    <string name="list_item_text_account">Account</string>
+    <string name="list_item_text_category">Category</string>
+    <string name="list_item_text_date">Date</string>
+    <string name="list_item_text_time">Time</string>
+
+    <string name="search_field_placeholder">Find category</string>
+    <string name="comment_placeholder">Comment</string>
+    <string name="amount_placeholder">Enter amount</string>
+    <string name="account_name_placeholder">Account name</string>
+    <string name="balance_placeholder">Balance</string>
+    <string name="search_field_icon_description">Search</string>
+
+    <string name="settings_item_night_theme">Dark theme</string>
+    <string name="settings_item_primary_color">Primary color</string>
+    <string name="settings_item_sounds">Sounds</string>
+    <string name="settings_item_haptic">Haptics</string>
+    <string name="settings_item_password">Password code</string>
+    <string name="settings_item_sync">Synchronization</string>
+    <string name="settings_item_lang">Language</string>
+    <string name="settings_item_about">About</string>
+
+    <string name="bottom_label_expenses">Expenses</string>
+    <string name="bottom_label_incomes">Income</string>
+    <string name="bottom_label_account">Account</string>
+    <string name="bottom_label_categories">Categories</string>
+    <string name="bottom_label_settings">Settings</string>
+
+    <string name="button_delete_expense">Delete expense</string>
+    <string name="button_delete_income">Delete income</string>
+
+    <string name="no_analysis_data">No data for analysis</string>
+
+    <string name="no_history_data">No history for selected period</string>
+
+    <string name="no_network_connection">No internet connection</string>
+    <string name="network_connection_restored">Connection restored</string>
+    
+    <string name="response_timeout">Response timeout exceeded</string>
+
+    <string name="ruble_lable">Russian Ruble ₽</string>
+    <string name="ruble_code">₽</string>
+
+    <string name="dollar_lable">US Dollar $</string>
+    <string name="dollar_code">$</string>
+
+    <string name="euro_lable">Euro €</string>
+    <string name="euro_code">€</string>
+
+    <string name="incorrect_id_or_date">Invalid account ID or date format</string>
+    <string name="incorrect_data_or_id">Invalid data or ID format</string>
+    <string name="incorrect_id">Invalid ID format</string>
+    <string name="incorrect_data">Invalid data</string>
+    <string name="unauthorised_access">Unauthorized access</string>
+    <string name="internal_server_error">Internal server error</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="failed_to_load_data">Failed to load data</string>
+    <string name="data_not_found">Data not found</string>
+    <string name="account_not_found">Account not found</string>
+    <string name="transaction_not_found">Transaction not found</string>
+
+    <string name="trs_account_ctg_not_found">Transaction, account or category not found</string>
+    <string name="failed_to_save_transaction">Failed to save transaction</string>
+    <string name="failed_to_load_categories">Failed to load categories</string>
+
+    <string name="choose_category_error">Please select a category</string>
+    <string name="invalid_sum_format">Invalid amount format</string>
+    <string name="invalid_balance_format">Invalid balance format</string>
+    <string name="empty_account_error">Account name cannot be empty</string>
+
+    <string name="about_item_app_name">App name</string>
+    <string name="about_item_version">Version</string>
+    <string name="about_item_last_update">Last update</string>
+    <string name="about_app_error">Failed to load application data</string>
+
+    <string name="error_loading_language">Error loading language settings</string>
+    <string name="error_saving_language">Error saving language settings</string>
+
+    <string name="error_load_theme">Error loading the theme</string>
+    <string name="error_save_theme">Error saving the theme</string>
+
+    <string name="theme_default">Standard</string>
+    <string name="theme_blue">Blue</string>
+    <string name="theme_green">Green</string>
+    <string name="theme_orange">Orange</string>
+    <string name="theme_purple">Purple</string>
+    <string name="choose_theme">Choose theme</string>
+    <string name="dark_mode">Dark mode</string>
+    <string name="dark_mode_description">Enable dark mode for the selected colour theme</string>
+    <string name="color_themes">Color themes</string>
+
+    <string name="create_password_label">Create PIN</string>
+    <string name="enter_password_title">Enter password</string>
+
+    <string name="confirm_password_label">Confirm PIN</string>
+
+    <string name="create_password_title">Create a 4-digit PIN</string>
+    <string name="confirm_password_title">Please, confirm your PIN code</string>
+    <string name="pin_dont_match_error">PIN codes don\'t match</string>
+    <string name="create_pin_error">PIN creation error</string>
+
+
+</resources>

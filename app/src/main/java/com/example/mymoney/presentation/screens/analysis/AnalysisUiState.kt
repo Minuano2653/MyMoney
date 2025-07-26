@@ -1,8 +1,8 @@
 package com.example.mymoney.presentation.screens.analysis
 
-import com.example.mymoney.presentation.base.contract.BaseUiState
-import com.example.mymoney.presentation.screens.analysis.model.CategoryAnalysis
-import com.example.mymoney.utils.DateUtils
+import com.example.core.common.utils.DateUtils
+import com.example.core.domain.entity.CategoryAnalysis
+import com.example.core.ui.contract.BaseUiState
 import java.math.BigDecimal
 
 data class AnalysisUiState(

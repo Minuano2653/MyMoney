@@ -1,6 +1,6 @@
 package com.example.mymoney.presentation.screens.analysis
 
-import com.example.mymoney.presentation.base.contract.BaseEvent
+import com.example.core.ui.contract.BaseEvent
 
 sealed class AnalysisEvent: BaseEvent {
     object LoadAnalysis : AnalysisEvent()

@@ -1,13 +1,13 @@
 package com.example.mymoney.presentation.screens.expenses
 
 import androidx.lifecycle.viewModelScope
-import com.example.mymoney.data.utils.Resource
-import com.example.mymoney.domain.usecase.GetTransactionsByTypeAndPeriodUseCase
-import com.example.mymoney.domain.usecase.ObserveAccountUseCase
-import com.example.mymoney.domain.usecase.ObserveTransactionsByTypeAndPeriodUseCase
-import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
-import com.example.mymoney.utils.DateUtils
-import com.example.mymoney.utils.NetworkMonitor
+import com.example.core.domain.entity.Resource
+import com.example.core.domain.usecase.GetTransactionsByTypeAndPeriodUseCase
+import com.example.core.domain.usecase.ObserveAccountUseCase
+import com.example.core.domain.usecase.ObserveTransactionsByTypeAndPeriodUseCase
+import com.example.core.ui.viewmodel.BaseViewModel
+import com.example.core.common.utils.DateUtils
+import com.example.mymoney.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -25,9 +25,7 @@ class ExpensesViewModel @Inject constructor(
     private val getTransactionsByTypeAndPeriodUseCase: GetTransactionsByTypeAndPeriodUseCase,
     observeTransactionsByTypeAndPeriodUseCase: ObserveTransactionsByTypeAndPeriodUseCase,
     observeAccountUseCase: ObserveAccountUseCase,
-    networkMonitor: NetworkMonitor
 ): BaseViewModel<ExpensesUiState, ExpensesEvent, ExpensesSideEffect>(
-    networkMonitor,
     ExpensesUiState()
 ) {
     override val uiState: StateFlow<ExpensesUiState> =
@@ -45,7 +43,6 @@ class ExpensesViewModel @Inject constructor(
                     expenses = expensesResource.data ?: emptyList(),
                     total = expensesResource.data?.sumOf { it.amount } ?: BigDecimal.ZERO,
                     currency = account?.currency ?: _uiState.value.currency,
-                    error = null
                 )
 
                 is Resource.Success -> {
@@ -55,7 +52,6 @@ class ExpensesViewModel @Inject constructor(
                         expenses = expenses,
                         total = expenses.sumOf { it.amount },
                         currency = account?.currency ?: _uiState.value.currency,
-                        error = null
                     )
                 }
 
@@ -68,7 +64,6 @@ class ExpensesViewModel @Inject constructor(
                         expenses = expensesResource.data ?: emptyList(),
                         total = expensesResource.data?.sumOf { it.amount } ?: BigDecimal.ZERO,
                         currency = account?.currency ?: _uiState.value.currency,
-                        error = message
                     )
                 }
             }
@@ -97,9 +92,15 @@ class ExpensesViewModel @Inject constructor(
 
     private fun loadExpenses() {
         viewModelScope.launch(Dispatchers.IO) {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+            _uiState.update { it.copy(isLoading = true) }
 
-            val result = getTransactionsByTypeAndPeriodUseCase(isIncome = false)
+            val today = DateUtils.getTodayYearMonthDayFormatted()
+
+            val result = getTransactionsByTypeAndPeriodUseCase(
+                isIncome = false,
+                startDate = today,
+                endDate = today
+            )
             result
                 .onSuccess { expenses ->
                     _uiState.update {
@@ -107,7 +108,6 @@ class ExpensesViewModel @Inject constructor(
                             expenses = expenses,
                             total = expenses.sumOf { expense -> expense.amount },
                             isLoading = false,
-                            error = null
                         )
                     }
                 }
@@ -119,25 +119,18 @@ class ExpensesViewModel @Inject constructor(
         }
     }
 
-    override fun onNetworkStateChanged(isConnected: Boolean) {
-        _uiState.update { it.copy(isNetworkAvailable = isConnected) }
-        if (!isConnected) {
-            emitEffect(ExpensesSideEffect.ShowError("Нет подключения к интернету"))
-        }
-    }
-
-    private fun mapErrorToMessage(error: Throwable?): String {
+    private fun mapErrorToMessage(error: Throwable?): Int {
         return when (error) {
-            is UnknownHostException -> "Нет подключения к интернету"
-            is SocketTimeoutException -> "Превышено время ожидания ответа"
+            is UnknownHostException ->  R.string.no_network_connection
+            is SocketTimeoutException -> R.string.response_timeout
             is HttpException -> when (error.code()) {
-                400 -> "Неверный формат ID счета или некорректный формат дат"
-                401 -> "Неавторизованный доступ"
-                500 -> "Внутренняя ошибка сервера"
-                else -> "Ошибка сервера (${error.code()})"
+                400 -> R.string.incorrect_id_or_date
+                401 -> R.string.unauthorised_access
+                500 -> R.string.internal_server_error
+                else -> R.string.unknown_error
             }
             else -> {
-                "Не удалось загрузить данные"
+                R.string.failed_to_load_data
             }
         }
     }

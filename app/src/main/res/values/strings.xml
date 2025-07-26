@@ -3,14 +3,16 @@
     <string name="top_bar_title_expenses">Расходы сегодня</string>
     <string name="top_bar_title_incomes">Доходы сегодня</string>
     <string name="top_bar_title_account">Мой счет</string>
+    <string name="top_bar_title_my_expenses">Мои расходы</string>
+    <string name="top_bar_title_my_incomes">Мои доходы</string>
     <string name="top_bar_title_categories">Мои статьи</string>
     <string name="top_bar_title_settings">Настройки</string>
     <string name="top_bar_title_history">Моя история</string>
     <string name="top_bar_title_analysis">Анализ</string>
 
-    <string name="date_picker_clear_button">Очистить</string>
-    <string name="date_picker_dismiss_button">Отмена</string>
-    <string name="date_picker_ok_button">Ок</string>
+    <string name="dialog_clear_button">Очистить</string>
+    <string name="dialog_negative_button">Отмена</string>
+    <string name="dialog_positive_button">Ок</string>
 
     <string name="fab_description">Добавить</string>
 
@@ -21,8 +23,16 @@
     <string name="list_item_text_period_end">Период: конец</string>
     <string name="list_item_text_end">Конец</string>
     <string name="list_item_text_sum">Сумма</string>
+    <string name="list_item_text_account">Счет</string>
+    <string name="list_item_text_category">Статья</string>
+    <string name="list_item_text_date">Дата</string>
+    <string name="list_item_text_time">Время</string>
 
     <string name="search_field_placeholder">Найти статью</string>
+    <string name="comment_placeholder">Комментарий</string>
+    <string name="amount_placeholder">Введите сумму</string>
+    <string name="account_name_placeholder">Название счёта</string>
+    <string name="balance_placeholder">Баланс</string>
     <string name="search_field_icon_description">Поиск</string>
 
     <string name="settings_item_night_theme">Тёмная тема</string>
@@ -46,5 +56,69 @@
     <string name="no_analysis_data">Нет данных для анализа</string>
 
     <string name="no_history_data">Нет истории за выбранный период</string>
+
+    <string name="no_network_connection">Нет подключения к интернету</string>
+    <string name="network_connection_restored">Соединение восстановлено</string>
+    
+    <string name="response_timeout">Превышено время ожидания ответа</string>
+
+    <string name="ruble_lable">Российский рубль ₽</string>
+    <string name="ruble_code">₽</string>
+
+    <string name="dollar_lable">Американский доллар $</string>
+    <string name="dollar_code">$</string>
+
+    <string name="euro_lable">Евро €"</string>
+    <string name="euro_code">€"</string>
+
+    <string name="incorrect_id_or_date">Неверный формат ID счета или некорректный формат дат</string>
+    <string name="incorrect_data_or_id">Некорректные данные или неверный формат ID</string>
+    <string name="incorrect_id">Неверный формат ID</string>
+    <string name="incorrect_data">Неверные данные</string>
+    <string name="unauthorised_access">Неавторизованный доступ</string>
+    <string name="internal_server_error">Внутренняя ошибка сервера</string>
+    <string name="unknown_error">Неизвестная ошибка</string>
+    <string name="failed_to_load_data">Не удалось загрузить данные</string>
+    <string name="data_not_found">Данные не найдены</string>
+    <string name="account_not_found">Счёт не найден</string>
+    <string name="transaction_not_found">Транзакция не найдена</string>
+    <string name="trs_account_ctg_not_found">Транзакция, счет или категория не найдены</string>
+    <string name="failed_to_save_transaction">Не удалось сохранить транзакцию</string>
+    <string name="failed_to_load_categories">Не удалось загрузить категории</string>
+
+    <string name="choose_category_error">Выберите категорию</string>
+    <string name="invalid_sum_format">Неверный формат суммы</string>
+    <string name="invalid_balance_format">Неверный формат баланса</string>
+    <string name="empty_account_error">Название счёта не может быть пустым</string>
+
+    <string name="about_item_app_name">Название приложения</string>
+    <string name="about_item_version">Версия</string>
+    <string name="about_item_last_update">Последнее обновление</string>
+    <string name="about_app_error">Не удалось загрузить данные о приложении</string>
+
+    <string name="error_loading_language">Ошибка загрузки настроек языка</string>
+    <string name="error_saving_language">Ошибка сохранения настроек языка</string>
+
+    <string name="error_load_theme">Ошибка загрузки темы</string>
+    <string name="error_save_theme">Ошибка сохранения темы</string>
+
+    <string name="theme_default">Стандартная</string>
+    <string name="theme_blue">Синяя</string>
+    <string name="theme_green">Зеленая</string>
+    <string name="theme_orange">Оранжевая</string>
+    <string name="theme_purple">Фиолетовая</string>
+    <string name="choose_theme">Выбор темы</string>
+    <string name="dark_mode">Темный режим</string>
+    <string name="dark_mode_description">Включить темный режим для выбранной цветовой темы</string>
+    <string name="color_themes">Цветовые темы</string>
+
+    <string name="create_password_title">Создание пароля</string>
+    <string name="enter_password_title">Введите пароль</string>
+    <string name="confirm_password_title">Подтверждение пароля</string>
+
+    <string name="create_password_label">Введите 4-значный пароль</string>
+    <string name="confirm_password_label">Пожалуйста, подвердите пароль</string>
+    <string name="pin_dont_match_error">Пароль не совпадает</string>
+    <string name="create_pin_error">Ошибка создания пароля</string>
 
 </resources>

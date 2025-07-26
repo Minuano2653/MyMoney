@@ -2,7 +2,7 @@ package com.example.mymoney.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.mymoney.domain.entity.Account
+import com.example.core.domain.entity.Account
 import java.math.BigDecimal
 
 @Entity(

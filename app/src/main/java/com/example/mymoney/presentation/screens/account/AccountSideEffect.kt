@@ -1,6 +1,6 @@
 package com.example.mymoney.presentation.screens.account
 
-import com.example.mymoney.presentation.base.contract.BaseSideEffect
+import com.example.core.ui.contract.BaseSideEffect
 
 /**
  * Сайд-эффекты, связанные с экраном аккаунта.
@@ -8,5 +8,5 @@ import com.example.mymoney.presentation.base.contract.BaseSideEffect
  */
 sealed class AccountSideEffect: BaseSideEffect {
     data class NavigateToEditAccount(val accountId: Int): AccountSideEffect()
-    data class ShowError(val message: String): AccountSideEffect()
+    data class ShowError(val message: Int): AccountSideEffect()
 }

@@ -1,9 +1,8 @@
 package com.example.mymoney.presentation.screens.edit_transaction
 
-import com.example.mymoney.domain.entity.Account
-import com.example.mymoney.domain.entity.Category
-import com.example.mymoney.presentation.base.contract.BaseUiState
-import com.example.mymoney.utils.DateUtils
+import com.example.core.domain.entity.Account
+import com.example.core.domain.entity.Category
+import com.example.core.ui.contract.BaseUiState
 
 data class EditTransactionUiState(
     val isLoadingCategories: Boolean = false,
@@ -21,7 +20,5 @@ data class EditTransactionUiState(
     val showCategorySheet: Boolean = false,
     val showDatePicker: Boolean = false,
     val showTimePicker: Boolean = false,
-    val error: String? = null,
     val isIncome: Boolean = false,
-    val transactionId: Int = -1,
 ): BaseUiState

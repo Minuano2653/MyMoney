@@ -1,7 +1,7 @@
 package com.example.mymoney.presentation.screens.categories
 
-import com.example.mymoney.domain.entity.Category
-import com.example.mymoney.presentation.base.contract.BaseUiState
+import com.example.core.domain.entity.Category
+import com.example.core.ui.contract.BaseUiState
 
 /**
  * Состояние UI для экрана статей.
@@ -15,6 +15,6 @@ data class CategoriesUiState(
     val isLoading: Boolean = false,
     val categories: List<Category> = emptyList(),
     val searchQuery: String = "",
-    val error: String? = null,
+    val error: Int? = null,
     val isNetworkAvailable: Boolean = true
 ): BaseUiState

@@ -21,4 +21,9 @@ dependencyResolutionManagement {
 
 rootProject.name = "My money"
 include(":app")
- 
+include(":core")
+include(":core:ui")
+include(":core:domain")
+include(":core:common")
+include(":core:network")
+include(":core:ui:charts")

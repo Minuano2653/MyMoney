@@ -1,9 +1,9 @@
 package com.example.mymoney.presentation.screens.splash
 
 import androidx.lifecycle.viewModelScope
-import com.example.mymoney.domain.usecase.InitializeAppDataUseCase
-import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
-import com.example.mymoney.utils.NetworkMonitor
+import com.example.core.domain.usecase.InitializeAppDataUseCase
+import com.example.core.ui.viewmodel.BaseViewModel
+import com.example.mymoney.domain.IsPinCodeSetUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -11,12 +11,10 @@ import javax.inject.Inject
 
 class SplashViewModel @Inject constructor(
     private val initializeAppDataUseCase: InitializeAppDataUseCase,
-    networkMonitor: NetworkMonitor
+    private val isPinCodeSetUseCase: IsPinCodeSetUseCase
 ) : BaseViewModel<SplashUiState, SplashEvent, SplashSideEffect>(
-    networkMonitor,
     SplashUiState()
 ) {
-
     override fun handleEvent(event: SplashEvent) {
         when (event) {
             SplashEvent.LoadAccount -> loadAccount()
@@ -27,16 +25,17 @@ class SplashViewModel @Inject constructor(
         viewModelScope.launch {
             delay(1000)
 
-            val result = initializeAppDataUseCase()
-            result.fold(
-                onSuccess = {
-                    _uiState.update { it.copy(isLoading = false) }
-                },
-                onFailure = { e ->
-                    _uiState.update { it.copy(isLoading = false) }
-                }
-            )
-            emitEffect(SplashSideEffect.NavigateToMain)
+            val initResult = initializeAppDataUseCase()
+
+            val isPinSet = isPinCodeSetUseCase().getOrDefault(false)
+
+            _uiState.update { it.copy(isLoading = false) }
+
+            if (isPinSet) {
+                emitEffect(SplashSideEffect.NavigateToEnterPin)
+            } else {
+                emitEffect(SplashSideEffect.NavigateToMain)
+            }
         }
     }
 }

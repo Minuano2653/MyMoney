@@ -1,13 +1,11 @@
 package com.example.mymoney.presentation.screens.expenses
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -17,23 +15,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mymoney.R
-import com.example.mymoney.presentation.base.viewmodel.daggerViewModel
-import com.example.mymoney.presentation.components.CustomFloatingActionButton
-import com.example.mymoney.presentation.components.CustomTopAppBar
-import com.example.mymoney.presentation.components.Divider
-import com.example.mymoney.presentation.components.EmojiIcon
-import com.example.mymoney.presentation.components.ListItemComponent
-import com.example.mymoney.presentation.components.TrailingIcon
+import com.example.core.ui.components.CustomFloatingActionButton
+import com.example.core.ui.components.CustomTopAppBar
+import com.example.core.ui.components.Divider
+import com.example.core.ui.components.EmojiIcon
+import com.example.core.ui.components.ListItemComponent
+import com.example.core.ui.components.LoadingCircularIndicator
+import com.example.core.ui.components.TrailingIcon
+import com.example.mymoney.presentation.daggerViewModel
 import com.example.mymoney.presentation.theme.MyMoneyTheme
-import com.example.mymoney.utils.formatAmount
-import com.example.mymoney.utils.toSymbol
+import com.example.core.common.utils.formatAmount
+import com.example.core.common.utils.toSymbol
+import com.example.core.domain.entity.Transaction
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -62,25 +62,32 @@ fun ExpensesScreen(
             CustomFloatingActionButton(
                 onClick = {
                     viewModel.handleEvent(ExpensesEvent.OnAddClicked)
-                }
+                },
+                iconRes = R.drawable.ic_add,
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        ExpensesScreenContent(
-            uiState = uiState,
-            onEvent = viewModel::handleEvent,
-            modifier = modifier.padding(paddingValues)
+        TransactionsScreenContent(
+            isLoading = uiState.isLoading,
+            transactions = uiState.expenses,
+            onExpenseClick = { expense ->
+                viewModel.handleEvent(ExpensesEvent.OnTransactionClicked(expense))
+            },
+            total = uiState.total.formatAmount(),
+            currency = uiState.currency.toSymbol(),
+            modifier = modifier.padding(paddingValues),
         )
     }
 
+    val context = LocalContext.current
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collectLatest { effect ->
             when (effect) {
                 is ExpensesSideEffect.ShowError -> {
-                    snackbarHostState.showSnackbar(effect.message)
+                    snackbarHostState.showSnackbar(context.getString(effect.message))
                 }
                 is ExpensesSideEffect.NavigateToHistory -> {
                     onNavigateToHistory()
@@ -99,36 +106,37 @@ fun ExpensesScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExpensesScreenContent(
+fun TransactionsScreenContent(
     modifier: Modifier = Modifier,
-    uiState: ExpensesUiState,
-    onEvent: (ExpensesEvent) -> Unit,
+    isLoading: Boolean,
+    transactions: List<Transaction>,
+    onExpenseClick: (Transaction) -> Unit,
+    total: String,
+    currency: String,
 ) {
-    if (uiState.isLoading) {
-        Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
-        }
+    if (isLoading) {
+        LoadingCircularIndicator()
     } else {
         Column(modifier = modifier.fillMaxSize()) {
             ListItemComponent(
                 title = stringResource(R.string.list_item_text_total),
-                trailingText = "${uiState.total.formatAmount()} ${uiState.currency.toSymbol()}",
+                trailingText = "$total $currency",
                 backgroundColor = MaterialTheme.colorScheme.secondary,
                 itemHeight = 56.dp
             )
             Divider()
             LazyColumn {
                 itemsIndexed(
-                    uiState.expenses,
+                    transactions,
                     key = { _, expense -> expense.id }
                 ) { _, expense ->
                     ListItemComponent(
                         title = expense.category.name,
                         subtitle = expense.comment,
-                        trailingText = "${expense.amount.formatAmount()} ${uiState.currency.toSymbol()}",
+                        trailingText = "${expense.amount.formatAmount()} $currency",
                         leadingIcon = { EmojiIcon(emoji = expense.category.emoji) },
-                        trailingIcon = { TrailingIcon() },
-                        onClick = { onEvent(ExpensesEvent.OnTransactionClicked(expense)) }
+                        trailingIcon = { TrailingIcon(R.drawable.ic_more_vert) },
+                        onClick = { onExpenseClick(expense) }
                     )
                     Divider()
                 }
@@ -141,9 +149,12 @@ fun ExpensesScreenContent(
 @Composable
 fun ExpensesScreenContentPreview() {
     MyMoneyTheme {
-        ExpensesScreenContent(
-            uiState = ExpensesUiState(),
-            onEvent = {}
+        TransactionsScreenContent(
+            transactions = emptyList(),
+            onExpenseClick = { },
+            total = "1111",
+            currency = "RUB",
+            isLoading = false
         )
     }
 }

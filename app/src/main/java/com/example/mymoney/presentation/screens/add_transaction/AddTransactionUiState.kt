@@ -1,9 +1,9 @@
 package com.example.mymoney.presentation.screens.add_transaction
 
-import com.example.mymoney.domain.entity.Account
-import com.example.mymoney.domain.entity.Category
-import com.example.mymoney.presentation.base.contract.BaseUiState
-import com.example.mymoney.utils.DateUtils
+import com.example.core.common.utils.DateUtils
+import com.example.core.domain.entity.Account
+import com.example.core.domain.entity.Category
+import com.example.core.ui.contract.BaseUiState
 
 data class AddTransactionUiState(
     val isLoadingCategories: Boolean = false,
@@ -21,7 +21,7 @@ data class AddTransactionUiState(
     val showCategorySheet: Boolean = false,
     val showDatePicker: Boolean = false,
     val showTimePicker: Boolean = false,
-    val error: String? = null,
+    val error: Int? = null,
     val isIncome: Boolean = false,
     val isEditMode: Boolean = false
 ): BaseUiState

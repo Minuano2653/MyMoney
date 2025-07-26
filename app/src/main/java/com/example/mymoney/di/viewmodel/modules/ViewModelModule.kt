@@ -4,13 +4,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.mymoney.di.viewmodel.factories.ViewModelFactory
 import com.example.mymoney.di.viewmodel.keys.ViewModelKey
+import com.example.mymoney.presentation.screens.settings.about.AboutViewModel
 import com.example.mymoney.presentation.screens.account.AccountViewModel
-import com.example.mymoney.presentation.screens.add_transaction.AddTransactionViewModel
 import com.example.mymoney.presentation.screens.categories.CategoriesViewModel
-import com.example.mymoney.presentation.screens.edit_transaction.EditTransactionViewModel
 import com.example.mymoney.presentation.screens.expenses.ExpensesViewModel
-import com.example.mymoney.presentation.screens.history.HistoryViewModel
 import com.example.mymoney.presentation.screens.incomes.IncomesViewModel
+import com.example.mymoney.presentation.screens.main.MainViewModel
+import com.example.mymoney.presentation.screens.settings.language.LanguageViewModel
+import com.example.mymoney.presentation.screens.settings.pincode.create.CreatePinViewModel
+import com.example.mymoney.presentation.screens.settings.pincode.enter.EnterPinViewModel
+import com.example.mymoney.presentation.screens.settings.theme.ThemeViewModel
 import com.example.mymoney.presentation.screens.splash.SplashViewModel
 import dagger.Binds
 import dagger.Module
@@ -20,6 +23,11 @@ import dagger.multibindings.IntoMap
 abstract class ViewModelModule {
     @Binds
     abstract fun bindViewModelFactory(factory: ViewModelFactory): ViewModelProvider.Factory
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(MainViewModel::class)
+    abstract fun bindMainViewModel(viewModel: MainViewModel): ViewModel
 
     @Binds
     @IntoMap
@@ -45,4 +53,29 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(SplashViewModel::class)
     abstract fun bindSplashViewModel(viewModel: SplashViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(AboutViewModel::class)
+    abstract fun bindAboutViewModel(viewModel: AboutViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(LanguageViewModel::class)
+    abstract fun bindLanguageViewModel(viewModel: LanguageViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(ThemeViewModel::class)
+    abstract fun bindThemeViewModel(viewModel: ThemeViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(CreatePinViewModel::class)
+    abstract fun bindCreatePinViewModel(viewModel: CreatePinViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(EnterPinViewModel::class)
+    abstract fun bindEnterPinViewModel(viewModel: EnterPinViewModel): ViewModel
 }

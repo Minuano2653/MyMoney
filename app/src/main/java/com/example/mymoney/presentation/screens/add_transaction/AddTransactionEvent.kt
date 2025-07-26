@@ -1,7 +1,7 @@
 package com.example.mymoney.presentation.screens.add_transaction
 
-import com.example.mymoney.domain.entity.Category
-import com.example.mymoney.presentation.base.contract.BaseEvent
+import com.example.core.domain.entity.Category
+import com.example.core.ui.contract.BaseEvent
 
 sealed class AddTransactionEvent : BaseEvent {
     object LoadCategories : AddTransactionEvent()

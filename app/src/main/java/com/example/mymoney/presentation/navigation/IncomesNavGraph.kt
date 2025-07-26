@@ -1,45 +1,71 @@
 package com.example.mymoney.presentation.navigation
 
-import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
+import com.example.mymoney.presentation.screens.add_transaction.AddTransactionScreen
+import com.example.mymoney.presentation.screens.analysis.AnalysisScreen
+import com.example.mymoney.presentation.screens.edit_transaction.EditTransactionScreen
+import com.example.mymoney.presentation.screens.history.HistoryScreen
+import com.example.mymoney.presentation.screens.incomes.IncomesScreen
 
 /**
  * Добавляет вложенный граф навигации для раздела "Доходы" в основной [NavGraphBuilder].
- *
- * @param incomesTodayScreenContent composable контент для экрана "Доходы сегодня".
- * @param incomesHistoryScreenContent composable контент для экрана "История доходов".
  */
 fun NavGraphBuilder.incomesNavGraph(
-    incomesTodayScreenContent: @Composable () -> Unit,
-    incomesHistoryScreenContent: @Composable (Boolean) -> Unit,
-    addIncomeScreenContent: @Composable (Boolean) -> Unit,
-    editIncomeScreenContent: @Composable (Boolean, Int) -> Unit,
-    incomesAnalysisScreenContent: @Composable (Boolean) -> Unit,
+    onNavigateToHistory: () -> Unit,
+    onNavigateToAddIncome: () -> Unit,
+    onNavigateToTransactionDetail: (Int) -> Unit,
+    onNavigateToAnalysis: (Boolean) -> Unit,
+    onNavigateBack: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     navigation<Incomes>(
         startDestination = IncomesToday
     ) {
         composable<IncomesToday> {
-            incomesTodayScreenContent()
+            IncomesScreen(
+                onNavigateToHistory = onNavigateToHistory,
+                onNavigateToAddIncome = onNavigateToAddIncome,
+                onNavigateToTransactionDetail = onNavigateToTransactionDetail,
+                modifier = modifier
+            )
         }
+
         composable<TransactionsHistory> { backStackEntry ->
-            val args = backStackEntry.toRoute<TransactionsHistory>()
-            incomesHistoryScreenContent(args.isIncome)
+            HistoryScreen(
+                onNavigateBack = onNavigateBack,
+                onNavigateToEditTransaction = onNavigateToTransactionDetail,
+                onNavigateToAnalysis = onNavigateToAnalysis,
+                modifier = modifier
+            )
         }
+
         composable<TransactionDetail> { backStackEntry ->
             val args = backStackEntry.toRoute<TransactionDetail>()
-            addIncomeScreenContent(args.isIncome)
+            AddTransactionScreen(
+                isIncome = args.isIncome,
+                onNavigateBack = onNavigateBack,
+                modifier = modifier
+            )
         }
+
         composable<EditTransaction> { backStackEntry ->
             val args = backStackEntry.toRoute<EditTransaction>()
-            editIncomeScreenContent(args.isIncome, args.transactionId)
+            EditTransactionScreen(
+                isIncome = args.isIncome,
+                onNavigateBack = onNavigateBack,
+                modifier = modifier
+            )
         }
+
         composable<Analysis> { backStackEntry ->
-            val args = backStackEntry.toRoute<Analysis>()
-            incomesAnalysisScreenContent(args.isIncome)
+            AnalysisScreen(
+                onNavigateBack = onNavigateBack,
+                modifier = modifier
+            )
         }
     }
 }

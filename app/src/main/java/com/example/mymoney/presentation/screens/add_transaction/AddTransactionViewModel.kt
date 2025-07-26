@@ -3,15 +3,15 @@ package com.example.mymoney.presentation.screens.add_transaction
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.example.mymoney.data.utils.Resource
-import com.example.mymoney.domain.usecase.CreateTransactionUseCase
-import com.example.mymoney.domain.usecase.GetCategoriesByTypeUseCase
-import com.example.mymoney.domain.usecase.ObserveAccountUseCase
-import com.example.mymoney.domain.usecase.ObserveCategoriesByTypeUseCase
-import com.example.mymoney.presentation.base.viewmodel.BaseViewModel
+import com.example.core.common.utils.DateUtils.combineDateAndTimeToIso
+import com.example.core.domain.entity.Resource
+import com.example.core.domain.usecase.CreateTransactionUseCase
+import com.example.core.domain.usecase.GetCategoriesByTypeUseCase
+import com.example.core.domain.usecase.ObserveAccountUseCase
+import com.example.core.domain.usecase.ObserveCategoriesByTypeUseCase
+import com.example.core.ui.viewmodel.BaseViewModel
+import com.example.mymoney.R
 import com.example.mymoney.presentation.navigation.TransactionDetail
-import com.example.mymoney.utils.DateUtils.combineDateAndTimeToIso
-import com.example.mymoney.utils.NetworkMonitor
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
@@ -31,9 +31,7 @@ class AddTransactionViewModel @AssistedInject constructor(
     @Assisted private val savedStateHandle: SavedStateHandle,
     observeAccountUseCase: ObserveAccountUseCase,
     observeCategoriesByTypeUseCase: ObserveCategoriesByTypeUseCase,
-    networkMonitor: NetworkMonitor,
 ) : BaseViewModel<AddTransactionUiState, AddTransactionEvent, AddTransactionSideEffect>(
-    networkMonitor,
     AddTransactionUiState()
 ) {
     private val isIncome: Boolean = savedStateHandle.toRoute<TransactionDetail>().isIncome
@@ -110,11 +108,11 @@ class AddTransactionViewModel @AssistedInject constructor(
         val currentState = uiState.value
 
         if (currentState.selectedCategory == null) {
-            emitEffect(AddTransactionSideEffect.ShowSnackbar("Выберите категорию"))
+            emitEffect(AddTransactionSideEffect.ShowSnackbar(R.string.choose_category_error))
             return
         }
         if (currentState.amount.toBigDecimalOrNull() == null) {
-            emitEffect(AddTransactionSideEffect.ShowSnackbar("Неверный формат суммы"))
+            emitEffect(AddTransactionSideEffect.ShowSnackbar(R.string.invalid_sum_format))
             return
         }
 
@@ -164,7 +162,7 @@ class AddTransactionViewModel @AssistedInject constructor(
                     }
                 },
                 onFailure = { error ->
-                    val message =mapErrorToMessage(error)
+                    val message = mapErrorToMessage(error)
                     _uiState.update { it.copy(isLoadingCategories = false) }
                     emitEffect(AddTransactionSideEffect.ShowSnackbar(message))
                 }
@@ -173,18 +171,18 @@ class AddTransactionViewModel @AssistedInject constructor(
     }
 
 
-    private fun mapErrorToMessage(error: Throwable?): String {
+    private fun mapErrorToMessage(error: Throwable?): Int {
         return when (error) {
-            is UnknownHostException -> "Нет подключения к интернету"
-            is SocketTimeoutException -> "Превышено время ожидания ответа"
+            is UnknownHostException -> R.string.no_network_connection
+            is SocketTimeoutException -> R.string.response_timeout
             is HttpException -> when (error.code()) {
-                400 -> "Некорректные данные"
-                401 -> "Неавторизованный доступ"
-                404 -> "Счет или категория не найдены"
-                500 -> "Внутренняя ошибка сервера"
-                else -> "Ошибка сервера (${error.code()})"
+                400 -> R.string.incorrect_data
+                401 -> R.string.unauthorised_access
+                404 -> R.string.data_not_found
+                500 -> R.string.internal_server_error
+                else -> R.string.unknown_error
             }
-            else -> "Не удалось сохранить транзакцию"
+            else -> R.string.failed_to_save_transaction
         }
     }
 }

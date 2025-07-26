@@ -1,8 +1,7 @@
 package com.example.mymoney.di
 
 import android.content.Context
-import com.example.mymoney.data.remote.datasource.AccountDataStore
-import com.example.mymoney.utils.NetworkMonitor
+import com.example.mymoney.data.local.datasource.AppDataStore
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -12,11 +11,6 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAccountDataStore(context: Context): AccountDataStore =
-        AccountDataStore(context)
-
-    @Provides
-    @Singleton
-    fun provideNetworkMonitor(context: Context): NetworkMonitor =
-        NetworkMonitor(context)
+    fun provideAppDataStore(context: Context): AppDataStore =
+        AppDataStore(context)
 }
